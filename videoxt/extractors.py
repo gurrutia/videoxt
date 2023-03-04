@@ -246,9 +246,7 @@ class BaseVideoExtractor:
         stop_time_display = f"{utils.seconds_to_timestamp(int(self.stop_second))} | {self.stop_second} seconds"
         if self.emoji:
             start_time_display = f"{C.EMOJI_MAP['start']} {start_time_display}"
-            stop_time_display = (
-                f"{C.EMOJI_MAP['stop']} {stop_time_display}"
-            )
+            stop_time_display = f"{C.EMOJI_MAP['stop']} {stop_time_display}"
 
         return dedent(
             f"""

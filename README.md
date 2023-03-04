@@ -6,6 +6,9 @@
   <b>videoxt</b> is a Python library and command-line tool that allows you to convert video frames to images, or create a GIF between two points in a video.
 </p>
 
+https://user-images.githubusercontent.com/3451528/222927520-6fd23a1f-b5f1-45db-b1db-2aa7e2566e47.mp4
+
+<br/>
 <p align="center">
   <a href="#installation">Installation</a> •
   <a href="#examples">Examples</a> •
@@ -49,6 +52,8 @@ Command-line equivalent:
 vxt images video.mp4
 ```
 
+<img src="https://user-images.githubusercontent.com/3451528/222924597-da48b568-cf13-4117-b5bf-cdecf4e006ce.jpg" alt="videoxt_example_1" width="700"></a>
+
 **Example 2**: Extract every `30th` frame from `50` seconds to the end of the video, save the images as `png`, resize the frames by `50%` and rotate the frames by `180` degrees.
 
 ```python
@@ -72,6 +77,8 @@ Command-line equivalent:
 vxt images video.mp4 --start-time 50 --capture-rate 30 --image-format png --resize 0.5 --rotate 180
 ```
 
+<img src="https://user-images.githubusercontent.com/3451528/222924619-f4e5b3d8-e743-476c-af86-da3b50b8b1a3.jpg" alt="videoxt_example_2" width="700"></a>
+
 **Example 3**: Create a GIF between `01:10` and `01:12` of the video at 1/4 the video speed, and resize the GIF to 640x480.
 
 ```python
@@ -93,6 +100,8 @@ Command-line equivalent:
 ```sh
 vxt gif video.mp4 --start-time 01:10 --stop-time 01:12 --speed 0.25 --dimensions 640 480
 ```
+
+<img src="https://user-images.githubusercontent.com/3451528/222924624-583b2ad2-b34c-4278-871b-094e13f83034.jpg" alt="videoxt_example_2" width="700"></a>
 
 ## Options
 

@@ -18,13 +18,13 @@
 ## Installation
 
 ```sh
-git clone https://github.com/gurrutia/videoxt.git
+pip install videoxt
 ```
 
 or
 
 ```sh
-pip install https://github.com/gurrutia/videoxt.git
+git clone https://github.com/gurrutia/videoxt.git
 ```
 
 ---

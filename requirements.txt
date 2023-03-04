@@ -1,0 +1,3 @@
+moviepy==1.0.3
+opencv-python==4.7.0.72
+rich==13.3.1

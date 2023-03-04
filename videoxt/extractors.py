@@ -242,8 +242,8 @@ class BaseVideoExtractor:
                 self.target_dimensions = self.video_dimensions
 
     def __str__(self) -> str:
-        start_time_display = f"{utils.seconds_to_timestamp(self.start_second)} | {self.start_second} seconds"
-        stop_time_display = f"{utils.seconds_to_timestamp(self.stop_second)} | {self.stop_second} seconds"
+        start_time_display = f"{utils.seconds_to_timestamp(int(self.start_second))} | {self.start_second} seconds"
+        stop_time_display = f"{utils.seconds_to_timestamp(int(self.stop_second))} | {self.stop_second} seconds"
         if self.emoji:
             start_time_display = f"{C.EMOJI_MAP['start']} {start_time_display}"
             stop_time_display = (

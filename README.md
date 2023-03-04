@@ -9,7 +9,7 @@
 <p align="center">
   <a href="#installation">Installation</a> •
   <a href="#examples">Examples</a> •
-  <a href="#command-line-options">CLI options</a> •
+  <a href="#command-line-options">Options</a> •
   <a href="#used-by">Used by</a>
 </p>
 
@@ -91,10 +91,10 @@ vtg.create_gif()
 Command-line equivalent:
 
 ```sh
-vxt gif video.mp4 --start-time 10:10 --stop-time 10:12 --speed 0.25 --dimensions 640 480
+vxt gif video.mp4 --start-time 01:10 --stop-time 01:12 --speed 0.25 --dimensions 640 480
 ```
 
-## Command-line options
+## Options
 
 ### Options / Shared
 

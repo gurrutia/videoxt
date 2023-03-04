@@ -101,8 +101,8 @@ vxt gif video.mp4 --start-time 10:10 --stop-time 10:12 --speed 0.25 --dimensions
 Argument&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Description
 ---|---
 **`video_path`** | Path to the video file with the extension. **(Required)**<br/><br/>Example: `C:/Users/gurrutia/Videos/video.mp4`
-**`--start-time`** | Specify the video extraction start time, in seconds or as a timestamp in the format `HH:MM:SS`, `H:MM:SS`, `MM:SS` or `M:SS`.<br/><br/>Example: `--start 1:30` or `--start 90`<br/><br/>Default: the start of the video.
-**`--stop-time`** | Specify the video extraction stop time, in seconds or as a timestamp in the format `HH:MM:SS`, `H:MM:SS`, `MM:SS` or `M:SS`.<br/><br/>Example: `--end 2:00` or `--end 120`<br/><br/>Default: the end of the video.
+**`--start-time`** | Specify the video extraction start time, in seconds or as a timestamp in the format `HH:MM:SS`, `H:MM:SS`, `MM:SS` or `M:SS`.<br/><br/>Example: `--start-time 1:30` or `--start-time 90`<br/><br/>Default: the start of the video.
+**`--stop-time`** | Specify the video extraction stop time, in seconds or as a timestamp in the format `HH:MM:SS`, `H:MM:SS`, `MM:SS` or `M:SS`.<br/><br/>Example: `--stop-time 2:00` or `--stop-time 120`<br/><br/>Default: the end of the video.
 **`--fps`** | Number of frames per second in the video file, overrides the video metadata frames per second. Use this option sparingly and only when the video metadata fps is incorrectly detected.<br/><br/>Example: `--fps 30`<br/><br/>Default: the video metadata fps.
 **`--dimensions`** | Specify the media output dimensions as space-separated values.<br/><br/>Example: `--dimensions 1920 1080`<br/><br/>Default: the native video dimensions.
 **`--resize`** | Resize the media output by a factor of *n*.<br/><br/>Example: `--resize 1.5` to increase the media output size by 50%<br/><br/>Default: 1.0, no resize.

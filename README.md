@@ -12,7 +12,7 @@ https://user-images.githubusercontent.com/3451528/222927520-6fd23a1f-b5f1-45db-b
 <p align="center">
   <a href="#installation">Installation</a> •
   <a href="#examples">Examples</a> •
-  <a href="#command-line-options">Options</a> •
+  <a href="#options">Options</a> •
   <a href="#used-by">Used by</a>
 </p>
 

@@ -69,18 +69,18 @@ vti.extract_images()
 Command-line equivalent:
 
 ```sh
-vxt images video.mp4 --start 50 --capture-rate 30 --image-format png --resize 0.5 --rotate 180
+vxt images video.mp4 --start-time 50 --capture-rate 30 --image-format png --resize 0.5 --rotate 180
 ```
 
-**Example 3**: Create a GIF between `10:10` and `10:12` of the video at 1/4 the video speed, and resize the GIF to 640x480.
+**Example 3**: Create a GIF between `01:10` and `01:12` of the video at 1/4 the video speed, and resize the GIF to 640x480.
 
 ```python
 from videoxt.extractors import VideoToGIF
 
 vtg = VideoToGIF(
   "C:/Users/gurrutia/Videos/video.mp4",
-  start="10:10",
-  end="10:12",
+  start_time="01:10",
+  stop_time="01:12",
   speed=.25,
   dimensions=(640, 480),
 )
@@ -91,7 +91,7 @@ vtg.create_gif()
 Command-line equivalent:
 
 ```sh
-vxt gif video.mp4 --start 10:10 --end 10:12 --speed 0.25 --dimensions 640 480
+vxt gif video.mp4 --start-time 10:10 --stop-time 10:12 --speed 0.25 --dimensions 640 480
 ```
 
 ## Command-line options

@@ -1,4 +1,5 @@
 import datetime
+from typing import Union
 
 
 def timestamp_to_seconds(timestamp: str) -> int:
@@ -12,5 +13,7 @@ def timestamp_to_seconds(timestamp: str) -> int:
     return seconds
 
 
-def seconds_to_timestamp(seconds: int) -> str:
+def seconds_to_timestamp(seconds: Union[float, int]) -> str:
+    if isinstance(seconds, float):
+        seconds = int(seconds)
     return str(datetime.timedelta(seconds=seconds))

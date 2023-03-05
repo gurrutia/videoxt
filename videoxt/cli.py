@@ -135,6 +135,11 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
         metavar="",
         help="Speed of the GIF animation. Default is 1.0, which is the original speed of the video.",
     )
+    parser_gif.add_argument(
+        "--bounce",
+        action="store_true",
+        help="Make GIF bounce forwards and backwards, boomerang style.",
+    )
 
     # parse args
     args = main_parser.parse_args(argv)
@@ -177,6 +182,7 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
                 quiet=args.quiet,
                 emoji=args.emoji,
                 speed=args.speed,
+                bounce=args.bounce,
             )
         except argparse.ArgumentTypeError as e:
             print(e)

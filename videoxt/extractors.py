@@ -7,7 +7,7 @@ from typing import Optional, Tuple, Union
 
 import cv2
 import numpy as np
-from moviepy.editor import VideoFileClip
+from moviepy.editor import VideoFileClip, concatenate, vfx
 from rich import print
 from rich.console import Console
 from rich.progress import Progress
@@ -384,6 +384,7 @@ class VideoToImages(BaseVideoExtractor):
 @dataclass
 class VideoToGIF(BaseVideoExtractor):
     speed: float = 1.0
+    bounce: bool = False
 
     def __post_init__(self) -> None:
         super().__post_init__()
@@ -398,6 +399,9 @@ class VideoToGIF(BaseVideoExtractor):
 
         if self.rotate != 0:
             subclip = subclip.rotate(self.rotate)
+
+        if self.bounce:
+            subclip = concatenate([subclip, subclip.fx(vfx.time_mirror)])
 
         return subclip
 
@@ -451,6 +455,7 @@ class VideoToGIF(BaseVideoExtractor):
               resize:       {resize_display}
               rotate:       {rotate_display}
               speed:        {speed_display}
+              bounce:       {self.bounce}
               dimensions:   {self.target_dimensions}
               """
         )

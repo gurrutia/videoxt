@@ -28,7 +28,7 @@ VALID_IMAGE_FORMATS = (
 EMOJI_MAP = {
     "video": "VIDEO \N{FILM PROJECTOR}",
     "extraction": "EXTRACTION \N{TOOTH}",
-    "image": "IMAGE \N{CAMERA WITH FLASH}",
+    "image": "IMAGES \N{CAMERA WITH FLASH}",
     "gif": "GIF \N{FILM FRAMES}",
     "resize_small": "\N{BUG}",
     "resize_normal": "\N{GOAT}",

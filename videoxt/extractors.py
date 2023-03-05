@@ -371,7 +371,7 @@ class VideoToImages(BaseVideoExtractor):
 
         return super().__str__() + dedent(
             f"""
-            {"IMAGE" if not self.emoji else C.EMOJI_MAP['image']}
+            {"IMAGES" if not self.emoji else C.EMOJI_MAP['image']}
               filenames:    {name_display!r}
               format:       {self.image_format!r}
               resize:       {resize_display}

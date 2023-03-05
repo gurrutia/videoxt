@@ -3,11 +3,9 @@
 </h1>
 
 <p align="center">
-  <b>videoxt</b> is a Python library and command-line tool that allows you to convert video frames to images, or create a GIF between two points in a video.
+  <b>videoxt</b> is a Python library and command-line tool that allows you to convert video frames to images, or create a GIF between two points in a video.<br/><br/><b>Demo</b>
 </p>
-
-https://user-images.githubusercontent.com/3451528/222927520-6fd23a1f-b5f1-45db-b1db-2aa7e2566e47.mp4
-
+https://user-images.githubusercontent.com/3451528/222924597-da48b568-cf13-4117-b5bf-cdecf4e006ce.jpg
 <br/>
 <p align="center">
   <a href="#installation">Installation</a> •
@@ -39,9 +37,9 @@ git clone https://github.com/gurrutia/videoxt.git
 **Example 1**: Extract all video frames.
 
 ```python
-from videoxt.extractors import VideoToImage
+from videoxt.extractors import VideoToImages
 
-vti = VideoToImage("C:/Users/gurrutia/Videos/video.mp4")
+vti = VideoToImages("C:/Users/gurrutia/Videos/video.mp4")
 
 vti.extract_images()
 ```
@@ -57,9 +55,9 @@ vxt images video.mp4
 **Example 2**: Extract every `30th` frame from `50` seconds to the end of the video, save the images as `png`, resize the frames by `50%` and rotate the frames by `180` degrees.
 
 ```python
-from videoxt.extractors import VideoToImage
+from videoxt.extractors import VideoToImages
 
-vti = VideoToImage(
+vti = VideoToImages(
   "C:/Users/gurrutia/Videos/video.mp4",
   start_time=50,
   capture_rate=30,
@@ -114,7 +112,7 @@ Argument&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 **`--stop-time`** | Specify the video extraction stop time, in seconds or as a timestamp in the format `HH:MM:SS`, `H:MM:SS`, `MM:SS` or `M:SS`.<br/><br/>Example: `--stop-time 2:00` or `--stop-time 120`<br/><br/>Default: the end of the video.
 **`--fps`** | Number of frames per second in the video file, overrides the video metadata frames per second. Use this option sparingly and only when the video metadata fps is incorrectly detected.<br/><br/>Example: `--fps 30`<br/><br/>Default: the video metadata fps.
 **`--dimensions`** | Specify the media output dimensions as space-separated values.<br/><br/>Example: `--dimensions 1920 1080`<br/><br/>Default: the native video dimensions.
-**`--resize`** | Resize the media output by a factor of *n*.<br/><br/>Example: `--resize 1.5` to increase the media output size by 50%<br/><br/>Default: 1.0, no resize.
+**`--resize`** | Resize the media output by a factor of *n*.<br/><br/>Example: `--resize 1.5` to increase the media output size by 50%<br/><br/>Default: `1.0`, no resize.
 **`--rotate`** | Rotate the media output by 90, 180, or 270 degrees.<br/><br/>Valid rotate values: 0, 90, 180, 270<br/><br/>Example: `--rotate 270` to rotate the media counter-clockwise by 90 degrees.<br/><br/>Default: `0`, no rotation.
 **`--output-dir`** | Directory to save the media output to.<br/><br/>Example: `--output-dir C:/Users/gurrutia/Videos/custom_folder`<br/><br/>Default for *images*: `same/directory/as/video/video_frames`<br/>Default for *gif*: `same/directory/as/video`.
 **`--output-filename`** | Specify the file name of the media output.<br/><br/>Example for *images*: `--output-filname my_images`, which will name all the images as `my_images_*.jpg` where `*` is the frame number.<br/>Example for *gif*: `--output-filename my.gif`<br/><br/>Default for *images*: `video_filename_*.jpg`<br/>Default for *gif*: `video_filename.gif`

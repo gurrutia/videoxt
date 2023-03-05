@@ -3,12 +3,11 @@
 </h1>
 
 <p align="center">
-  <b>videoxt</b> is a Python library and command-line tool that allows you to convert video frames to images, or create a GIF between two points in a video.<br/><br/><b>Demo</b>
+  <b>videoxt</b> is a Python library and command-line tool that allows you to convert video frames to images, or create a GIF between two points in a video.
 </p>
 
-https://user-images.githubusercontent.com/3451528/222927520-6fd23a1f-b5f1-45db-b1db-2aa7e2566e47.mp4
+[![videoxt demo](https://i.vimeocdn.com/video/1625119839-dd58766e279a6ff55dc505a718c721da027467575bf25f844d909558cc7fa2f0-d_640)](https://vimeo.com/804903665 "View videoxt demo on Vimeo")
 
-<br/>
 <p align="center">
   <a href="#installation">Installation</a> •
   <a href="#examples">Examples</a> •

@@ -131,7 +131,7 @@ Argument&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 Argument&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Description
 ---|---
 **`--speed`** | Speed of the GIF animation.<br/><br/>Example: `--speed 0.5` to create a GIF at half the video speed.<br/><br/>Default: `1.0`, same speed as the video.
-
+**`--bounce`** | Make GIF bounce forwards and backwards, boomerang style.<br/><br/>Example: `--bounce`<br/><br/>Default: `False`
 ---
 
 ## Used by

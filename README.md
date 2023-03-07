@@ -119,6 +119,7 @@ Argument&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 **`--rotate`** | Rotate the media output by 90, 180, or 270 degrees.<br/><br/>Valid rotate values: 0, 90, 180, 270<br/><br/>Example: `--rotate 270` to rotate the media counter-clockwise by 90 degrees.<br/><br/>Default: `0`, no rotation.
 **`--output-dir`** | Directory to save the media output to.<br/><br/>Example: `--output-dir C:/Users/gurrutia/Videos/custom_folder`<br/><br/>Default for *images*: `same/directory/as/video/video_frames`<br/>Default for *gif*: `same/directory/as/video`.
 **`--output-filename`** | Specify the file name of the media output.<br/><br/>Example for *images*: `--output-filname my_images`, which will name all the images as `my_images_*.jpg` where `*` is the frame number.<br/>Example for *gif*: `--output-filename my.gif`<br/><br/>Default for *images*: `video_filename_*.jpg`<br/>Default for *gif*: `video_filename.gif`
+**`--monochrome`** | Convert the media output to monochrome (black and white).<br/><br/>Example: `--monochrome`.<br/><br/>Default: `False`
 **`--quiet`** | Disable extraction details in terminal.<br/><br/>Example: `--quiet` to disable extraction details from being printed.<br/><br/>Default: `False`
 **`--emoji`** | Enable emoji's in terminal. Added by special request 👍.<br/><br/>Example: `--emoji` to enable emoji's.<br/><br/>Default: `False`
 

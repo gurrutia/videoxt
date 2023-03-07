@@ -77,6 +77,11 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
         help="Specify the file name of the media output. Default is the input video file name.",
     )
     parent_parser.add_argument(
+        "--monochrome",
+        action="store_true",
+        help="Convert the media output to monochrome (black and white).",
+    )
+    parent_parser.add_argument(
         "--quiet",
         action="store_true",
         help="Disable extraction details in terminal.",

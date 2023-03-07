@@ -28,6 +28,7 @@ class BaseVideoExtractor:
     rotate: int = 0
     output_dir: Optional[str] = None
     output_filename: Optional[str] = None
+    monochrome: bool = False
     quiet: bool = False
     emoji: bool = False
     extraction_type: str = field(init=False)
@@ -295,6 +296,9 @@ class VideoToImages(BaseVideoExtractor):
         if self.rotate in C.ROTATION_MAP:
             image = cv2.rotate(image, C.ROTATION_MAP[self.rotate])
 
+        if self.monochrome:
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
         return image
 
     def extract_images(self) -> None:
@@ -374,6 +378,7 @@ class VideoToImages(BaseVideoExtractor):
               format:       {self.image_format!r}
               resize:       {resize_display}
               rotate:       {rotate_display}
+              monochrome:   {self.monochrome}
               capture rate: {self.capture_rate}
               expected:     {self.images_expected}
               dimensions:   {self.target_dimensions}
@@ -402,6 +407,9 @@ class VideoToGIF(BaseVideoExtractor):
 
         if self.bounce:
             subclip = concatenate([subclip, subclip.fx(vfx.time_mirror)])
+
+        if self.monochrome:
+            subclip = subclip.fx(vfx.blackwhite)
 
         return subclip
 
@@ -454,6 +462,7 @@ class VideoToGIF(BaseVideoExtractor):
               filename:     {self.output_filename!r}
               resize:       {resize_display}
               rotate:       {rotate_display}
+              monochrome:   {self.monochrome}
               speed:        {speed_display}
               bounce:       {self.bounce}
               dimensions:   {self.target_dimensions}

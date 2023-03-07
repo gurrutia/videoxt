@@ -5,17 +5,18 @@
 [![PyPI](https://img.shields.io/pypi/v/videoxt)](https://pypi.org/project/videoxt) [![Downloads](https://static.pepy.tech/badge/videoxt)](https://pepy.tech/project/videoxt)
 
 <p align="center">
-  <b>videoxt</b> is a Python library and command-line tool that allows you to convert video frames to images, or create a GIF between two points in a video.
-</p>
-
-[![videoxt demo](https://i.vimeocdn.com/video/1625119839-dd58766e279a6ff55dc505a718c721da027467575bf25f844d909558cc7fa2f0-d_640)](https://vimeo.com/804903665 "View videoxt demo on Vimeo")
-
-<p align="center">
+  <b>videoxt</b> is a Python library and command-line tool that allows you to convert video frames to images, or create a GIF between two points in a video.<br/><br/>
   <a href="#installation">Installation</a> •
   <a href="#examples">Examples</a> •
   <a href="#options">Options</a> •
   <a href="#used-by">Used by</a>
 </p>
+
+<div align="center">
+  <b>View demo on Vimeo:</b><br/>
+  <a href="https://vimeo.com/804903665"><img src="https://i.vimeocdn.com/video/1625119839-dd58766e279a6ff55dc505a718c721da027467575bf25f844d909558cc7fa2f0-d_640" alt="videoxt demo" title="View videoxt demo on Vimeo"></a>
+</div>
+
 
 ---
 
@@ -106,7 +107,7 @@ vxt gif video.mp4 --start-time 01:10 --stop-time 01:12 --speed 0.25 --dimensions
 
 ## Options
 
-### Options / Shared
+### General options
 
 Argument&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Description
 ---|---
@@ -123,12 +124,12 @@ Argument&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 **`--quiet`** | Disable extraction details in terminal.<br/><br/>Example: `--quiet` to disable extraction details from being printed.<br/><br/>Default: `False`
 **`--emoji`** | Enable emoji's in terminal. Added by special request 👍.<br/><br/>Example: `--emoji` to enable emoji's.<br/><br/>Default: `False`
 
-### Options / Images
+### Image only options
 Argument&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Description
 ---|---
 **`---capture-rate`** | Capture every *nth* video frame.<br/><br/>Example: `--capture-rate 30` to every 30th frame.<br/><br/>Default: `1`, every frame.
 **`--image-format`** | Specify the image format to save the frames as.<br/><br/>Valid image formats: bmp, dib, jpeg, jpg, png, tiff, tif, webp<br/><br/>Example: `--image-format png` or `--image-format .png`<br/><br/>Default: `jpg`
-### Options / GIF
+### GIF only options
 Argument&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Description
 ---|---
 **`--speed`** | Speed of the GIF animation.<br/><br/>Example: `--speed 0.5` to create a GIF at half the video speed.<br/><br/>Default: `1.0`, same speed as the video.

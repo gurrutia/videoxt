@@ -1,4 +1,4 @@
-from videoxt.utils import timestamp_to_seconds
+from videoxt.utils import seconds_to_timestamp, timestamp_to_seconds
 
 
 def timestamp_to_seconds_test():
@@ -10,3 +10,13 @@ def timestamp_to_seconds_test():
     assert timestamp_to_seconds("1:01") == 61
     assert timestamp_to_seconds("1:01:01") == 3661
     assert timestamp_to_seconds("1:01:01.1") == 3661
+
+
+def seconds_to_timestamp_test():
+    assert seconds_to_timestamp(0) == "0:00:00"
+    assert seconds_to_timestamp(1) == "0:00:01"
+    assert seconds_to_timestamp(59) == "0:00:59"
+    assert seconds_to_timestamp(60) == "0:01:00"
+    assert seconds_to_timestamp(61) == "0:01:01"
+    assert seconds_to_timestamp(3661) == "1:01:01"
+    assert seconds_to_timestamp(3661.1) == "1:01:01"

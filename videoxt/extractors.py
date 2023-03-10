@@ -99,7 +99,7 @@ class BaseVideoExtractor:
     def _initialize_video_metadata(self) -> None:
         """Video metadata initialized: frame count, fps, video length, and video dimensions."""
         video_capture = cv2.VideoCapture(self.video_abspath)
-
+        print(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
         self.frame_count = round(video_capture.get(cv2.CAP_PROP_FRAME_COUNT), 2)
 
         if self.fps is None:
@@ -258,8 +258,8 @@ class BaseVideoExtractor:
               type:         {self.extraction_type!r}
               start time:   {start_time_display}
               stop time:    {stop_time_display}
-              start frame:  {self.start_frame + 1 if not self.emoji else C.EMOJI_MAP['start'] + ' ' + str(self.start_frame + 1)}
-              stop frame:   {self.stop_frame + 1 if not self.emoji else C.EMOJI_MAP['stop'] + ' ' + str(self.stop_frame + 1)}
+              start frame:  {self.start_frame if not self.emoji else C.EMOJI_MAP['start'] + ' ' + str(self.start_frame)}
+              stop frame:   {self.stop_frame if not self.emoji else C.EMOJI_MAP['stop'] + ' ' + str(self.stop_frame)}
               output dir:   {self.output_dir}"""
         )
 

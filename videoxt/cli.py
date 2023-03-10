@@ -94,7 +94,7 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
 
     # main parser and subparsers
     main_parser = argparse.ArgumentParser(
-        prog="vxt",
+        prog="videoxt",
         description="Extract individual frames from a video, or create a GIF between two points in a video.",
     )
     main_parser.add_argument(

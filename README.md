@@ -37,6 +37,8 @@ git clone https://github.com/gurrutia/videoxt.git
 ## Examples
 
 > **NOTE**: All command-line examples are run from the directory where the video is located. You can run the commands from any directory by specifying the full path to the video.
+>
+> **vxt** cli entry point will be deprecated in a future release, use **videoxt** instead.
 
 **Example 1**: Extract all video frames.
 
@@ -51,7 +53,7 @@ vti.extract_images()
 Command-line equivalent:
 
 ```sh
-vxt images video.mp4
+videoxt images video.mp4
 ```
 
 <img src="https://user-images.githubusercontent.com/3451528/222924597-da48b568-cf13-4117-b5bf-cdecf4e006ce.jpg" alt="videoxt_example_1" width="700"></a>
@@ -76,7 +78,7 @@ vti.extract_images()
 Command-line equivalent:
 
 ```sh
-vxt images video.mp4 --start-time 50 --capture-rate 30 --image-format png --resize 0.5 --rotate 180
+videoxt images video.mp4 --start-time 50 --capture-rate 30 --image-format png --resize 0.5 --rotate 180
 ```
 
 <img src="https://user-images.githubusercontent.com/3451528/222924619-f4e5b3d8-e743-476c-af86-da3b50b8b1a3.jpg" alt="videoxt_example_2" width="700"></a>
@@ -100,7 +102,7 @@ vtg.create_gif()
 Command-line equivalent:
 
 ```sh
-vxt gif video.mp4 --start-time 01:10 --stop-time 01:12 --speed 0.25 --dimensions 640 480
+videoxt gif video.mp4 --start-time 01:10 --stop-time 01:12 --speed 0.25 --dimensions 640 480
 ```
 
 <img src="https://user-images.githubusercontent.com/3451528/222924624-583b2ad2-b34c-4278-871b-094e13f83034.jpg" alt="videoxt_example_2" width="700"></a>

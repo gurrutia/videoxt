@@ -11,12 +11,17 @@ class ValidationException(Exception):
     pass
 
 
-def positive_int(num: Union[int, str]) -> int:
+def positive_int(num: Union[float, int, str]) -> int:
     error_msg_value = f"expected integer, got {num!r}"
 
     try:
-        value = int(num)
+        value = float(num)
     except ValueError:
+        if C.IS_TERMINAL:
+            raise argparse.ArgumentTypeError(error_msg_value)
+        raise ValidationException(error_msg_value)
+
+    if not value.is_integer():
         if C.IS_TERMINAL:
             raise argparse.ArgumentTypeError(error_msg_value)
         raise ValidationException(error_msg_value)

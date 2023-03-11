@@ -32,7 +32,7 @@ def positive_int(num: Union[float, int, str]) -> int:
     return value
 
 
-def positive_float(num: Union[float, str]) -> float:
+def positive_float(num: Union[float, int, str]) -> float:
     try:
         value = float(num)
     except ValueError:

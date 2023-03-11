@@ -9,6 +9,7 @@ from videoxt.validators import non_negative_int
 from videoxt.validators import positive_float
 from videoxt.validators import positive_int
 from videoxt.validators import valid_dir
+from videoxt.validators import valid_filename
 from videoxt.validators import valid_filepath
 from videoxt.validators import ValidationException
 
@@ -107,6 +108,13 @@ def test_valid_dir_with_valid_pathlib_dir(tmp_path):
     dirpath.mkdir()
     assert valid_dir(dirpath) == str(dirpath)
     os.rmdir(dirpath)
+
+
+def test_valid_filename_with_valid_filename():
+    assert valid_filename("file.txt") == "file.txt"
+    assert valid_filename("file_with_underscores.txt") == "file_with_underscores.txt"
+    assert valid_filename("file-with-dashes.txt") == "file-with-dashes.txt"
+    assert valid_filename("file (1).txt") == "file (1).txt"
 
 
 class TestNonTerminal:
@@ -229,3 +237,40 @@ class TestNonTerminal:
     def test_valid_dir_with_non_string_from_non_terminal(self):
         with pytest.raises(ValidationException):
             valid_dir(1)
+
+    # valid_filename
+    def test_valid_filename_with_slashes(self):
+        with pytest.raises(ValidationException):
+            valid_filename("file/with/slashes.txt")
+
+    def test_valid_filename_with_backslashes(self):
+        with pytest.raises(ValidationException):
+            valid_filename("file\\with\\backslashes.txt")
+
+    def test_valid_filename_with_colons(self):
+        with pytest.raises(ValidationException):
+            valid_filename("file:with:colons.txt")
+
+    def test_valid_filename_with_question_marks(self):
+        with pytest.raises(ValidationException):
+            valid_filename("file?with?question?marks.txt")
+
+    def test_valid_filename_with_asterisks(self):
+        with pytest.raises(ValidationException):
+            valid_filename("file*with*asterisks.txt")
+
+    def test_valid_filename_with_quotes(self):
+        with pytest.raises(ValidationException):
+            valid_filename('file"with"quotes.txt')
+
+    def test_valid_filename_with_less_than(self):
+        with pytest.raises(ValidationException):
+            valid_filename("file<with<less<than.txt")
+
+    def test_valid_filename_with_greater_than(self):
+        with pytest.raises(ValidationException):
+            valid_filename("file>with>greater>than.txt")
+
+    def test_valid_filename_with_pipes(self):
+        with pytest.raises(ValidationException):
+            valid_filename("file|with|pipes.txt")

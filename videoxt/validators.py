@@ -81,7 +81,8 @@ def valid_filepath(filepath: Union[str, Path]) -> str:
     return filepath
 
 
-def valid_dir(dir: str) -> str:
+def valid_dir(dir: Union[str, Path]) -> str:
+    dir = str(dir)
     if not os.path.exists(dir):
         _raise_error(f"directory not found, got {dir!r}")
 

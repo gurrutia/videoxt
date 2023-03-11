@@ -1,4 +1,5 @@
 import argparse
+import os
 
 import pytest
 
@@ -7,6 +8,7 @@ from videoxt.validators import non_negative_float
 from videoxt.validators import non_negative_int
 from videoxt.validators import positive_float
 from videoxt.validators import positive_int
+from videoxt.validators import valid_filepath
 from videoxt.validators import ValidationException
 
 
@@ -76,6 +78,20 @@ def test_non_negative_float_with_non_negative_ints():
     assert non_negative_float("1") == 1.0
     assert non_negative_float(100_000_000) == 100_000_000.0
     assert non_negative_float("100_000_000") == 100_000_000.0
+
+
+def test_valid_filepath_with_valid_string_filepath(tmp_path):
+    filepath = tmp_path / "t.txt"
+    filepath.write_text("t")
+    assert valid_filepath(str(filepath)) == str(filepath)
+    os.remove(filepath)
+
+
+def test_valid_filepath_with_valid_pathlib_filepath(tmp_path):
+    filepath = tmp_path / "t.txt"
+    filepath.write_text("t")
+    assert valid_filepath(filepath) == str(filepath)
+    os.remove(filepath)
 
 
 class TestNonTerminal:
@@ -180,3 +196,12 @@ class TestNonTerminal:
     def test_non_negative_float_with_non_float_string_from_non_terminal(self):
         with pytest.raises(ValidationException):
             non_negative_float("a")
+
+    # valid_filepath
+    def test_valid_filepath_with_invalid_filepath_from_non_terminal(self):
+        with pytest.raises(ValidationException):
+            valid_filepath("invalid.txt")
+
+    def test_invalid_filepath_with_non_string_from_non_terminal(self):
+        with pytest.raises(ValidationException):
+            valid_filepath(1)

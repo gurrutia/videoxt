@@ -1,6 +1,7 @@
 import argparse
 import os
 import re
+from pathlib import Path
 from typing import Tuple
 from typing import Union
 
@@ -72,7 +73,8 @@ def non_negative_float(num: Union[int, float, str]) -> float:
     return value
 
 
-def valid_filepath(filepath: str) -> str:
+def valid_filepath(filepath: Union[str, Path]) -> str:
+    filepath = str(filepath)
     if not os.path.isfile(filepath):
         _raise_error(f"file not found, got {filepath!r}")
 

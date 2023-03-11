@@ -1,7 +1,8 @@
 import argparse
 import os
 import re
-from typing import Tuple, Union
+from typing import Tuple
+from typing import Union
 
 import videoxt.constants as C
 import videoxt.utils as utils
@@ -29,7 +30,7 @@ def positive_int(num: Union[float, int, str]) -> int:
     if value <= 0:
         _raise_error(f"expected positive integer, got {num}")
 
-    return value
+    return int(value)
 
 
 def positive_float(num: Union[float, int, str]) -> float:
@@ -44,7 +45,7 @@ def positive_float(num: Union[float, int, str]) -> float:
     return value
 
 
-def non_negative_int(num: Union[int, str]) -> int:
+def non_negative_int(num: Union[float, int, str]) -> int:
     try:
         value = int(num)
     except ValueError:

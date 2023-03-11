@@ -47,14 +47,17 @@ def positive_float(num: Union[float, int, str]) -> float:
 
 def non_negative_int(num: Union[float, int, str]) -> int:
     try:
-        value = int(num)
+        value = float(num)
     except ValueError:
+        _raise_error(f"expected integer, got {num!r}")
+
+    if not value.is_integer():
         _raise_error(f"expected integer, got {num!r}")
 
     if value < 0:
         _raise_error(f"expected non-negative integer, got {num}")
 
-    return value
+    return int(value)
 
 
 def non_negative_float(num: Union[int, float, str]) -> float:

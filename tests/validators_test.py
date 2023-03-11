@@ -8,6 +8,7 @@ from videoxt.validators import non_negative_float
 from videoxt.validators import non_negative_int
 from videoxt.validators import positive_float
 from videoxt.validators import positive_int
+from videoxt.validators import valid_dir
 from videoxt.validators import valid_filepath
 from videoxt.validators import ValidationException
 
@@ -92,6 +93,20 @@ def test_valid_filepath_with_valid_pathlib_filepath(tmp_path):
     filepath.write_text("t")
     assert valid_filepath(filepath) == str(filepath)
     os.remove(filepath)
+
+
+def test_valid_dir_with_valid_string_dir(tmp_path):
+    dirpath = tmp_path / "t"
+    dirpath.mkdir()
+    assert valid_dir(str(dirpath)) == str(dirpath)
+    os.rmdir(dirpath)
+
+
+def test_valid_dir_with_valid_pathlib_dir(tmp_path):
+    dirpath = tmp_path / "t"
+    dirpath.mkdir()
+    assert valid_dir(dirpath) == str(dirpath)
+    os.rmdir(dirpath)
 
 
 class TestNonTerminal:
@@ -205,3 +220,12 @@ class TestNonTerminal:
     def test_invalid_filepath_with_non_string_from_non_terminal(self):
         with pytest.raises(ValidationException):
             valid_filepath(1)
+
+    # valid_dir
+    def test_valid_dir_with_invalid_dir_from_non_terminal(self):
+        with pytest.raises(ValidationException):
+            valid_dir("invalid")
+
+    def test_valid_dir_with_non_string_from_non_terminal(self):
+        with pytest.raises(ValidationException):
+            valid_dir(1)

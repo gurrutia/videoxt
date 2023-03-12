@@ -116,7 +116,29 @@ def valid_image_format(image_format: str) -> str:
 
 
 def valid_timestamp(timestamp: str, timestamp_type: str) -> str:
+    """Validates timestamp strings with colons are in the correct format:
+    (HH:MM:SS, H:MM:SS, MM:SS, M:SS, SS, S),
+    then converts to seconds for additional validation.
+
+    Milliseconds are ignored.
+
+    If the timestamp does not include a colon,
+    it is assumed to be a float representing seconds.
+
+    If the timestamp_type is "start",
+    the timestamp as seconds is validated to be a non-negative number.
+
+    If the timestamp_type is "stop",
+    the timestamp as seconds validated to be a positive number.
+    """
+    if timestamp_type not in ("start", "stop"):
+        _raise_error(f"invalid timestamp_type, got {timestamp_type!r}")
+
+    if "." in timestamp:
+        timestamp = timestamp.split(".")[0]
+
     timestamp_as_seconds = None
+
     if ":" in timestamp:
         regex = r"^([0-9]|[0-5][0-9])(:[0-5][0-9]){1,2}$"
         if not bool(re.match(regex, timestamp)):
@@ -132,7 +154,7 @@ def valid_timestamp(timestamp: str, timestamp_type: str) -> str:
         )
     elif timestamp_type == "stop":
         timestamp_as_seconds = (
-            positive_float(float(timestamp))
+            positive_float(timestamp)
             if timestamp_as_seconds is None
             else positive_float(timestamp_as_seconds)
         )

@@ -12,6 +12,7 @@ from videoxt.validators import valid_dir
 from videoxt.validators import valid_filename
 from videoxt.validators import valid_filepath
 from videoxt.validators import valid_image_format
+from videoxt.validators import valid_timestamp
 from videoxt.validators import ValidationException
 
 
@@ -136,6 +137,33 @@ def test_valid_image_format_with_valid_lowercase_image_formats_with_dot():
 def test_valid_image_format_with_valid_uppercase_image_formats_with_dot():
     for image_format in C.VALID_IMAGE_FORMATS:
         assert valid_image_format(f".{image_format.upper()}") == image_format
+
+
+def test_valid_timestamp_with_valid_start_timestamp_zero():
+    assert valid_timestamp(timestamp="0", timestamp_type="start") == "0"
+    assert valid_timestamp(timestamp="0:00", timestamp_type="start") == "0:00"
+    assert valid_timestamp(timestamp="0:00:00", timestamp_type="start") == "0:00:00"
+    assert valid_timestamp(timestamp="0:00:00.0", timestamp_type="start") == "0:00:00"
+    assert valid_timestamp(timestamp="0:00:00.9", timestamp_type="start") == "0:00:00"
+
+
+def test_valid_timestamp_with_valid_start_timestamp_non_zero():
+    for timestamp_type in ("start", "stop"):
+        assert valid_timestamp("1", timestamp_type) == "1"
+        assert valid_timestamp("1:00", timestamp_type) == "1:00"
+        assert valid_timestamp("1:00:00", timestamp_type) == "1:00:00"
+        assert valid_timestamp("1:00:00.0", timestamp_type) == "1:00:00"
+        assert valid_timestamp("1:00:00.1", timestamp_type) == "1:00:00"
+        assert valid_timestamp("61", timestamp_type) == "61"
+        assert valid_timestamp("59:59", timestamp_type) == "59:59"
+        assert valid_timestamp("59:59:59", timestamp_type) == "59:59:59"
+        assert valid_timestamp("59:59:59.0", timestamp_type) == "59:59:59"
+        assert valid_timestamp("59:59:59.9", timestamp_type) == "59:59:59"
+
+
+def test_valid_timestamp_without_timestamp_type():
+    with pytest.raises(TypeError):
+        valid_timestamp("0")
 
 
 class TestNonTerminal:
@@ -300,3 +328,40 @@ class TestNonTerminal:
     def test_valid_image_format_with_invalid_format_from_non_terminal(self):
         with pytest.raises(ValidationException):
             valid_image_format("invalid")
+
+    # valid_timestamp
+    def test_valid_timestamp_containing_colon_from_non_terminal(self):
+        for timestamp_type in ("start", "stop"):
+            with pytest.raises(ValidationException):
+                valid_timestamp("x0:00:00", timestamp_type)
+            with pytest.raises(ValidationException):
+                valid_timestamp("0x:00:00", timestamp_type)
+            with pytest.raises(ValidationException):
+                valid_timestamp("00:x0:00", timestamp_type)
+            with pytest.raises(ValidationException):
+                valid_timestamp("00:0x:00", timestamp_type)
+            with pytest.raises(ValidationException):
+                valid_timestamp("00:00:x0", timestamp_type)
+            with pytest.raises(ValidationException):
+                valid_timestamp("00:00:0x", timestamp_type)
+
+    def test_valid_timestamp_with_invalid_timestamp_60_from_non_terminal(self):
+        for timestamp_type in ("start", "stop"):
+            with pytest.raises(ValidationException):
+                valid_timestamp("60:00:00", timestamp_type)
+            with pytest.raises(ValidationException):
+                valid_timestamp("60:00", timestamp_type)
+            with pytest.raises(ValidationException):
+                valid_timestamp("1:60", timestamp_type)
+
+    def test_valid_timestamp_with_invalid_start_timestamp_from_non_terminal(self):
+        with pytest.raises(ValidationException):
+            valid_timestamp("-1", "start")
+
+    def test_valid_timestamp_with_invalid_stop_timestamp_from_non_terminal(self):
+        with pytest.raises(ValidationException):
+            valid_timestamp("-1", "stop")
+        with pytest.raises(ValidationException):
+            valid_timestamp("0", "stop")
+        with pytest.raises(ValidationException):
+            valid_timestamp("0.9", "stop")

@@ -189,23 +189,30 @@ def valid_dimensions(dimensions: Tuple[int, int]) -> Tuple[int, int]:
     return dimensions
 
 
-def valid_rotate_value(rotate_value: Union[int, str]) -> int:
+def valid_rotate_value(rotate_value: Union[float, int, str]) -> int:
     """Valid rotate values are 0, 90, 180, 270."""
+    if isinstance(rotate_value, float):
+        if not rotate_value.is_integer():
+            _raise_error(
+                f"invalid float rotate value, got {rotate_value}\n"
+                f"valid rotate values: {C.VALID_ROTATE_VALUES}"
+            )
+
     try:
-        rotate_value = int(rotate_value)
+        rotate_value = float(rotate_value)
     except ValueError:
         _raise_error(
-            f"invalid rotate value, got {rotate_value!r}\n"
+            f"invalid rotate value, got {rotate_value}\n"
             f"valid rotate values: {C.VALID_ROTATE_VALUES}"
         )
 
     if rotate_value not in C.VALID_ROTATE_VALUES:
         _raise_error(
-            f"invalid rotate value, got {rotate_value!r}\n"
+            f"invalid rotate value, got {rotate_value}\n"
             f"valid rotate values: {C.VALID_ROTATE_VALUES}"
         )
 
-    return rotate_value
+    return int(rotate_value)
 
 
 def valid_start_time(start_time: Union[float, int, str]) -> Union[float, int, str]:

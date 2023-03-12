@@ -18,6 +18,7 @@ from videoxt.validators import valid_rotate_value
 from videoxt.validators import valid_start_time
 from videoxt.validators import valid_stop_time
 from videoxt.validators import valid_timestamp
+from videoxt.validators import validate_video_extraction_range
 from videoxt.validators import ValidationException
 
 
@@ -599,3 +600,16 @@ class TestNonTerminal:
             valid_stop_time("-1")
         with pytest.raises(ValidationException):
             valid_stop_time("0")
+
+    # validate_video_extraction_range
+    def test_validate_video_extraction_range_where_start_second_greater_than_video_length_second_from_non_terminal(
+        self,
+    ):
+        with pytest.raises(ValidationException):
+            validate_video_extraction_range(2.0, 1.0, 1.0)
+
+    def test_validate_video_extraction_range_where_start_second_greater_than_stop_second(
+        self,
+    ):
+        with pytest.raises(ValidationException):
+            validate_video_extraction_range(2.0, 1.0, 3.0)

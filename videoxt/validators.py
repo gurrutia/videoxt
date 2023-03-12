@@ -162,7 +162,7 @@ def valid_timestamp(timestamp: str, timestamp_type: str) -> str:
     return timestamp
 
 
-def valid_resize_value(resize_value: Union[float, str]) -> float:
+def valid_resize_value(resize_value: Union[float, int, str]) -> float:
     """Video resize mutliplier max value of 50 is arbitrary, but is used to prevent
     the user from accidentally resizing output to abnormally large size.
     """

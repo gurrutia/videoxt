@@ -16,6 +16,7 @@ from videoxt.validators import valid_image_format
 from videoxt.validators import valid_resize_value
 from videoxt.validators import valid_rotate_value
 from videoxt.validators import valid_start_time
+from videoxt.validators import valid_stop_time
 from videoxt.validators import valid_timestamp
 from videoxt.validators import ValidationException
 
@@ -243,6 +244,31 @@ def test_valid_start_time_with_valid_start_time_floats():
     assert valid_start_time(60.9) == 60.9
     assert valid_start_time(3600.0) == 3600.0
     assert valid_start_time(3600.9) == 3600.9
+
+
+def test_valid_stop_time_with_valid_stop_time_strings():
+    assert valid_stop_time("1") == "1"
+    assert valid_stop_time("1:00") == "1:00"
+    assert valid_stop_time("1:00:00") == "1:00:00"
+    assert valid_stop_time("1:00:00.0") == "1:00:00"
+    assert valid_stop_time("1:00:00.9") == "1:00:00"
+    assert valid_stop_time("60") == "60"
+
+
+def test_valid_stop_time_with_valid_stop_time_ints():
+    assert valid_stop_time(1) == 1
+    assert valid_stop_time(60) == 60
+    assert valid_stop_time(3600) == 3600
+
+
+def test_valid_stop_time_with_valid_stop_time_floats():
+    assert valid_stop_time(0.01) == 0.01
+    assert valid_stop_time(1.0) == 1.0
+    assert valid_stop_time(1.9) == 1.9
+    assert valid_stop_time(60.0) == 60.0
+    assert valid_stop_time(60.9) == 60.9
+    assert valid_stop_time(3600.0) == 3600.0
+    assert valid_stop_time(3600.9) == 3600.9
 
 
 class TestNonTerminal:
@@ -544,3 +570,32 @@ class TestNonTerminal:
     def test_valid_start_time_with_invalid_int_string_from_non_terminal(self):
         with pytest.raises(ValidationException):
             valid_start_time("-1")
+
+    # valid_stop_time
+    def test_valid_stop_time_with_invalid_value_from_non_terminal(self):
+        with pytest.raises(ValidationException):
+            valid_stop_time("invalid")
+
+    def test_valid_stop_time_with_invalid_float_from_non_terminal(self):
+        with pytest.raises(ValidationException):
+            valid_stop_time(-1.0)
+        with pytest.raises(ValidationException):
+            valid_stop_time(0.0)
+
+    def test_valid_stop_time_with_invalid_float_string_from_non_terminal(self):
+        with pytest.raises(ValidationException):
+            valid_stop_time("-1.0")
+        with pytest.raises(ValidationException):
+            valid_stop_time("0.0")
+
+    def test_valid_stop_time_with_invalid_int_from_non_terminal(self):
+        with pytest.raises(ValidationException):
+            valid_stop_time(-1)
+        with pytest.raises(ValidationException):
+            valid_stop_time(0)
+
+    def test_valid_stop_time_with_invalid_int_string_from_non_terminal(self):
+        with pytest.raises(ValidationException):
+            valid_stop_time("-1")
+        with pytest.raises(ValidationException):
+            valid_stop_time("0")

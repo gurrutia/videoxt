@@ -1,12 +1,17 @@
 import math
 import os
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+from dataclasses import field
 from textwrap import dedent
-from typing import Optional, Tuple, Union
+from typing import Optional
+from typing import Tuple
+from typing import Union
 
 import cv2
 import numpy as np
-from moviepy.editor import VideoFileClip, concatenate, vfx
+from moviepy.editor import concatenate
+from moviepy.editor import vfx
+from moviepy.editor import VideoFileClip
 from rich import print
 from rich.console import Console
 from rich.progress import Progress
@@ -33,10 +38,10 @@ class BaseVideoExtractor:
     extraction_type: str = field(init=False)
     start_second: float = field(init=False)
     stop_second: float = field(init=False)
-    start_frame: float = field(init=False)
-    stop_frame: float = field(init=False)
+    start_frame: int = field(init=False)
+    stop_frame: int = field(init=False)
     target_dimensions: Tuple[int, int] = field(init=False)
-    frame_count: float = field(init=False)
+    frame_count: int = field(init=False)
     video_abspath: str = field(init=False)
     video_basename: str = field(init=False)
     video_dirname: str = field(init=False)
@@ -99,8 +104,7 @@ class BaseVideoExtractor:
     def _initialize_video_metadata(self) -> None:
         """Video metadata initialized: frame count, fps, video length, and video dimensions."""
         video_capture = cv2.VideoCapture(self.video_abspath)
-        print(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
-        self.frame_count = round(video_capture.get(cv2.CAP_PROP_FRAME_COUNT), 2)
+        self.frame_count = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
 
         if self.fps is None:
             self.fps = round(video_capture.get(cv2.CAP_PROP_FPS), 2)
@@ -147,10 +151,10 @@ class BaseVideoExtractor:
         The stop frame is set to the frame count if the stop time is not specified or
         if the stop frame is greater than the frame count.
         """
-        self.start_frame = round(self.start_second * self.fps, 2)
+        self.start_frame = int(self.start_second * self.fps)  # type: ignore
 
         if self.stop_time is not None:
-            self.stop_frame = round(self.stop_second * self.fps, 2)
+            self.stop_frame = int(self.stop_second * self.fps)  # type: ignore
             self.stop_frame = (
                 self.frame_count
                 if self.stop_frame > self.frame_count
@@ -302,7 +306,7 @@ class VideoToImages(BaseVideoExtractor):
 
     def extract_images(self) -> None:
         video_capture = cv2.VideoCapture(self.video_path)
-        frame_position = int(self.start_frame)
+        frame_position = self.start_frame
         video_capture.set(cv2.CAP_PROP_POS_FRAMES, frame_position)
 
         # Only creates the directory if the default output directory `video_frames_*.jpg` was used.

@@ -8,6 +8,7 @@ from videoxt.validators import non_negative_float
 from videoxt.validators import non_negative_int
 from videoxt.validators import positive_float
 from videoxt.validators import positive_int
+from videoxt.validators import valid_dimensions
 from videoxt.validators import valid_dir
 from videoxt.validators import valid_filename
 from videoxt.validators import valid_filepath
@@ -188,6 +189,13 @@ def test_valid_resize_value_with_valid_ints():
     assert valid_resize_value(50) == 50
 
 
+def test_valid_dimensions_with_valid_dimensions():
+    assert valid_dimensions((1, 1)) == (1, 1)
+    assert valid_dimensions((1, 100_000_000)) == (1, 100_000_000)
+    assert valid_dimensions((100_000_000, 1)) == (100_000_000, 1)
+    assert valid_dimensions((100_000_000, 100_000_000)) == (100_000_000, 100_000_000)
+
+
 class TestNonTerminal:
     C.IS_TERMINAL = False
 
@@ -310,39 +318,39 @@ class TestNonTerminal:
             valid_dir(1)
 
     # valid_filename
-    def test_valid_filename_with_slashes(self):
+    def test_valid_filename_with_slashes_from_non_terminal(self):
         with pytest.raises(ValidationException):
             valid_filename("file/with/slashes.txt")
 
-    def test_valid_filename_with_backslashes(self):
+    def test_valid_filename_with_backslashes_from_non_terminal(self):
         with pytest.raises(ValidationException):
             valid_filename("file\\with\\backslashes.txt")
 
-    def test_valid_filename_with_colons(self):
+    def test_valid_filename_with_colons_from_non_terminal(self):
         with pytest.raises(ValidationException):
             valid_filename("file:with:colons.txt")
 
-    def test_valid_filename_with_question_marks(self):
+    def test_valid_filename_with_question_marks_from_non_terminal(self):
         with pytest.raises(ValidationException):
             valid_filename("file?with?question?marks.txt")
 
-    def test_valid_filename_with_asterisks(self):
+    def test_valid_filename_with_asterisks_from_non_terminal(self):
         with pytest.raises(ValidationException):
             valid_filename("file*with*asterisks.txt")
 
-    def test_valid_filename_with_quotes(self):
+    def test_valid_filename_with_quotes_from_non_terminal(self):
         with pytest.raises(ValidationException):
             valid_filename('file"with"quotes.txt')
 
-    def test_valid_filename_with_less_than(self):
+    def test_valid_filename_with_less_than_from_non_terminal(self):
         with pytest.raises(ValidationException):
             valid_filename("file<with<less<than.txt")
 
-    def test_valid_filename_with_greater_than(self):
+    def test_valid_filename_with_greater_than_from_non_terminal(self):
         with pytest.raises(ValidationException):
             valid_filename("file>with>greater>than.txt")
 
-    def test_valid_filename_with_pipes(self):
+    def test_valid_filename_with_pipes_from_non_terminal(self):
         with pytest.raises(ValidationException):
             valid_filename("file|with|pipes.txt")
 
@@ -393,13 +401,13 @@ class TestNonTerminal:
         with pytest.raises(ValidationException):
             valid_resize_value("invalid")
 
-    def test_valid_resize_value_with_invalid_ints(self):
+    def test_valid_resize_value_with_invalid_ints_from_non_terminal(self):
         with pytest.raises(ValidationException):
             valid_resize_value(-1)
         with pytest.raises(ValidationException):
             valid_resize_value(0)
 
-    def test_valid_resize_value_with_invalid_floats(self):
+    def test_valid_resize_value_with_invalid_floats_from_non_terminal(self):
         with pytest.raises(ValidationException):
             valid_resize_value(-1.0)
         with pytest.raises(ValidationException):
@@ -407,7 +415,7 @@ class TestNonTerminal:
         with pytest.raises(ValidationException):
             valid_resize_value(0.009)
 
-    def test_valid_resize_value_with_invalid_strings(self):
+    def test_valid_resize_value_with_invalid_strings_from_non_terminal(self):
         with pytest.raises(ValidationException):
             valid_resize_value("-1")
         with pytest.raises(ValidationException):
@@ -418,3 +426,38 @@ class TestNonTerminal:
             valid_resize_value("0.0")
         with pytest.raises(ValidationException):
             valid_resize_value("0.009")
+
+    # valid_dimensions
+    def test_valid_dimensions_with_invalid_ints_from_non_terminal(self):
+        with pytest.raises(ValidationException):
+            valid_dimensions((-1, -1))
+        with pytest.raises(ValidationException):
+            valid_dimensions((0, 0))
+
+    def test_valid_dimensions_with_invalid_floats_from_non_terminal(self):
+        with pytest.raises(ValidationException):
+            valid_dimensions((-1.0, -1.0))
+        with pytest.raises(ValidationException):
+            valid_dimensions((0.0, 0.0))
+        with pytest.raises(ValidationException):
+            valid_dimensions((0.009, 0.009))
+
+    def test_valid_dimensions_with_invalid_strings_from_non_terminal(self):
+        with pytest.raises(ValidationException):
+            valid_dimensions(("-1", "-1"))
+        with pytest.raises(ValidationException):
+            valid_dimensions(("0", "0"))
+        with pytest.raises(ValidationException):
+            valid_dimensions(("-1.0", "-1.0"))
+        with pytest.raises(ValidationException):
+            valid_dimensions(("0.0", "0.0"))
+        with pytest.raises(ValidationException):
+            valid_dimensions(("0.009", "0.009"))
+
+    def test_valid_dimensions_with_more_than_two_values_from_non_terminal(self):
+        with pytest.raises(ValidationException):
+            valid_dimensions((1, 2, 3))
+
+    def test_test_valid_dimensions_with_less_than_two_values_from_non_terminal(self):
+        with pytest.raises(ValidationException):
+            valid_dimensions((1,))

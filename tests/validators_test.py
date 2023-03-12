@@ -14,6 +14,7 @@ from videoxt.validators import valid_filename
 from videoxt.validators import valid_filepath
 from videoxt.validators import valid_image_format
 from videoxt.validators import valid_resize_value
+from videoxt.validators import valid_rotate_value
 from videoxt.validators import valid_timestamp
 from videoxt.validators import ValidationException
 
@@ -194,6 +195,26 @@ def test_valid_dimensions_with_valid_dimensions():
     assert valid_dimensions((1, 100_000_000)) == (1, 100_000_000)
     assert valid_dimensions((100_000_000, 1)) == (100_000_000, 1)
     assert valid_dimensions((100_000_000, 100_000_000)) == (100_000_000, 100_000_000)
+
+
+def test_valid_rotate_value_with_valid_rotate_ints():
+    for rotate_value in C.VALID_ROTATE_VALUES:
+        assert valid_rotate_value(rotate_value) == rotate_value
+
+
+def test_valid_rotate_value_with_valid_rotate_floats():
+    for rotate_value in C.VALID_ROTATE_VALUES:
+        assert valid_rotate_value(float(rotate_value)) == rotate_value
+
+
+def test_valid_rotate_value_with_valid_rotate_int_strings():
+    for rotate_value in C.VALID_ROTATE_VALUES:
+        assert valid_rotate_value(str(rotate_value)) == rotate_value
+
+
+def test_valid_rotate_value_with_valid_rotate_float_strings():
+    for rotate_value in C.VALID_ROTATE_VALUES:
+        assert valid_rotate_value(str(float(rotate_value))) == rotate_value
 
 
 class TestNonTerminal:
@@ -461,3 +482,16 @@ class TestNonTerminal:
     def test_test_valid_dimensions_with_less_than_two_values_from_non_terminal(self):
         with pytest.raises(ValidationException):
             valid_dimensions((1,))
+
+    # valid_rotate_value
+    def test_valid_rotate_value_with_invalid_value_from_non_terminal(self):
+        with pytest.raises(ValidationException):
+            valid_rotate_value("invalid")
+
+    def test_valid_rotate_value_with_invalid_float_from_non_terminal(self):
+        with pytest.raises(ValidationException):
+            valid_rotate_value(0.1)
+
+    def test_valid_rotate_value_with_invalid_float_string_from_non_terminal(self):
+        with pytest.raises(ValidationException):
+            valid_rotate_value("0.1")

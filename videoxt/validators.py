@@ -261,7 +261,7 @@ def validate_video_extraction_range(
         )
 
 
-def valid_capture_rate(capture_rate: int, start_frame: float, stop_frame: float) -> int:
+def valid_capture_rate(capture_rate: int, start_frame: int, stop_frame: int) -> int:
     """Capture rate is validated after determining the start and stop video frames."""
     if capture_rate > (stop_frame - start_frame):
         _raise_error(

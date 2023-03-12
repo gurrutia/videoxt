@@ -232,12 +232,12 @@ def valid_start_time(start_time: Union[float, int, str]) -> Union[float, int, st
 
 
 def valid_stop_time(stop_time: Union[float, int, str]) -> Union[float, int, str]:
-    if isinstance(stop_time, int):
-        stop_time = positive_int(stop_time)
-        return stop_time
-
     if isinstance(stop_time, float):
         stop_time = positive_float(stop_time)
+        return stop_time
+
+    if isinstance(stop_time, int):
+        stop_time = positive_int(stop_time)
         return stop_time
 
     if isinstance(stop_time, str):

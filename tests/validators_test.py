@@ -12,6 +12,7 @@ from videoxt.validators import valid_dir
 from videoxt.validators import valid_filename
 from videoxt.validators import valid_filepath
 from videoxt.validators import valid_image_format
+from videoxt.validators import valid_resize_value
 from videoxt.validators import valid_timestamp
 from videoxt.validators import ValidationException
 
@@ -164,6 +165,27 @@ def test_valid_timestamp_with_valid_start_timestamp_non_zero():
 def test_valid_timestamp_without_timestamp_type():
     with pytest.raises(TypeError):
         valid_timestamp("0")
+
+
+def test_valid_resize_value_with_valid_resize_values_strings():
+    assert valid_resize_value("0.01") == 0.01
+    assert valid_resize_value("0.1") == 0.1
+    assert valid_resize_value("1") == 1
+    assert valid_resize_value("1.0") == 1.0
+    assert valid_resize_value("50.0") == 50.0
+
+
+def test_valid_resize_value_with_valid_resize_values_floats():
+    assert valid_resize_value(0.01) == 0.01
+    assert valid_resize_value(0.1) == 0.1
+    assert valid_resize_value(1) == 1
+    assert valid_resize_value(1.0) == 1.0
+    assert valid_resize_value(50.0) == 50.0
+
+
+def test_valid_resize_value_with_valid_ints():
+    assert valid_resize_value(1) == 1
+    assert valid_resize_value(50) == 50
 
 
 class TestNonTerminal:
@@ -365,3 +387,34 @@ class TestNonTerminal:
             valid_timestamp("0", "stop")
         with pytest.raises(ValidationException):
             valid_timestamp("0.9", "stop")
+
+    # valid_resize_value
+    def test_valid_resize_value_with_invalid_value_from_non_terminal(self):
+        with pytest.raises(ValidationException):
+            valid_resize_value("invalid")
+
+    def test_valid_resize_value_with_invalid_ints(self):
+        with pytest.raises(ValidationException):
+            valid_resize_value(-1)
+        with pytest.raises(ValidationException):
+            valid_resize_value(0)
+
+    def test_valid_resize_value_with_invalid_floats(self):
+        with pytest.raises(ValidationException):
+            valid_resize_value(-1.0)
+        with pytest.raises(ValidationException):
+            valid_resize_value(0.0)
+        with pytest.raises(ValidationException):
+            valid_resize_value(0.009)
+
+    def test_valid_resize_value_with_invalid_strings(self):
+        with pytest.raises(ValidationException):
+            valid_resize_value("-1")
+        with pytest.raises(ValidationException):
+            valid_resize_value("0")
+        with pytest.raises(ValidationException):
+            valid_resize_value("-1.0")
+        with pytest.raises(ValidationException):
+            valid_resize_value("0.0")
+        with pytest.raises(ValidationException):
+            valid_resize_value("0.009")

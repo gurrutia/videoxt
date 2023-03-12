@@ -216,12 +216,12 @@ def valid_rotate_value(rotate_value: Union[float, int, str]) -> int:
 
 
 def valid_start_time(start_time: Union[float, int, str]) -> Union[float, int, str]:
-    if isinstance(start_time, int):
-        start_time = non_negative_int(start_time)
-        return start_time
-
     if isinstance(start_time, float):
         start_time = non_negative_float(start_time)
+        return start_time
+
+    if isinstance(start_time, int):
+        start_time = non_negative_int(start_time)
         return start_time
 
     if isinstance(start_time, str):

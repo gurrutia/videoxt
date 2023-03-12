@@ -11,6 +11,7 @@ from videoxt.validators import positive_int
 from videoxt.validators import valid_dir
 from videoxt.validators import valid_filename
 from videoxt.validators import valid_filepath
+from videoxt.validators import valid_image_format
 from videoxt.validators import ValidationException
 
 
@@ -115,6 +116,26 @@ def test_valid_filename_with_valid_filename():
     assert valid_filename("file_with_underscores.txt") == "file_with_underscores.txt"
     assert valid_filename("file-with-dashes.txt") == "file-with-dashes.txt"
     assert valid_filename("file (1).txt") == "file (1).txt"
+
+
+def test_valid_image_format_with_valid_lowercase_image_formats():
+    for image_format in C.VALID_IMAGE_FORMATS:
+        assert valid_image_format(image_format) == image_format
+
+
+def test_valid_image_format_with_valid_uppercase_image_formats():
+    for image_format in C.VALID_IMAGE_FORMATS:
+        assert valid_image_format(image_format.upper()) == image_format
+
+
+def test_valid_image_format_with_valid_lowercase_image_formats_with_dot():
+    for image_format in C.VALID_IMAGE_FORMATS:
+        assert valid_image_format(f".{image_format}") == image_format
+
+
+def test_valid_image_format_with_valid_uppercase_image_formats_with_dot():
+    for image_format in C.VALID_IMAGE_FORMATS:
+        assert valid_image_format(f".{image_format.upper()}") == image_format
 
 
 class TestNonTerminal:
@@ -274,3 +295,8 @@ class TestNonTerminal:
     def test_valid_filename_with_pipes(self):
         with pytest.raises(ValidationException):
             valid_filename("file|with|pipes.txt")
+
+    # valid_image_format
+    def test_valid_image_format_with_invalid_format_from_non_terminal(self):
+        with pytest.raises(ValidationException):
+            valid_image_format("invalid")

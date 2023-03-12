@@ -8,6 +8,7 @@ from videoxt.validators import non_negative_float
 from videoxt.validators import non_negative_int
 from videoxt.validators import positive_float
 from videoxt.validators import positive_int
+from videoxt.validators import valid_capture_rate
 from videoxt.validators import valid_dimensions
 from videoxt.validators import valid_dir
 from videoxt.validators import valid_filename
@@ -270,6 +271,16 @@ def test_valid_stop_time_with_valid_stop_time_floats():
     assert valid_stop_time(60.9) == 60.9
     assert valid_stop_time(3600.0) == 3600.0
     assert valid_stop_time(3600.9) == 3600.9
+
+
+def test_valid_capture_rate_with_valid_capture_rates():
+    assert valid_capture_rate(1, 0, 1) == 1
+    assert valid_capture_rate(12, 0, 12) == 12
+    assert valid_capture_rate(24, 0, 24) == 24
+    assert valid_capture_rate(30, 0, 30) == 30
+    assert valid_capture_rate(60, 0, 60) == 60
+    assert valid_capture_rate(120, 0, 120) == 120
+    assert valid_capture_rate(240, 0, 240) == 240
 
 
 class TestNonTerminal:
@@ -613,3 +624,16 @@ class TestNonTerminal:
     ):
         with pytest.raises(ValidationException):
             validate_video_extraction_range(2.0, 1.0, 3.0)
+
+    # valid_capture_rate
+    def test_valid_capture_rate_where_capture_rate_greater_than_frame_range_from_non_terminal(
+        self,
+    ):
+        with pytest.raises(ValidationException):
+            valid_capture_rate(1, 1, 1)
+
+    def test_valid_capture_rate_where_capture_rate_greater_than_frame_range_from_non_terminal(
+        self,
+    ):
+        with pytest.raises(ValidationException):
+            valid_capture_rate(100_000_000, 0, 30)

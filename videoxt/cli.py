@@ -1,12 +1,14 @@
 import argparse
 import sys
-from typing import Optional, Sequence
+from typing import Optional
+from typing import Sequence
 
 from rich import print
 
 import videoxt.constants as C
 import videoxt.validators as V
-from videoxt.extractors import VideoToGIF, VideoToImages
+from videoxt.extractors import VideoToGIF
+from videoxt.extractors import VideoToImages
 
 
 def main(argv: Optional[Sequence[str]] = None) -> None:
@@ -104,7 +106,7 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
     )
     subparsers = main_parser.add_subparsers(dest="subparser_name", required=True)
 
-    # img subparser
+    # images subparser
     parser_img = subparsers.add_parser(
         "images",
         help="Extract individual frames from a video as images.",
@@ -168,7 +170,6 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
             )
         except argparse.ArgumentTypeError as e:
             print(e)
-            sys.exit(1)
         else:
             vti.extract_images()
 
@@ -191,10 +192,9 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
             )
         except argparse.ArgumentTypeError as e:
             print(e)
-            sys.exit(1)
         else:
             vtg.create_gif()
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

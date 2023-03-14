@@ -326,7 +326,6 @@ class VideoToImages(BaseVideoExtractor):
             while video_capture.isOpened():
                 read_successful, image = video_capture.read()
                 if read_successful:
-                    # Write image to disk,
                     image_filename = f"{self.output_filename}_{frame_position + 1}.{self.image_format}"
                     image_path = os.path.join(str(self.output_dir), image_filename)
                     image = self._apply_image_transformations(image)
@@ -418,7 +417,6 @@ class VideoToGIF(BaseVideoExtractor):
 
     def create_gif(self) -> None:
         with VideoFileClip(self.video_path, audio=False) as clip:
-            # Create a subclip of the video from start_second to stop_second and apply transformations.
             subclip = clip.subclip(self.start_second, self.stop_second)
             subclip = self._apply_gif_transformations(subclip)
 

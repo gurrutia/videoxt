@@ -19,6 +19,7 @@ def timestamp_to_seconds(timestamp: str) -> int:
 
 def seconds_to_timestamp(seconds: Union[float, int]) -> str:
     """Converts seconds to a timestamp string. Milliseconds are truncated."""
-    if isinstance(seconds, float):
-        seconds = int(seconds)
-    return str(datetime.timedelta(seconds=seconds))
+    if seconds < 0:
+        seconds = 0
+
+    return str(datetime.timedelta(seconds=int(seconds)))

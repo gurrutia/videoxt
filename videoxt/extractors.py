@@ -33,22 +33,22 @@ class BaseVideoExtractor:
     output_dir: Optional[str] = None
     output_filename: Optional[str] = None
     monochrome: bool = False
-    quiet: bool = False
+    quiet: bool = True
     emoji: bool = False
     extraction_type: str = field(init=False)
-    start_second: float = field(init=False)
-    stop_second: float = field(init=False)
-    start_frame: int = field(init=False)
-    stop_frame: int = field(init=False)
-    target_dimensions: Tuple[int, int] = field(init=False)
     frame_count: int = field(init=False)
+    start_frame: int = field(init=False)
+    start_second: float = field(init=False)
+    stop_frame: int = field(init=False)
+    stop_second: float = field(init=False)
+    target_dimensions: Tuple[int, int] = field(init=False)
     video_abspath: str = field(init=False)
     video_basename: str = field(init=False)
+    video_dimensions: Tuple[int, int] = field(init=False)
     video_dirname: str = field(init=False)
     video_filename: str = field(init=False)
     video_length: str = field(init=False)
     video_length_seconds: float = field(init=False)
-    video_dimensions: Tuple[int, int] = field(init=False)
 
     def __post_init__(self) -> None:
         """The order in which these methods are called is important."""

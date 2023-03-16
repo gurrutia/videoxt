@@ -198,13 +198,14 @@ class BaseVideoExtractor:
         """Set the default output filename for extracted frames or gif.
 
         For the 'images' extraction type:
-        If the output filename is not specified, the default filename will be the name of the video file
-        with '_frame' appended to the end.
+        If the output filename is not specified, the default filename will be the name of
+        the video file with '_frame' appended to the end.
 
         For the 'gif' extraction type:
-        If the output filename is not specified, the default filename will be the name of the video file
-        with '.gif' appended to the end. If the output filename is specified, the '.gif' extension will be
-        appended to the end of the filename if it is not already present.
+        If the output filename is not specified, the default filename will be the name of
+        the video file with '.gif' appended to the end. If the output filename is
+        specified, the '.gif' extension will be appended to the end of the filename if it
+        is not already present.
         """
         if self.extraction_type == "images":
             if self.output_filename is None:
@@ -246,14 +247,18 @@ class BaseVideoExtractor:
     def __str__(self) -> str:
         start_time_display = f"{utils.seconds_to_timestamp(self.start_second)} | {self.start_second} seconds"
         stop_time_display = f"{utils.seconds_to_timestamp(self.stop_second)} | {self.stop_second} seconds"
+        start_frame_display = f"{self.start_frame}"
+        stop_frame_display = f"{self.stop_frame}"
         if self.emoji:
             start_time_display = f"{C.EMOJI_MAP['start']} {start_time_display}"
             stop_time_display = f"{C.EMOJI_MAP['stop']} {stop_time_display}"
+            start_frame_display = f"{C.EMOJI_MAP['start']} {start_frame_display}"
+            stop_frame_display = f"{C.EMOJI_MAP['stop']} {stop_frame_display}"
 
         return dedent(
             f"""
             {'VIDEO' if not self.emoji else C.EMOJI_MAP['video']}
-              input:        {self.video_path!r}
+              path:         {self.video_abspath}
               length:       {self.video_length} | {self.video_length_seconds} seconds
               fps:          {self.fps}
               frame count:  {self.frame_count}
@@ -262,8 +267,8 @@ class BaseVideoExtractor:
               type:         {self.extraction_type!r}
               start time:   {start_time_display}
               stop time:    {stop_time_display}
-              start frame:  {self.start_frame if not self.emoji else C.EMOJI_MAP['start'] + ' ' + str(self.start_frame)}
-              stop frame:   {self.stop_frame if not self.emoji else C.EMOJI_MAP['stop'] + ' ' + str(self.stop_frame)}
+              start frame:  {start_frame_display}
+              stop frame:   {stop_frame_display}
               output dir:   {self.output_dir}"""
         )
 
@@ -335,8 +340,9 @@ class VideoToImages(BaseVideoExtractor):
                         video_capture.release()
                         break
 
-                    # cv2.VideoCapture.read() increments and sets the next frame position by 1 on next read.
-                    # Therefore, the frame position is incremented by the capture rate only if capture rate > 1.
+                    # cv2.VideoCapture.read() increments by 1 and sets the next frame
+                    # position on next read. Therefore, the frame position is incremented
+                    # by the capture rate only if the capture rate is greater than 1.
                     frame_position += self.capture_rate
                     if self.capture_rate != 1:
                         video_capture.set(cv2.CAP_PROP_POS_FRAMES, frame_position)
@@ -344,7 +350,10 @@ class VideoToImages(BaseVideoExtractor):
                     progress.update(
                         extract_task,
                         advance=1,
-                        description=f"[yellow]EXTRACTING FRAMES FROM {self.video_basename!r} [{images_written}/{self.images_expected}]",
+                        description=(
+                            f"[yellow]EXTRACTING FRAMES FROM {self.video_basename!r}"
+                            f"[{images_written}/{self.images_expected}]"
+                        ),
                     )
 
                     images_written += 1
@@ -354,7 +363,8 @@ class VideoToImages(BaseVideoExtractor):
                     break
 
         print(
-            f"[green]EXTRACTION COMPLETE [{images_written}] IMAGES SAVED: {self.output_dir}[/green]"
+            f"[green]EXTRACTION COMPLETE [{images_written}] "
+            f"IMAGES SAVED: {self.output_dir}[/green]"
         )
 
     def __str__(self) -> str:
@@ -380,9 +390,9 @@ class VideoToImages(BaseVideoExtractor):
               format:       {self.image_format!r}
               resize:       {resize_display}
               rotate:       {rotate_display}
-              monochrome:   {self.monochrome}
               capture rate: {self.capture_rate}
               expected:     {self.images_expected}
+              monochrome:   {self.monochrome}
               dimensions:   {self.target_dimensions}
               """
         )
@@ -426,7 +436,8 @@ class VideoToGIF(BaseVideoExtractor):
                 print(str(self))
 
             with Console().status(
-                f"[yellow]CREATING GIF {self.output_filename!r} FROM {self.video_basename!r}[/yellow]"
+                f"[yellow]CREATING GIF {self.output_filename!r} "
+                f"FROM {self.video_basename!r}[/yellow]"
             ):
                 subclip.write_gif(
                     gif_path,
@@ -463,8 +474,8 @@ class VideoToGIF(BaseVideoExtractor):
               filename:     {self.output_filename!r}
               resize:       {resize_display}
               rotate:       {rotate_display}
-              monochrome:   {self.monochrome}
               speed:        {speed_display}
+              monochrome:   {self.monochrome}
               bounce:       {self.bounce}
               dimensions:   {self.target_dimensions}
               """

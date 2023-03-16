@@ -26,7 +26,7 @@ def positive_int(num: Union[float, int, str]) -> int:
         _raise_error(f"expected integer, got {num!r}")
 
     if not value.is_integer():
-        _raise_error(f"expected integer, got {num!r}")
+        _raise_error(f"expected integer, got {num}")
 
     if value <= 0:
         _raise_error(f"expected positive integer, got {num}")
@@ -61,7 +61,7 @@ def non_negative_int(num: Union[float, int, str]) -> int:
     return int(value)
 
 
-def non_negative_float(num: Union[int, float, str]) -> float:
+def non_negative_float(num: Union[float, int, str]) -> float:
     try:
         value = float(num)
     except ValueError:
@@ -248,16 +248,18 @@ def valid_stop_time(stop_time: Union[float, int, str]) -> Union[float, int, str]
 
 
 def validate_video_extraction_range(
-    start_seconds: float, stop_seconds: float, video_length_seconds: float
+    start_second: float, stop_second: float, video_length_second: float
 ) -> None:
-    if start_seconds > video_length_seconds:
+    if start_second > video_length_second:
         _raise_error(
-            f"start time in seconds ({start_seconds}) exceeds video length in seconds ({video_length_seconds})"
+            f"start time in seconds ({start_second}) exceeds "
+            f"video length in seconds ({video_length_second})"
         )
 
-    if start_seconds > stop_seconds:
+    if start_second > stop_second:
         _raise_error(
-            f"start time in seconds ({start_seconds}) exceeds stop time in seconds ({stop_seconds})"
+            f"start time in seconds ({start_second}) exceeds "
+            f"stop time in seconds ({stop_second})"
         )
 
 

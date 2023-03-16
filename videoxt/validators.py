@@ -1,5 +1,4 @@
 import argparse
-import os
 import re
 from pathlib import Path
 from typing import Tuple
@@ -73,21 +72,22 @@ def non_negative_float(num: Union[float, int, str]) -> float:
     return value
 
 
-def valid_filepath(filepath: Union[str, Path]) -> str:
-    filepath = str(filepath)
-    if not os.path.isfile(filepath):
-        _raise_error(f"file not found, got {filepath!r}")
+def valid_filepath(filepath: Union[Path, str]) -> Path:
+    if isinstance(filepath, str):
+        filepath = Path(filepath)
+
+    if not filepath.is_file():
+        _raise_error(f"file not found, got {filepath}")
 
     return filepath
 
 
-def valid_dir(dir: Union[str, Path]) -> str:
-    dir = str(dir)
-    if not os.path.exists(dir):
-        _raise_error(f"directory not found, got {dir!r}")
+def valid_dir(dir: Union[Path, str]) -> Path:
+    if isinstance(dir, str):
+        dir = Path(dir)
 
-    if not os.path.isdir(dir):
-        _raise_error(f"expected directory, got {dir!r}")
+    if not dir.is_dir():
+        _raise_error(f"directory not found, got {dir!r}")
 
     return dir
 

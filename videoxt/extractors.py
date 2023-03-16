@@ -1,7 +1,7 @@
 import math
-import os
 from dataclasses import dataclass
 from dataclasses import field
+from pathlib import Path
 from textwrap import dedent
 from typing import Optional
 from typing import Tuple
@@ -23,14 +23,14 @@ import videoxt.validators as V
 
 @dataclass
 class BaseVideoExtractor:
-    video_path: str
+    video_path: Path
     start_time: Union[float, int, str] = 0.0
     stop_time: Optional[Union[float, int, str]] = None
     fps: Optional[float] = None
     dimensions: Optional[Tuple[int, int]] = None
     resize: float = 1.0
     rotate: int = 0
-    output_dir: Optional[str] = None
+    output_dir: Optional[Path] = None
     output_filename: Optional[str] = None
     monochrome: bool = False
     quiet: bool = True
@@ -42,10 +42,10 @@ class BaseVideoExtractor:
     stop_frame: int = field(init=False)
     stop_second: float = field(init=False)
     target_dimensions: Tuple[int, int] = field(init=False)
-    video_abspath: str = field(init=False)
+    video_abspath: Path = field(init=False)
     video_basename: str = field(init=False)
     video_dimensions: Tuple[int, int] = field(init=False)
-    video_dirname: str = field(init=False)
+    video_dirname: Path = field(init=False)
     video_filename: str = field(init=False)
     video_length: str = field(init=False)
     video_length_seconds: float = field(init=False)
@@ -92,18 +92,14 @@ class BaseVideoExtractor:
                 self.output_filename = V.valid_filename(self.output_filename)
 
     def _initialize_video_attributes(self) -> None:
-        self.video_abspath = (
-            self.video_path
-            if os.path.isabs(self.video_path)
-            else os.path.abspath(self.video_path)
-        )
-        self.video_dirname = os.path.dirname(self.video_abspath)
-        self.video_basename = os.path.basename(self.video_abspath)
-        self.video_filename = os.path.splitext(self.video_basename)[0]
+        self.video_abspath = self.video_path.resolve()
+        self.video_dirname = self.video_abspath.parent
+        self.video_basename = self.video_abspath.name
+        self.video_filename = self.video_abspath.stem
 
     def _initialize_video_metadata(self) -> None:
         """Video metadata initialized: frame count, fps, video length, and video dimensions."""
-        video_capture = cv2.VideoCapture(self.video_abspath)
+        video_capture = cv2.VideoCapture(str(self.video_abspath))
         self.frame_count = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
 
         if self.fps is None:
@@ -178,14 +174,12 @@ class BaseVideoExtractor:
         if self.extraction_type == "images":
             if self.output_dir is None:
                 output_dir_name = f"{self.video_filename}_frames"
-                output_dir = os.path.join(self.video_dirname, output_dir_name)
+                output_dir = self.video_dirname / output_dir_name
 
-                if os.path.exists(output_dir):
+                if output_dir.exists():
                     index = 2
-                    while os.path.exists(output_dir):
-                        output_dir = os.path.join(
-                            self.video_dirname, f"{output_dir_name} ({index})"
-                        )
+                    while output_dir.exists():
+                        output_dir = self.video_dirname / f"{output_dir_name} ({index})"
                         index += 1
 
                 self.output_dir = output_dir
@@ -310,13 +304,13 @@ class VideoToImages(BaseVideoExtractor):
         return image
 
     def extract_images(self) -> None:
-        video_capture = cv2.VideoCapture(self.video_path)
+        video_capture = cv2.VideoCapture(str(self.video_abspath))
         frame_position = self.start_frame
         video_capture.set(cv2.CAP_PROP_POS_FRAMES, frame_position)
 
         # Only creates the directory if the default output directory `video_frames_*.jpg` was used.
-        if not os.path.exists(str(self.output_dir)):
-            os.mkdir(str(self.output_dir))
+        if not self.output_dir.exists():
+            self.output_dir.mkdir()
 
         if not self.quiet:
             print(str(self))
@@ -332,7 +326,7 @@ class VideoToImages(BaseVideoExtractor):
                 read_successful, image = video_capture.read()
                 if read_successful:
                     image_filename = f"{self.output_filename}_{frame_position + 1}.{self.image_format}"
-                    image_path = os.path.join(str(self.output_dir), image_filename)
+                    image_path = str(self.output_dir / image_filename)
                     image = self._apply_image_transformations(image)
                     cv2.imwrite(image_path, image)
 
@@ -426,11 +420,11 @@ class VideoToGIF(BaseVideoExtractor):
         return subclip
 
     def create_gif(self) -> None:
-        with VideoFileClip(self.video_path, audio=False) as clip:
+        with VideoFileClip(str(self.video_abspath), audio=False) as clip:
             subclip = clip.subclip(self.start_second, self.stop_second)
             subclip = self._apply_gif_transformations(subclip)
 
-            gif_path = os.path.join(str(self.output_dir), str(self.output_filename))
+            gif_path = str(self.output_dir / self.output_filename)
 
             if not self.quiet:
                 print(str(self))

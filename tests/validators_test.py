@@ -1,5 +1,5 @@
-import argparse
 import os
+from pathlib import Path
 
 import pytest
 
@@ -91,31 +91,31 @@ def test_non_negative_float_with_non_negative_ints():
     assert non_negative_float("100_000_000") == 100_000_000.0
 
 
-def test_valid_filepath_with_valid_string_filepath(tmp_path):
+def test_valid_filepath_with_valid_string_filepath(tmp_path: Path):
     filepath = tmp_path / "t.txt"
     filepath.write_text("t")
-    assert valid_filepath(str(filepath)) == str(filepath)
+    assert valid_filepath(str(filepath)) == filepath
     os.remove(filepath)
 
 
-def test_valid_filepath_with_valid_pathlib_filepath(tmp_path):
+def test_valid_filepath_with_valid_pathlib_filepath(tmp_path: Path):
     filepath = tmp_path / "t.txt"
     filepath.write_text("t")
-    assert valid_filepath(filepath) == str(filepath)
+    assert valid_filepath(filepath) == filepath
     os.remove(filepath)
 
 
-def test_valid_dir_with_valid_string_dir(tmp_path):
+def test_valid_dir_with_valid_dir_string(tmp_path: Path):
     dirpath = tmp_path / "t"
     dirpath.mkdir()
-    assert valid_dir(str(dirpath)) == str(dirpath)
+    assert valid_dir(str(dirpath)) == dirpath
     os.rmdir(dirpath)
 
 
-def test_valid_dir_with_valid_pathlib_dir(tmp_path):
+def test_valid_dir_with_valid_dir_pathlib(tmp_path: Path):
     dirpath = tmp_path / "t"
     dirpath.mkdir()
-    assert valid_dir(dirpath) == str(dirpath)
+    assert valid_dir(dirpath) == dirpath
     os.rmdir(dirpath)
 
 
@@ -387,22 +387,22 @@ class TestNonTerminal:
             non_negative_float("a")
 
     # valid_filepath
-    def test_valid_filepath_with_invalid_filepath_from_non_terminal(self):
+    def test_valid_filepath_with_invalid_string_filepath_from_non_terminal(self):
         with pytest.raises(ValidationException):
             valid_filepath("invalid.txt")
 
-    def test_invalid_filepath_with_non_string_from_non_terminal(self):
+    def test_valid_filepath_with_invalid_pathlib_filepath_from_non_terminal(self):
         with pytest.raises(ValidationException):
-            valid_filepath(1)
+            valid_filepath(Path("invalid.txt"))
 
     # valid_dir
-    def test_valid_dir_with_invalid_dir_from_non_terminal(self):
+    def test_valid_dir_with_invalid_dir_string_from_non_terminal(self):
         with pytest.raises(ValidationException):
             valid_dir("invalid")
 
-    def test_valid_dir_with_non_string_from_non_terminal(self):
+    def test_valid_dir_with_invalid_dir_pathlib_from_non_terminal(self):
         with pytest.raises(ValidationException):
-            valid_dir(1)
+            valid_dir(Path("invalid"))
 
     # valid_filename
     def test_valid_filename_with_slashes_from_non_terminal(self):

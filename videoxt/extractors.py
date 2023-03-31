@@ -1,476 +1,228 @@
-import math
+"""Extractor objects that implement video extraction using Request objects."""
+import itertools
+import typing as t
+from abc import ABC
+from abc import abstractmethod
 from dataclasses import dataclass
-from dataclasses import field
-from pathlib import Path
-from textwrap import dedent
-from typing import Optional
-from typing import Tuple
-from typing import Union
 
-import cv2
+import cv2  # type: ignore
 import numpy as np
-from moviepy.editor import concatenate
-from moviepy.editor import vfx
-from moviepy.editor import VideoFileClip
+from moviepy.editor import VideoFileClip  # type: ignore
 from rich import print
 from rich.console import Console
 from rich.progress import Progress
 
-import videoxt.constants as C
-import videoxt.utils as utils
-import videoxt.validators as V
+import videoxt.editors as E
+import videoxt.preppers as P
+import videoxt.utils as U
+from videoxt.requestors import AudioRequest
+from videoxt.requestors import BaseRequest
+from videoxt.requestors import ClipRequest
+from videoxt.requestors import FramesRequest
+from videoxt.requestors import GifRequest
+from videoxt.video import Video
 
 
 @dataclass
-class BaseVideoExtractor:
-    video_path: Path
-    start_time: Union[float, int, str] = 0.0
-    stop_time: Optional[Union[float, int, str]] = None
-    fps: Optional[float] = None
-    dimensions: Optional[Tuple[int, int]] = None
-    resize: float = 1.0
-    rotate: int = 0
-    output_dir: Optional[Path] = None
-    output_filename: Optional[str] = None
-    monochrome: bool = False
-    quiet: bool = True
-    emoji: bool = False
-    extraction_type: str = field(init=False)
-    frame_count: int = field(init=False)
-    start_frame: int = field(init=False)
-    start_second: float = field(init=False)
-    stop_frame: int = field(init=False)
-    stop_second: float = field(init=False)
-    target_dimensions: Tuple[int, int] = field(init=False)
-    video_abspath: Path = field(init=False)
-    video_basename: str = field(init=False)
-    video_dimensions: Tuple[int, int] = field(init=False)
-    video_dirname: Path = field(init=False)
-    video_filename: str = field(init=False)
-    video_length: str = field(init=False)
-    video_length_seconds: float = field(init=False)
+class Extractor(ABC):
+    request: BaseRequest
 
-    def __post_init__(self) -> None:
-        """The order in which these methods are called is important."""
-        self.extraction_type = self.__class__.__name__.lower().replace("videoto", "")
-        self._validate_user_input()
-        self._initialize_video_attributes()
-        self._initialize_video_metadata()
-        self._set_video_extraction_seconds_range()
-        V.validate_video_extraction_range(
-            self.start_second, self.stop_second, self.video_length_seconds
+    @abstractmethod
+    def apply_edits(
+        self, clip: t.Union[VideoFileClip, np.ndarray]
+    ) -> t.Union[VideoFileClip, np.ndarray]:
+        """Perform edits to the output media prior to extraction."""
+        pass
+
+    @abstractmethod
+    def extract(self) -> None:
+        """Initiate the extraction process."""
+        pass
+
+
+@dataclass
+class AudioExtractor(Extractor):
+    request: AudioRequest
+
+    def apply_edits(self, clip: VideoFileClip) -> VideoFileClip:
+        clip = E.trim_clip(
+            clip,
+            self.request.time_range.start_second,
+            self.request.time_range.stop_second,
         )
-        self._set_video_extraction_frame_range()
-        self._set_default_output_dir()
-        self._set_default_output_filename()
-        self._set_target_dimensions()
-
-    def _validate_user_input(self) -> None:
-        """Validations when run from command-line are handled by argparse."""
-        if not C.IS_TERMINAL:
-            self.video_path = V.valid_filepath(self.video_path)
-            self.start_time = V.valid_start_time(self.start_time)
-            self.stop_time = (
-                V.valid_stop_time(self.stop_time)
-                if self.stop_time is not None
-                else self.stop_time
-            )
-            self.fps = V.positive_float(self.fps) if self.fps is not None else None
-            self.resize = V.valid_resize_value(self.resize)
-            self.dimensions = (
-                V.valid_dimensions(self.dimensions)
-                if self.dimensions is not None
-                else self.dimensions
-            )
-            self.rotate = V.valid_rotate_value(self.rotate)
-            self.output_dir = (
-                V.valid_dir(self.output_dir)
-                if self.output_dir is not None
-                else self.output_dir
-            )
-            if self.output_filename is not None:
-                self.output_filename = V.valid_filename(self.output_filename)
-
-    def _initialize_video_attributes(self) -> None:
-        self.video_abspath = self.video_path.resolve()
-        self.video_dirname = self.video_abspath.parent
-        self.video_basename = self.video_abspath.name
-        self.video_filename = self.video_abspath.stem
-
-    def _initialize_video_metadata(self) -> None:
-        """Video metadata initialized: frame count, fps, video length, and video dimensions."""
-        video_capture = cv2.VideoCapture(str(self.video_abspath))
-        self.frame_count = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
-
-        if self.fps is None:
-            self.fps = round(video_capture.get(cv2.CAP_PROP_FPS), 2)
-
-        self.video_length_seconds = round(self.frame_count / self.fps, 2)
-        self.video_length = utils.seconds_to_timestamp(self.video_length_seconds)
-
-        self.video_dimensions = (
-            int(video_capture.get(cv2.CAP_PROP_FRAME_WIDTH)),
-            int(video_capture.get(cv2.CAP_PROP_FRAME_HEIGHT)),
+        clip = E.edit_clip_audio(clip, self.request.volume, self.request.normalize)
+        clip = E.edit_clip_motion(
+            clip, self.request.speed, self.request.reverse, self.request.bounce
         )
+
+        return clip
+
+    def extract(self) -> None:
+        with VideoFileClip(str(self.request.video.filepath)) as clip:
+            subclip = self.apply_edits(clip)
+
+            if self.request.verbose:
+                print(self.request.video.__str__() + str(self.request))
+
+            with Console().status(
+                f"[yellow]EXTRACTING AUDIO FROM {self.request.video.filepath.name!r} "
+                f"TO {self.request.filepath.name!r}[/yellow]"
+            ):
+                subclip.audio.write_audiofile(
+                    str(self.request.filepath), logger=None, fps=44100
+                )
+
+            print(
+                f"[green]AUDIO EXTRACTED: {str(self.request.filepath.resolve())}[/green]"
+            )
+
+
+@dataclass
+class ClipExtractor(Extractor):
+    request: ClipRequest
+
+    def apply_edits(self, clip: VideoFileClip) -> VideoFileClip:
+        clip = E.trim_clip(
+            clip,
+            self.request.time_range.start_second,
+            self.request.time_range.stop_second,
+        )
+        clip = E.edit_clip_audio(clip, self.request.volume, self.request.normalize)
+        clip = E.edit_clip_motion(
+            clip, self.request.speed, self.request.reverse, self.request.bounce
+        )
+        clip = E.edit_clip_image(
+            clip, self.request.dimensions, self.request.rotate, self.request.monochrome
+        )
+        return clip
+
+    def extract(self) -> None:
+        with VideoFileClip(str(self.request.video.filepath)) as clip:
+            subclip = self.apply_edits(clip)
+
+            if self.request.verbose:
+                print(self.request.video.__str__() + str(self.request))
+
+            with Console().status(
+                f"[yellow]EXTRACTING CLIP FROM {self.request.video.filepath.name!r} "
+                f"TO {self.request.filepath.name!r}[/yellow]"
+            ):
+                subclip.write_videofile(str(self.request.filepath), logger=None)
+
+            print(
+                f"[green]CLIP EXTRACTED: {str(self.request.filepath.resolve())}[/green]"
+            )
+
+
+@dataclass
+class FramesExtractor(Extractor):
+    request: FramesRequest
+
+    def apply_edits(self, image: np.ndarray) -> np.ndarray:
+        return E.edit_image(
+            image, self.request.dimensions, self.request.rotate, self.request.monochrome
+        )
+
+    def extract(self) -> None:
+        video_capture = cv2.VideoCapture(str(self.request.video.filepath))
+        video_capture.set(cv2.CAP_PROP_POS_FRAMES, self.request.time_range.start_frame)
+
+        if not self.request.dir.exists():
+            self.request.dir.mkdir()
+
+        if self.request.verbose:
+            print(self.request.video.__str__() + str(self.request))
+
+        with Progress(transient=True) as progress:
+            task = progress.add_task(
+                "EXTRACTING FRAMES", total=self.request.images_expected
+            )
+
+            frame_numbers = itertools.count(
+                start=self.request.time_range.start_frame,
+                step=self.request.capture_rate,
+            )
+
+            images_written = 0
+
+            for frame_number in frame_numbers:
+                read_successful, image = video_capture.read()
+
+                if not read_successful:
+                    break
+
+                image_filepath = P.prepare_filepath_image(
+                    self.request.dir,
+                    self.request.filename,
+                    frame_number,
+                    self.request.image_format,
+                )
+                image = self.apply_edits(image)
+                cv2.imwrite(image_filepath, image)
+
+                images_written += 1
+
+                progress.update(
+                    task,
+                    advance=1,
+                    description=(
+                        f"[yellow]EXTRACTING FRAMES FROM {self.request.video.filepath.name!r} "
+                        f"[{images_written}/{self.request.images_expected}][/yellow]"
+                    ),
+                )
+
+                if images_written == self.request.images_expected:
+                    break
 
         video_capture.release()
 
-    def _set_video_extraction_seconds_range(self) -> None:
-        """Set the start and stop seconds for video extraction
-
-        The stop second is set to the video length if the stop time is not specified or
-        if the stop second is greater than the video length.
-        """
-        self.start_second = (
-            utils.timestamp_to_seconds(self.start_time)
-            if isinstance(self.start_time, str)
-            else self.start_time
-        )
-
-        if self.stop_time is not None:
-            self.stop_second = (
-                utils.timestamp_to_seconds(self.stop_time)
-                if isinstance(self.stop_time, str)
-                else self.stop_time
-            )
-            self.stop_second = (
-                self.video_length_seconds
-                if self.stop_second > self.video_length_seconds
-                else self.stop_second
-            )
-        else:
-            self.stop_second = self.video_length_seconds
-
-    def _set_video_extraction_frame_range(self) -> None:
-        """Set the start and stop frame for video extraction
-
-        The stop frame is set to the frame count if the stop time is not specified or
-        if the stop frame is greater than the frame count.
-        """
-        self.start_frame = int(self.start_second * self.fps)  # type: ignore
-
-        if self.stop_time is not None:
-            self.stop_frame = int(self.stop_second * self.fps)  # type: ignore
-            self.stop_frame = (
-                self.frame_count
-                if self.stop_frame > self.frame_count
-                else self.stop_frame
-            )
-        else:
-            self.stop_frame = self.frame_count
-
-    def _set_default_output_dir(self) -> None:
-        """Set the default output directory for extracted frames or gif.
-
-        For the 'images' extraction type:
-        If the output directory is not specified, the default directory will be created
-        in the same directory as the video file. If the default directory already exists,
-        a new directory will be created with a number appended to the end of the name.
-
-        For the 'gif' extraction type:
-        If the output directory is not specified, the gif will be saved in the same directory
-        as the video file.
-        """
-        if self.extraction_type == "images":
-            if self.output_dir is None:
-                output_dir_name = f"{self.video_filename}_frames"
-                output_dir = self.video_dirname / output_dir_name
-
-                if output_dir.exists():
-                    index = 2
-                    while output_dir.exists():
-                        output_dir = self.video_dirname / f"{output_dir_name} ({index})"
-                        index += 1
-
-                self.output_dir = output_dir
-
-        elif self.extraction_type == "gif":
-            if self.output_dir is None:
-                self.output_dir = self.video_dirname
-
-    def _set_default_output_filename(self) -> None:
-        """Set the default output filename for extracted frames or gif.
-
-        For the 'images' extraction type:
-        If the output filename is not specified, the default filename will be the name of
-        the video file with '_frame' appended to the end.
-
-        For the 'gif' extraction type:
-        If the output filename is not specified, the default filename will be the name of
-        the video file with '.gif' appended to the end. If the output filename is
-        specified, the '.gif' extension will be appended to the end of the filename if it
-        is not already present.
-        """
-        if self.extraction_type == "images":
-            if self.output_filename is None:
-                self.output_filename = f"{self.video_filename}_frame"
-
-        elif self.extraction_type == "gif":
-            if self.output_filename is None:
-                self.output_filename = f"{self.video_filename}.gif"
-            else:
-                if not self.output_filename.endswith(".gif"):
-                    self.output_filename += ".gif"
-
-    def _set_target_dimensions(self) -> None:
-        """Set the target dimensions for extracted frames or gif.
-
-        If the resize value is not 1, each dimension will be multiplied by the resize value,
-        regardless of whether or not the user specified the dimensions.
-        If the user does not specify the dimensions, the target dimensions
-        will be the same as the video dimensions.
-        """
-        if self.dimensions is not None:
-            if self.resize != 1:
-                self.target_dimensions = tuple(
-                    [int(dimension * self.resize) for dimension in self.dimensions]
-                )
-            else:
-                self.target_dimensions = self.dimensions
-        else:
-            if self.resize != 1:
-                self.target_dimensions = tuple(
-                    [
-                        int(dimension * self.resize)
-                        for dimension in self.video_dimensions
-                    ]
-                )
-            else:
-                self.target_dimensions = self.video_dimensions
-
-    def __str__(self) -> str:
-        start_time_display = f"{utils.seconds_to_timestamp(self.start_second)} | {self.start_second} seconds"
-        stop_time_display = f"{utils.seconds_to_timestamp(self.stop_second)} | {self.stop_second} seconds"
-        start_frame_display = f"{self.start_frame}"
-        stop_frame_display = f"{self.stop_frame}"
-        if self.emoji:
-            start_time_display = f"{C.EMOJI_MAP['start']} {start_time_display}"
-            stop_time_display = f"{C.EMOJI_MAP['stop']} {stop_time_display}"
-            start_frame_display = f"{C.EMOJI_MAP['start']} {start_frame_display}"
-            stop_frame_display = f"{C.EMOJI_MAP['stop']} {stop_frame_display}"
-
-        return dedent(
-            f"""
-            {'VIDEO' if not self.emoji else C.EMOJI_MAP['video']}
-              path:         {self.video_abspath}
-              length:       {self.video_length} | {self.video_length_seconds} seconds
-              fps:          {self.fps}
-              frame count:  {self.frame_count}
-              dimensions:   {self.video_dimensions}
-            {'EXTRACTION' if not self.emoji else C.EMOJI_MAP['extraction']}
-              type:         {self.extraction_type!r}
-              start time:   {start_time_display}
-              stop time:    {stop_time_display}
-              start frame:  {start_frame_display}
-              stop frame:   {stop_frame_display}
-              output dir:   {self.output_dir}"""
-        )
+        print(f"[green]FRAMES EXTRACTED: {self.request.dir.resolve()}[/green]")
 
 
 @dataclass
-class VideoToImages(BaseVideoExtractor):
-    capture_rate: int = 1
-    image_format: str = "jpg"
-    images_expected: int = field(init=False)
+class GifExtractor(Extractor):
+    request: GifRequest
 
-    def __post_init__(self) -> None:
-        super().__post_init__()
-        self._validate_image_input()
-        self._set_images_expected()
-
-    def _validate_image_input(self) -> None:
-        if not C.IS_TERMINAL:
-            self.image_format = V.valid_image_format(self.image_format)
-            self.capture_rate = V.positive_int(self.capture_rate)
-
-        self.capture_rate = V.valid_capture_rate(
-            self.capture_rate, self.start_frame, self.stop_frame
+    def apply_edits(self, clip: VideoFileClip) -> VideoFileClip:
+        clip = E.trim_clip(
+            clip,
+            self.request.time_range.start_second,
+            self.request.time_range.stop_second,
+        )
+        clip = E.edit_clip_image(
+            clip, self.request.dimensions, self.request.rotate, self.request.monochrome
+        )
+        clip = E.edit_clip_motion(
+            clip, self.request.speed, self.request.reverse, self.request.bounce
         )
 
-    def _set_images_expected(self) -> None:
-        self.images_expected = math.ceil(
-            (self.stop_frame - self.start_frame) / self.capture_rate
-        )
+        return clip
 
-    def _apply_image_transformations(self, image: np.ndarray) -> np.ndarray:
-        image = cv2.resize(image, self.target_dimensions)
+    def extract(self) -> None:
+        with VideoFileClip(str(self.request.video.filepath)) as clip:
+            subclip = self.apply_edits(clip)
 
-        if self.rotate in C.ROTATION_MAP:
-            image = cv2.rotate(image, C.ROTATION_MAP[self.rotate])
-
-        if self.monochrome:
-            image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
-        return image
-
-    def extract_images(self) -> None:
-        video_capture = cv2.VideoCapture(str(self.video_abspath))
-        frame_position = self.start_frame
-        video_capture.set(cv2.CAP_PROP_POS_FRAMES, frame_position)
-
-        # Only creates the directory if the default output directory `video_frames_*.jpg` was used.
-        if not self.output_dir.exists():
-            self.output_dir.mkdir()
-
-        if not self.quiet:
-            print(str(self))
-
-        with Progress(transient=True) as progress:
-            extract_task = progress.add_task(
-                f"[yellow]EXTRACTING FRAMES {self.video_basename}",
-                total=self.images_expected,
-            )
-
-            images_written = 1
-            while video_capture.isOpened():
-                read_successful, image = video_capture.read()
-                if read_successful:
-                    image_filename = f"{self.output_filename}_{frame_position + 1}.{self.image_format}"
-                    image_path = str(self.output_dir / image_filename)
-                    image = self._apply_image_transformations(image)
-                    cv2.imwrite(image_path, image)
-
-                    if self.images_expected == images_written:
-                        video_capture.release()
-                        break
-
-                    # cv2.VideoCapture.read() increments by 1 and sets the next frame
-                    # position on next read. Therefore, the frame position is incremented
-                    # by the capture rate only if the capture rate is greater than 1.
-                    frame_position += self.capture_rate
-                    if self.capture_rate != 1:
-                        video_capture.set(cv2.CAP_PROP_POS_FRAMES, frame_position)
-
-                    progress.update(
-                        extract_task,
-                        advance=1,
-                        description=(
-                            f"[yellow]EXTRACTING FRAMES FROM {self.video_basename!r}"
-                            f"[{images_written}/{self.images_expected}]"
-                        ),
-                    )
-
-                    images_written += 1
-
-                else:
-                    video_capture.release()
-                    break
-
-        print(
-            f"[green]EXTRACTION COMPLETE [{images_written}] "
-            f"IMAGES SAVED: {self.output_dir}[/green]"
-        )
-
-    def __str__(self) -> str:
-        if self.emoji:
-            if self.resize < 1:
-                resize_display = str(self.resize) + " " + C.EMOJI_MAP["resize_small"]
-            elif self.resize > 1:
-                resize_display = str(self.resize) + " " + C.EMOJI_MAP["resize_large"]
-            else:
-                resize_display = str(self.resize) + " " + C.EMOJI_MAP["resize_normal"]
-
-            rotate_display = str(self.rotate) + " " + C.EMOJI_MAP[self.rotate]
-        else:
-            resize_display = str(self.resize)
-            rotate_display = str(self.rotate)
-
-        name_display = f"{self.output_filename}_*.{self.image_format}"
-
-        return super().__str__() + dedent(
-            f"""
-            {"IMAGES" if not self.emoji else C.EMOJI_MAP['image']}
-              filenames:    {name_display!r}
-              format:       {self.image_format!r}
-              resize:       {resize_display}
-              rotate:       {rotate_display}
-              capture rate: {self.capture_rate}
-              expected:     {self.images_expected}
-              monochrome:   {self.monochrome}
-              dimensions:   {self.target_dimensions}
-              """
-        )
-
-
-@dataclass
-class VideoToGIF(BaseVideoExtractor):
-    speed: float = 1.0
-    bounce: bool = False
-
-    def __post_init__(self) -> None:
-        super().__post_init__()
-        self._validate_gif_input()
-
-    def _validate_gif_input(self) -> None:
-        if not C.IS_TERMINAL:
-            self.speed = V.positive_float(self.speed)
-
-    def _apply_gif_transformations(self, subclip: VideoFileClip) -> VideoFileClip:
-        subclip = subclip.resize(self.target_dimensions).speedx(self.speed)
-
-        if self.rotate != 0:
-            subclip = subclip.rotate(self.rotate)
-
-        if self.bounce:
-            subclip = concatenate([subclip, subclip.fx(vfx.time_mirror)])
-
-        if self.monochrome:
-            subclip = subclip.fx(vfx.blackwhite)
-
-        return subclip
-
-    def create_gif(self) -> None:
-        with VideoFileClip(str(self.video_abspath), audio=False) as clip:
-            subclip = clip.subclip(self.start_second, self.stop_second)
-            subclip = self._apply_gif_transformations(subclip)
-
-            gif_path = str(self.output_dir / self.output_filename)
-
-            if not self.quiet:
-                print(str(self))
+            if self.request.verbose:
+                print(self.request.video.__str__() + str(self.request))
 
             with Console().status(
-                f"[yellow]CREATING GIF {self.output_filename!r} "
-                f"FROM {self.video_basename!r}[/yellow]"
+                f"[yellow]EXTRACTING GIF FROM {self.request.video.filepath.name!r} "
+                f"TO {self.request.filepath.name!r}[/yellow]"
             ):
-                subclip.write_gif(
-                    gif_path,
-                    fps=self.fps,
-                    logger=None,
-                )
-            print(f"[green]GIF CREATED HERE: {gif_path}[/green]")
+                subclip.write_gif(str(self.request.filepath), logger=None)
 
-    def __str__(self) -> str:
-        if self.emoji:
-            if self.resize < 1:
-                resize_display = str(self.resize) + " " + C.EMOJI_MAP["resize_small"]
-            elif self.resize > 1:
-                resize_display = str(self.resize) + " " + C.EMOJI_MAP["resize_large"]
-            else:
-                resize_display = str(self.resize) + " " + C.EMOJI_MAP["resize_normal"]
+            print(
+                f"[green]GIF EXTRACTED: {str(self.request.filepath.resolve())}[/green]"
+            )
 
-            rotate_display = str(self.rotate) + " " + C.EMOJI_MAP[self.rotate]
 
-            if self.speed > 1:
-                speed_display = str(self.speed) + " " + C.EMOJI_MAP["speed_fast"]
-            elif self.speed < 1:
-                speed_display = str(self.speed) + " " + C.EMOJI_MAP["speed_slow"]
-            else:
-                speed_display = str(self.speed) + " " + C.EMOJI_MAP["speed_normal"]
-        else:
-            resize_display = str(self.resize)
-            rotate_display = str(self.rotate)
-            speed_display = str(self.speed)
-
-        return super().__str__() + dedent(
-            f"""
-            {"GIF" if not self.emoji else C.EMOJI_MAP['gif']}
-              filename:     {self.output_filename!r}
-              resize:       {resize_display}
-              rotate:       {rotate_display}
-              speed:        {speed_display}
-              monochrome:   {self.monochrome}
-              bounce:       {self.bounce}
-              dimensions:   {self.target_dimensions}
-              """
-        )
+def extraction_factory(
+    video: Video,
+    request_cls: t.Type[BaseRequest],
+    extractor_cls: t.Type[Extractor],
+    **kwargs: t.Dict[str, t.Any],
+) -> None:
+    request_kwargs = U.parse_kwargs(kwargs, request_cls) if kwargs else kwargs
+    request = request_cls(video, **request_kwargs)
+    extractor = extractor_cls(request)
+    extractor.extract()

@@ -1,201 +1,251 @@
 import argparse
 import sys
-from typing import Optional
-from typing import Sequence
+import typing as t
 
-from rich import print
-
+import videoxt.api as API
 import videoxt.constants as C
 import videoxt.validators as V
-from videoxt.extractors import VideoToGIF
-from videoxt.extractors import VideoToImages
+from videoxt.exceptions import ValidationException
 
 
-def main(argv: Optional[Sequence[str]] = None) -> None:
-    C.IS_TERMINAL = True
+def process_args(args: argparse.Namespace) -> int:
+    subparser_name = args.subparser_name
+    del args.subparser_name
 
-    # parent_parser houses shared subparser args
+    filepath = args.filepath
+    del args.filepath
+
+    kwargs = vars(args)
+
+    if subparser_name == "audio":
+        API.extract_audio(filepath, **kwargs)
+        return 0
+    elif subparser_name == "clip":
+        API.extract_clip(filepath, **kwargs)
+        return 0
+    elif subparser_name == "frames":
+        API.extract_frames(filepath, **kwargs)
+        return 0
+    elif subparser_name == "gif":
+        API.extract_gif(filepath, **kwargs)
+        return 0
+
+    return 1
+
+
+def main(argv: t.Optional[t.Sequence[str]] = None) -> int:
+    # parent_parser houses arguments common to all subparsers
     parent_parser = argparse.ArgumentParser(add_help=False)
     parent_parser.add_argument(
-        "video_path",
-        type=V.valid_filepath,
+        "filepath",
+        type=V.valid_filepath_cli,
         help="Path to the video file with extension.",
     )
     parent_parser.add_argument(
         "--start-time",
-        type=V.valid_start_time,
-        default=0.0,
+        "-s",
+        type=V.valid_start_time_cli,
+        default="0:00:00",
         metavar="",
         dest="start_time",
-        help="Specify the start time of the video to extract frames from. Default is the start of the video.",
+        help="Time to start extraction. Can be a number representing seconds or a timestamp. Example: 0:55 or 55.",
     )
     parent_parser.add_argument(
         "--stop-time",
-        type=V.valid_stop_time,
+        "-S",
+        type=V.valid_stop_time_cli,
         metavar="",
         dest="stop_time",
-        help="Specify the stop time of the video to extract frames from. Default is the end of the video.",
+        help="Time to stop extraction. Can be a number representing seconds or a timestamp. Example: 1:30 or 90.",
     )
     parent_parser.add_argument(
         "--fps",
-        type=V.positive_float,
+        "-f",
+        type=V.positive_float_cli,
         metavar="",
-        help="Specify the video frames per second. This will override the video metadata FPS.",
+        help="Override the video's frames per second.",
     )
     parent_parser.add_argument(
-        "--dimensions",
-        type=V.positive_int,
-        nargs=2,
+        "--dir",
+        "-d",
+        type=V.valid_dir_cli,
         metavar="",
-        help="Specify the media output dimensions as space-separated values (Ex: --dimensions 1920 1080). Defaults to native video dimensions.",
+        dest="dir",
+        help="Directory to save the media to. Default is the video's directory.",
     )
     parent_parser.add_argument(
-        "--resize",
-        type=V.valid_resize_value,
-        default=1.0,
+        "--filename",
+        "-fn",
+        type=V.valid_filename_cli,
         metavar="",
-        help="Resize the media output by a factor of n. Default is 1.0, which is the original size of the video.",
-    )
-    parent_parser.add_argument(
-        "--rotate",
-        type=V.valid_rotate_value,
-        default=0,
-        metavar="",
-        dest="rotate",
-        help="Rotate the media output by 90, 180, or 270 degrees. Default is 0 (no rotation).",
-    )
-    parent_parser.add_argument(
-        "--output-dir",
-        type=V.valid_dir,
-        metavar="",
-        dest="output_dir",
-        help="Directory to save the media output to. Default is within input video directory.",
-    )
-    parent_parser.add_argument(
-        "--output-filename",
-        type=V.valid_filename,
-        metavar="",
-        dest="output_filename",
-        help="Specify the file name of the media output. Default is the input video file name.",
-    )
-    parent_parser.add_argument(
-        "--monochrome",
-        action="store_true",
-        help="Convert the media output to monochrome (black and white).",
+        dest="filename",
+        help="Filename of the resulting media without extension. Default is the input video filename.",
     )
     parent_parser.add_argument(
         "--quiet",
-        action="store_true",
-        help="Disable extraction details in terminal.",
-    )
-    parent_parser.add_argument(
-        "--emoji",
-        action="store_true",
-        help="Enable emoji's in terminal.",
+        "-q",
+        action="store_false",
+        dest="verbose",
+        help="Disable extraction details from being printed to the console.",
     )
 
-    # main parser and subparsers
+    # parent_parser_audio houses arguments common to audio and clip subparsers
+    parent_parser_audio = argparse.ArgumentParser(add_help=False)
+    parent_parser_audio.add_argument(
+        "--volume",
+        "-v",
+        type=V.non_negative_float_cli,
+        default=1.0,
+        metavar="",
+        help="Increase or decrease the audio volume by a factor of n.",
+    )
+    parent_parser_audio.add_argument(
+        "--normalize",
+        action="store_true",
+        help="Normalize the audio output to a maximum of 0dB.",
+    )
+
+    # parent_parser_image houses arguments common to clip, frames and gif subparsers
+    parent_parser_image = argparse.ArgumentParser(add_help=False)
+    parent_parser_image.add_argument(
+        "--dimensions",
+        "-dm",
+        type=V.positive_int_cli,
+        nargs=2,
+        metavar="",
+        help="The output media dimensions as space-separated values (Ex: 1920 1080). Defaults to the input video dimensions.",
+    )
+    parent_parser_image.add_argument(
+        "--resize",
+        "-rs",
+        type=V.valid_resize_value_cli,
+        default=1.0,
+        metavar="",
+        help="Resize the media output by a factor of n.",
+    )
+    parent_parser_image.add_argument(
+        "--rotate",
+        "-rt",
+        type=V.valid_rotate_value_cli,
+        default=0,
+        metavar="",
+        dest="rotate",
+        help="Rotate the media output by 90, 180, or 270 degrees.",
+    )
+    parent_parser_image.add_argument(
+        "--monochrome",
+        action="store_true",
+        help="Apply a black and white filter to the media output.",
+    )
+
+    # parent_parser_motion houses arguments common to audio, clip and gif subparsers
+    parent_parser_motion = argparse.ArgumentParser(add_help=False)
+    parent_parser_motion.add_argument(
+        "--speed",
+        "-sp",
+        type=V.positive_float_cli,
+        default=1.0,
+        metavar="",
+        help="Increase or decrease the speed of the output media by a factor of n.",
+    )
+    parent_parser_motion.add_argument(
+        "--bounce",
+        action="store_true",
+        help="Make the output media bounce back and forth, boomerang style.",
+    )
+    parent_parser_motion.add_argument(
+        "--reverse",
+        action="store_true",
+        help="Reverse the output media.",
+    )
+
+    # main_parser encompasses all subparsers
     main_parser = argparse.ArgumentParser(
         prog="videoxt",
-        description="Extract individual frames from a video, or create a GIF between two points in a video.",
+        description=(
+            "A video extraction tool allowing you to extract "
+            "audio, clips, frames and gifs from videos."
+        ),
     )
     main_parser.add_argument(
         "--version",
+        "-V",
         action="version",
         version=f"%(prog)s {C.VERSION}",
     )
     subparsers = main_parser.add_subparsers(dest="subparser_name", required=True)
 
-    # images subparser
-    parser_img = subparsers.add_parser(
-        "images",
-        help="Extract individual frames from a video as images.",
-        parents=[parent_parser],
+    # audio subparser
+    subparser_audio = subparsers.add_parser(
+        "audio",
+        help="Extract audio from video.",
+        parents=[parent_parser, parent_parser_audio],
     )
-    parser_img.add_argument(
+    subparser_audio.add_argument(
+        "--audio-format",
+        "-af",
+        type=V.valid_audio_format_cli,
+        metavar="",
+        default="mp3",
+        dest="audio_format",
+        help="Audio format to save as. Default is 'mp3'.",
+    )
+
+    # clip subparser
+    subparsers.add_parser(
+        "clip",
+        help="Extract a clip of a video file. Only supports 'mp4' output.",
+        parents=[
+            parent_parser,
+            parent_parser_audio,
+            parent_parser_image,
+            parent_parser_motion,
+        ],
+    )
+
+    # frames subparser
+    subparser_frames = subparsers.add_parser(
+        "frames",
+        help="Extract individual frames from a video and save them as images.",
+        parents=[parent_parser, parent_parser_image],
+    )
+    subparser_frames.add_argument(
+        "--image-format",
+        "-if",
+        type=V.valid_image_format_cli,
+        metavar="",
+        default="jpg",
+        dest="image_format",
+        help="Image format to save the frames as. Default is 'jpg'.",
+    )
+    subparser_frames.add_argument(
         "--capture-rate",
-        type=V.positive_int,
+        "-cr",
+        type=V.positive_int_cli,
         default=1,
         metavar="",
         dest="capture_rate",
         help="Capture every nth video frame. Default is 1, which captures every frame.",
     )
-    parser_img.add_argument(
-        "--image-format",
-        type=V.valid_image_format,
-        default="jpg",
-        metavar="",
-        dest="image_format",
-        help="Specify the image format to save the frames as. Default is jpg.",
-    )
 
     # gif subparser
-    parser_gif = subparsers.add_parser(
+    subparsers.add_parser(
         "gif",
-        help="create a GIF between two points in a video.",
-        parents=[parent_parser],
-    )
-    parser_gif.add_argument(
-        "--speed",
-        type=V.positive_float,
-        default=1.0,
-        metavar="",
-        help="Speed of the GIF animation. Default is 1.0, which is the original speed of the video.",
-    )
-    parser_gif.add_argument(
-        "--bounce",
-        action="store_true",
-        help="Make GIF bounce forwards and backwards, boomerang style.",
+        help="Create a GIF between two points in a video.",
+        parents=[parent_parser, parent_parser_image, parent_parser_motion],
     )
 
-    # parse args
-    args = main_parser.parse_args(argv)
+    try:
+        args = main_parser.parse_args(argv)
+    except argparse.ArgumentTypeError as e:
+        print(e)
+        return 1
 
-    if args.subparser_name == "images":
-        try:
-            vti = VideoToImages(
-                video_path=args.video_path,
-                start_time=args.start_time,
-                stop_time=args.stop_time,
-                dimensions=args.dimensions,
-                resize=args.resize,
-                rotate=args.rotate,
-                fps=args.fps,
-                output_dir=args.output_dir,
-                output_filename=args.output_filename,
-                monochrome=args.monochrome,
-                quiet=args.quiet,
-                emoji=args.emoji,
-                capture_rate=args.capture_rate,
-                image_format=args.image_format,
-            )
-        except argparse.ArgumentTypeError as e:
-            print(e)
-        else:
-            vti.extract_images()
-
-    if args.subparser_name == "gif":
-        try:
-            vtg = VideoToGIF(
-                video_path=args.video_path,
-                start_time=args.start_time,
-                stop_time=args.stop_time,
-                dimensions=args.dimensions,
-                resize=args.resize,
-                rotate=args.rotate,
-                fps=args.fps,
-                output_dir=args.output_dir,
-                output_filename=args.output_filename,
-                monochrome=args.monochrome,
-                quiet=args.quiet,
-                emoji=args.emoji,
-                speed=args.speed,
-                bounce=args.bounce,
-            )
-        except argparse.ArgumentTypeError as e:
-            print(e)
-        else:
-            vtg.create_gif()
+    try:
+        return process_args(args)
+    except ValidationException as e:
+        print(e)
+        return 1
 
 
 if __name__ == "__main__":

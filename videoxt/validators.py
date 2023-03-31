@@ -1,270 +1,190 @@
+"""User input validators called from Request objects and command line."""
 import argparse
 import re
+import typing as t
 from pathlib import Path
-from typing import Tuple
-from typing import Union
 
 import videoxt.constants as C
-import videoxt.utils as utils
+import videoxt.utils as U
+from videoxt.exceptions import ValidationException
 
 
-class ValidationException(Exception):
-    pass
-
-
-def _raise_error(error_msg: str) -> None:
-    if C.IS_TERMINAL:
+def _raise_error(error_msg: str, from_cli: bool = False) -> None:
+    if from_cli:
         raise argparse.ArgumentTypeError(error_msg)
     raise ValidationException(error_msg)
 
 
-def positive_int(num: Union[float, int, str]) -> int:
+def positive_int(num: t.Union[float, int, str], from_cli: bool = False) -> int:
     try:
         value = float(num)
     except ValueError:
-        _raise_error(f"expected integer, got {num!r}")
+        _raise_error(f"expected integer, got {num!r}", from_cli)
 
     if not value.is_integer():
-        _raise_error(f"expected integer, got {num}")
+        _raise_error(f"expected integer, got {num}", from_cli)
 
     if value <= 0:
-        _raise_error(f"expected positive integer, got {num}")
+        _raise_error(f"expected positive integer, got {num}", from_cli)
 
     return int(value)
 
 
-def positive_float(num: Union[float, int, str]) -> float:
+def positive_float(num: t.Union[float, int, str], from_cli: bool = False) -> float:
     try:
         value = float(num)
     except ValueError:
-        _raise_error(f"expected numeric value, got {num!r}")
+        _raise_error(f"expected numeric value, got {num!r}", from_cli)
 
     if value <= 0:
-        _raise_error(f"expected positive number, got {num}")
+        _raise_error(f"expected positive number, got {num}", from_cli)
 
     return value
 
 
-def non_negative_int(num: Union[float, int, str]) -> int:
+def non_negative_int(num: t.Union[float, int, str], from_cli: bool = False) -> int:
     try:
         value = float(num)
     except ValueError:
-        _raise_error(f"expected integer, got {num!r}")
+        _raise_error(f"expected integer, got {num!r}", from_cli)
 
     if not value.is_integer():
-        _raise_error(f"expected integer, got {num!r}")
+        _raise_error(f"expected integer, got {num!r}", from_cli)
 
     if value < 0:
-        _raise_error(f"expected non-negative integer, got {num}")
+        _raise_error(f"expected non-negative integer, got {num}", from_cli)
 
     return int(value)
 
 
-def non_negative_float(num: Union[float, int, str]) -> float:
+def non_negative_float(num: t.Union[float, int, str], from_cli: bool = False) -> float:
     try:
         value = float(num)
     except ValueError:
-        _raise_error(f"expected numeric value, got {num!r}")
+        _raise_error(f"expected numeric value, got {num!r}", from_cli)
 
     if value < 0:
-        _raise_error(f"expected non-negative number, got {num}")
+        _raise_error(f"expected non-negative number, got {num}", from_cli)
 
     return value
 
 
-def valid_filepath(filepath: Union[Path, str]) -> Path:
-    if isinstance(filepath, str):
-        filepath = Path(filepath)
+def valid_dir(dir: t.Union[Path, str], from_cli: bool = False) -> Path:
+    dir_path = Path(dir)
 
-    if not filepath.is_file():
-        _raise_error(f"file not found, got {filepath}")
+    if not dir_path.is_dir():
+        _raise_error(f"directory not found, got {dir_path!r}", from_cli)
 
-    return filepath
-
-
-def valid_dir(dir: Union[Path, str]) -> Path:
-    if isinstance(dir, str):
-        dir = Path(dir)
-
-    if not dir.is_dir():
-        _raise_error(f"directory not found, got {dir!r}")
-
-    return dir
+    return dir_path
 
 
-def valid_filename(filename: str) -> str:
+def valid_filepath(filepath: t.Union[Path, str], from_cli: bool = False) -> Path:
+    filepath_path = Path(filepath)
+
+    if not filepath_path.is_file():
+        _raise_error(f"file not found, got {filepath_path}", from_cli)
+
+    return filepath_path
+
+
+def valid_filename(filename: str, from_cli: bool = False) -> str:
     invalid_chars = r"[\\/:*?\"<>|]"
-
     if re.search(invalid_chars, filename):
         _raise_error(
             f"invalid filename, got {filename!r}\n"
-            f"filename can't contain any of the following characters: \\/:*?\"<>|"
+            f"filename can't contain any of the following characters: \\/:*?\"<>|",
+            from_cli,
         )
+
+    if not filename:
+        _raise_error(f"invalid filename, got {filename!r}", from_cli)
 
     return filename
 
 
-def valid_image_format(image_format: str) -> str:
-    image_format = str(image_format).lower().strip(".")
-    if image_format not in C.VALID_IMAGE_FORMATS:
-        _raise_error(
-            f"invalid image format, got {image_format!r}\n"
-            f"valid image formats: {C.VALID_IMAGE_FORMATS}"
-        )
+def valid_timestamp(timestamp: str, from_cli: bool = False) -> str:
+    """Validates timestamps are in the correct format. Microseconds are ignored.
 
-    return image_format
-
-
-def valid_timestamp(timestamp: str, timestamp_type: str) -> str:
-    """Validates timestamp strings with colons are in the correct format:
-    (HH:MM:SS, H:MM:SS, MM:SS, M:SS, SS, S),
-    then converts to seconds for additional validation.
-
-    Milliseconds are ignored.
-
-    If the timestamp does not include a colon,
-    it is assumed to be a float representing seconds.
-
-    If the timestamp_type is "start",
-    the timestamp as seconds is validated to be a non-negative number.
-
-    If the timestamp_type is "stop",
-    the timestamp as seconds validated to be a positive number.
+    Correct formats: `HH:MM:SS`, `H:MM:SS`, `MM:SS`, `M:SS`, `SS`, `S`
     """
-    if timestamp_type not in ("start", "stop"):
-        _raise_error(f"invalid timestamp_type, got {timestamp_type!r}")
+    timestamp = timestamp.split(".")[0]
 
-    if "." in timestamp:
-        timestamp = timestamp.split(".")[0]
-
-    timestamp_as_seconds = None
-
-    if ":" in timestamp:
-        regex = r"^([0-9]|[0-5][0-9])(:[0-5][0-9]){1,2}$"
-        if not bool(re.match(regex, timestamp)):
-            _raise_error(f"invalid timestamp, got {timestamp!r}")
-
-        timestamp_as_seconds = utils.timestamp_to_seconds(timestamp)
-
-    if timestamp_type == "start":
-        timestamp_as_seconds = (
-            non_negative_float(timestamp)
-            if timestamp_as_seconds is None
-            else non_negative_float(timestamp_as_seconds)
-        )
-    elif timestamp_type == "stop":
-        timestamp_as_seconds = (
-            positive_float(timestamp)
-            if timestamp_as_seconds is None
-            else positive_float(timestamp_as_seconds)
-        )
+    regex = r"^([0-9]|[0-5][0-9])(:[0-5][0-9]){1,2}$"
+    if not bool(re.match(regex, timestamp)):
+        _raise_error(f"invalid timestamp, got {timestamp!r}", from_cli)
 
     return timestamp
 
 
-def valid_resize_value(resize_value: Union[float, int, str]) -> float:
-    """Video resize mutliplier max value of 50 is arbitrary, but is used to prevent
-    the user from accidentally resizing output to abnormally large size.
-    """
+def valid_start_timestamp(start_time: str, from_cli: bool = False) -> str:
+    timestamp = valid_timestamp(start_time, from_cli)
+    timestamp_as_seconds = U.timestamp_to_seconds(timestamp)
+    timestamp_as_seconds = (
+        non_negative_float(timestamp, from_cli)
+        if timestamp_as_seconds is None
+        else non_negative_float(timestamp_as_seconds, from_cli)
+    )
+
+    return timestamp
+
+
+def valid_stop_timestamp(stop_time: str, from_cli: bool = False) -> str:
+    timestamp = valid_timestamp(stop_time, from_cli)
+    timestamp_as_seconds = U.timestamp_to_seconds(timestamp)
+    timestamp_as_seconds = (
+        positive_float(timestamp, from_cli)
+        if timestamp_as_seconds is None
+        else positive_float(timestamp_as_seconds, from_cli)
+    )
+
+    return timestamp
+
+
+def valid_start_time(
+    start_time: t.Union[float, str], from_cli: bool = False
+) -> t.Union[float, str]:
     try:
-        resize_value = float(resize_value)
+        start_time_float = float(start_time)
     except ValueError:
-        _raise_error(f"invalid resize value, got {resize_value!r}")
-
-    if not 0.01 <= resize_value <= 50:
-        _raise_error(f"resize value must be between 0.01 and 50, got {resize_value}")
-
-    return resize_value
+        return valid_start_timestamp(str(start_time), from_cli)
+    else:
+        return non_negative_float(start_time_float, from_cli)
 
 
-def valid_dimensions(dimensions: Tuple[int, int]) -> Tuple[int, int]:
-    """Dimensions are validated differently when run from command-line because
-    argparse's type conversions are applied to each argument individually.
-    """
-    if len(dimensions) != 2:
-        _raise_error(f"invalid dimensions, got {dimensions!r}")
-
-    dimensions = tuple([positive_int(dim) for dim in list(dimensions)])
-
-    return dimensions
-
-
-def valid_rotate_value(rotate_value: Union[float, int, str]) -> int:
-    """Valid rotate values are 0, 90, 180, 270."""
-    if isinstance(rotate_value, float):
-        if not rotate_value.is_integer():
-            _raise_error(
-                f"invalid float rotate value, got {rotate_value}\n"
-                f"valid rotate values: {C.VALID_ROTATE_VALUES}"
-            )
-
+def valid_stop_time(
+    stop_time: t.Union[float, str], from_cli: bool = False
+) -> t.Union[float, str]:
     try:
-        rotate_value = float(rotate_value)
+        stop_time_float = float(stop_time)
     except ValueError:
-        _raise_error(
-            f"invalid rotate value, got {rotate_value}\n"
-            f"valid rotate values: {C.VALID_ROTATE_VALUES}"
-        )
-
-    if rotate_value not in C.VALID_ROTATE_VALUES:
-        _raise_error(
-            f"invalid rotate value, got {rotate_value}\n"
-            f"valid rotate values: {C.VALID_ROTATE_VALUES}"
-        )
-
-    return int(rotate_value)
+        return valid_stop_timestamp(str(stop_time), from_cli)
+    else:
+        return positive_float(stop_time_float, from_cli)
 
 
-def valid_start_time(start_time: Union[float, int, str]) -> Union[float, int, str]:
-    if isinstance(start_time, float):
-        start_time = non_negative_float(start_time)
-        return start_time
-
-    if isinstance(start_time, int):
-        start_time = non_negative_int(start_time)
-        return start_time
-
-    if isinstance(start_time, str):
-        start_time = valid_timestamp(start_time, timestamp_type="start")
-        return start_time
-
-    _raise_error(f"invalid start time, got {start_time!r}")
-
-
-def valid_stop_time(stop_time: Union[float, int, str]) -> Union[float, int, str]:
-    if isinstance(stop_time, float):
-        stop_time = positive_float(stop_time)
-        return stop_time
-
-    if isinstance(stop_time, int):
-        stop_time = positive_int(stop_time)
-        return stop_time
-
-    if isinstance(stop_time, str):
-        stop_time = valid_timestamp(stop_time, timestamp_type="stop")
-        return stop_time
-
-    _raise_error(f"invalid stop time, got {stop_time!r}")
-
-
-def validate_video_extraction_range(
+def valid_extraction_range(
     start_second: float, stop_second: float, video_length_second: float
-) -> None:
+) -> bool:
     if start_second > video_length_second:
         _raise_error(
-            f"start time in seconds ({start_second}) exceeds "
-            f"video length in seconds ({video_length_second})"
+            f"start second ({start_second}) exceeds "
+            f"length of video {video_length_second}"
+        )
+
+    if start_second == stop_second:
+        _raise_error(
+            f"start second ({start_second}) equals stop second ({stop_second})"
         )
 
     if start_second > stop_second:
         _raise_error(
-            f"start time in seconds ({start_second}) exceeds "
-            f"stop time in seconds ({stop_second})"
+            f"start second ({start_second}) exceeds stop second ({stop_second})"
         )
+
+    return True
 
 
 def valid_capture_rate(capture_rate: int, start_frame: int, stop_frame: int) -> int:
-    """Capture rate is validated after determining the start and stop video frames."""
     if capture_rate > (stop_frame - start_frame):
         _raise_error(
             f"capture rate ({capture_rate}) exceeds range between "
@@ -272,3 +192,123 @@ def valid_capture_rate(capture_rate: int, start_frame: int, stop_frame: int) -> 
         )
 
     return capture_rate
+
+
+def valid_resize_value(
+    resize_value: t.Union[float, str], from_cli: bool = False
+) -> float:
+    """Resize has an arbitrary max value of 7680, which is used to prevent
+    the user from accidentally resizing output to abnormally large size.
+    """
+    try:
+        val = float(resize_value)
+    except ValueError:
+        _raise_error(f"invalid resize value, got {resize_value!r}", from_cli)
+
+    if not 0.01 <= val <= 7680:
+        _raise_error(
+            f"resize value must be between 0.01 and 7680, got {resize_value}", from_cli
+        )
+
+    return val
+
+
+def valid_dimensions(dimensions: t.Tuple[int, int]) -> t.Tuple[int, int]:
+    if len(dimensions) != 2:
+        _raise_error(f"invalid dimensions, got {dimensions!r}")
+
+    dims = tuple([positive_int(dim) for dim in list(dimensions)])
+    return t.cast(t.Tuple[int, int], dims)
+
+
+def valid_rotate_value(rotate_value: t.Union[int, str], from_cli: bool = False) -> int:
+    """Valid rotate values are 0, 90, 180, 270."""
+    try:
+        val = int(rotate_value)
+    except ValueError:
+        _raise_error(
+            f"invalid rotate value, got {rotate_value!r}\n"
+            f"valid rotate values: {C.VALID_ROTATE_VALUES}",
+            from_cli,
+        )
+
+    if val not in C.VALID_ROTATE_VALUES:
+        _raise_error(
+            f"rotate value entered not a valid rotate value, got {rotate_value}\n"
+            f"valid rotate values: {C.VALID_ROTATE_VALUES}",
+            from_cli,
+        )
+
+    return val
+
+
+def valid_audio_format(audio_format: str, from_cli: bool = False) -> str:
+    audio_format = audio_format.lower().strip(".")
+    if audio_format not in C.VALID_AUDIO_FORMATS:
+        _raise_error(
+            f"invalid audio format, got {audio_format!r}\n"
+            f"valid audio formats: {C.VALID_AUDIO_FORMATS}",
+            from_cli,
+        )
+
+    return audio_format
+
+
+def valid_image_format(image_format: str, from_cli: bool = False) -> str:
+    image_format = image_format.lower().strip(".")
+    if image_format not in C.VALID_IMAGE_FORMATS:
+        _raise_error(
+            f"invalid image format, got {image_format!r}\n"
+            f"valid image formats: {C.VALID_IMAGE_FORMATS}",
+            from_cli,
+        )
+
+    return image_format
+
+
+def positive_int_cli(num: str) -> int:
+    return positive_int(num, from_cli=True)
+
+
+def positive_float_cli(num: str) -> float:
+    return positive_float(num, from_cli=True)
+
+
+def non_negative_float_cli(num: str) -> float:
+    return non_negative_float(num, from_cli=True)
+
+
+def valid_dir_cli(dir: str) -> Path:
+    return valid_dir(dir, from_cli=True)
+
+
+def valid_filepath_cli(filepath: str) -> Path:
+    return valid_filepath(filepath, from_cli=True)
+
+
+def valid_filename_cli(filename: str) -> str:
+    return valid_filename(filename, from_cli=True)
+
+
+def valid_audio_format_cli(audio_format: str) -> str:
+    return valid_audio_format(audio_format, from_cli=True)
+
+
+def valid_image_format_cli(image_format: str) -> str:
+    return valid_image_format(image_format, from_cli=True)
+
+
+def valid_resize_value_cli(resize_value: str) -> float:
+    return valid_resize_value(resize_value, from_cli=True)
+
+
+def valid_rotate_value_cli(rotate_value: str) -> int:
+    return valid_rotate_value(rotate_value, from_cli=True)
+
+
+def valid_start_time_cli(start_time: str) -> t.Union[float, str]:
+    return valid_start_time(start_time, from_cli=True)
+
+
+def valid_stop_time_cli(stop_time: str) -> t.Union[float, str]:
+    return valid_stop_time(stop_time, from_cli=True)

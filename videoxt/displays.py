@@ -47,8 +47,7 @@ def base_request_str(request: BaseRequest) -> str:
         {C.EMOJI_MAP['extraction']}
             start time:         {start_time_display}
             stop time:          {stop_time_display}
-            fps:                {request.fps}
-            destination dir:    {request.destdir.resolve()}"""  # type: ignore
+            fps:                {request.fps}"""
     )
 
 
@@ -57,7 +56,7 @@ def audio_request_str(request: AudioRequest) -> str:
     return dedent(
         f"""
         {C.EMOJI_MAP['audio']}
-            filename:           {request.filepath.name!r}
+            filepath:           {request.filepath}
             format:             {request.audio_format!r}
             volume:             {request.volume}
             speed:              {request.speed}
@@ -73,7 +72,7 @@ def clip_request_str(request: ClipRequest) -> str:
     return dedent(
         f"""
         {C.EMOJI_MAP['clip']}
-            filename:           {request.filepath.name!r}
+            filepath:           {request.filepath}
             resize:             {request.resize}
             rotate:             {request.rotate}
             speed:              {request.speed}
@@ -93,6 +92,7 @@ def frames_request_str(request: FramesRequest) -> str:
     return dedent(
         f"""
         {C.EMOJI_MAP['frames']}
+            destionation dir:   {request.destdir}
             filenames:          {f"{request.filename}_*.{request.image_format}"!r}
             format:             {request.image_format!r}
             images expected:    {request.images_expected}
@@ -110,7 +110,7 @@ def gif_request_str(request: GifRequest) -> str:
     return dedent(
         f"""
         {C.EMOJI_MAP['gif']}
-            filename:           {request.filepath.name!r}
+            filepath:           {request.filepath}
             resize:             {request.resize}
             rotate:             {request.rotate}
             speed:              {request.speed}

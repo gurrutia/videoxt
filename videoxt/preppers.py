@@ -63,11 +63,8 @@ def prepare_seconds(frame: int, fps: float) -> float:
 
 
 def prepare_fps(video_fps: float, request_fps: t.Optional[float]) -> float:
-    return video_fps if request_fps is None else request_fps
-
-
-def prepare_frame_number(fps: float, second: float) -> int:
-    return int(second * fps)
+    """Prepare the fps to use for extraction. If no fps is requested, the video's fps is used."""
+    return request_fps or video_fps
 
 
 def prepare_destdir(video_dir: Path, reqeust_dir: t.Optional[Path]) -> Path:
@@ -119,7 +116,11 @@ def prepare_images_expected(
 
 
 def prepare_filepath_image(
-    dir: Path, filename: str, frame: int, image_format: str
+    dir: Path, filename: str, frame_num: int, image_format: str
 ) -> str:
-    image_filename = f"{filename}_{frame + 1}.{image_format}"
+    """Prepare the filepath to use for the 'frames' extraction request. The filepath is created
+    by combining the directory, filename, frame number, and image format. The frame number is
+    incremented by the capture rate during extraction.
+    """
+    image_filename = f"{filename}_{frame_num + 1}.{image_format}"
     return str(dir / image_filename)

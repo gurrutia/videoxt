@@ -9,6 +9,8 @@ import videoxt.utils as U
 
 @dataclass
 class TimeRange:
+    """A dataclass to hold the time range for extraction."""
+
     start_timestamp: str
     start_frame: int
     start_second: float
@@ -25,6 +27,9 @@ def prepare_time_range(
     video_frame_count: int,
     fps: float,
 ) -> TimeRange:
+    """Prepare the time range for extraction by parsing the range requested to a
+    timestamp, seconds, and frames.
+    """
     start_frame = prepare_time_range_frame(start_time_request, fps)
     start_second = prepare_seconds(start_frame, fps)
     start_timestamp = U.seconds_to_timestamp(start_second)
@@ -49,6 +54,7 @@ def prepare_time_range(
 
 
 def prepare_time_range_frame(time_request: t.Union[float, str], fps: float) -> int:
+    """Prepare the start and stop frame numbers to use for extraction."""
     seconds = (
         U.timestamp_to_seconds(time_request)
         if isinstance(time_request, str)
@@ -59,6 +65,9 @@ def prepare_time_range_frame(time_request: t.Union[float, str], fps: float) -> i
 
 
 def prepare_seconds(frame: int, fps: float) -> float:
+    """Prepare the start and stop seconds to use for extraction. Seconds are rounded
+    to 2 decimal places.
+    """
     return round(frame / fps, 2)
 
 
@@ -77,6 +86,9 @@ def prepare_destdir(video_dir: Path, reqeust_dir: t.Optional[Path]) -> Path:
 def prepare_destdir_frames(
     video_dir: Path, video_filename: str, request_dir: t.Optional[Path]
 ) -> Path:
+    """Prepare the directory to use for the 'frames' extraction request. If no directory
+    is requested, a directory will be made within the video's directory.
+    """
     if request_dir is None:
         return U.enumerate_dir(video_dir / f"{video_filename}_frames")
 
@@ -84,12 +96,18 @@ def prepare_destdir_frames(
 
 
 def prepare_filename_frames(video_stem: str, request_filename: t.Optional[str]) -> str:
+    """Prepare the filename to use for the 'frames' extraction request. If no filename
+    is requested, the video's filename is used.
+    """
     return request_filename or video_stem
 
 
 def prepare_filepath(
     video_filename: str, request_filename: t.Optional[str], dir: Path, suffix: str
 ) -> Path:
+    """Prepare the filepath to use for extraction requests 'audio', 'clip', and 'gif'.
+    If no filename was requested, the video's filename is used to create a new filepath.
+    """
     if request_filename is None:
         return U.enumerate_filepath(dir / f"{video_filename}.{suffix}")
 
@@ -101,6 +119,10 @@ def prepare_dimensions(
     request_dimensions: t.Optional[t.Tuple[int, int]],
     resize: float = 1.0,
 ) -> t.Tuple[int, int]:
+    """Prepare the dimensions to use for extraction. If no dimensions are requested,
+    the video's dimensions are used. If a resize value other than 1 was requested,
+    the dimensions are multiplied by the resize factor.
+    """
     dims = request_dimensions or video_dimensions
 
     if resize != 1:
@@ -112,6 +134,9 @@ def prepare_dimensions(
 def prepare_images_expected(
     start_frame: int, stop_frame: int, capture_rate: int
 ) -> int:
+    """Calculate the number of images expected to be extracted. Used to create a progress bar and
+    to determine if the extraction was successful.
+    """
     return math.ceil((stop_frame - start_frame) / capture_rate)
 
 

@@ -13,6 +13,8 @@ from videoxt.video import Video
 
 @dataclass
 class Request(ABC):
+    """Abstract class for all requests. All requests adhere to this interface."""
+
     video: Video
 
     @abstractmethod
@@ -35,6 +37,8 @@ class Request(ABC):
 
 @dataclass
 class BaseRequest(Request):
+    """Base request class for all requests. All requests inherit from this class."""
+
     video: Video
     start_time: t.Union[float, str] = "0:00:00"
     stop_time: t.Optional[t.Union[float, str]] = None
@@ -45,6 +49,7 @@ class BaseRequest(Request):
     time_range: P.TimeRange = field(init=False)
 
     def __post_init__(self) -> None:
+        """Validate `BaseRequest` attributes."""
         self.start_time = V.valid_start_time(self.start_time)
 
         if self.stop_time is not None:
@@ -60,6 +65,7 @@ class BaseRequest(Request):
             self.filename = V.valid_filename(self.filename)
 
     def prepare_request(self) -> None:
+        """Prepare `BaseRequest` attributes."""
         self.fps = P.prepare_fps(self.video.properties.fps, self.fps)
         self.time_range = P.prepare_time_range(
             self.start_time,
@@ -84,6 +90,8 @@ class BaseRequest(Request):
 
 @dataclass
 class AudioRequest(BaseRequest):
+    """Request object for audio extraction."""
+
     audio_format: str = "mp3"
     speed: float = 1.0
     volume: float = 1.0
@@ -93,6 +101,7 @@ class AudioRequest(BaseRequest):
     filepath: Path = field(init=False)
 
     def __post_init__(self) -> None:
+        """Validate `AudioRequest` attributes, call `prepare_request` method."""
         super().__post_init__()
 
         self.audio_format = V.valid_audio_format(self.audio_format)
@@ -102,6 +111,7 @@ class AudioRequest(BaseRequest):
         self.prepare_request()
 
     def prepare_request(self) -> None:
+        """Prepare `AudioRequest` attributes."""
         super().prepare_request()
 
         self.destdir = P.prepare_destdir(self.video.filepath.parent, self.destdir)
@@ -120,6 +130,8 @@ class AudioRequest(BaseRequest):
 
 @dataclass
 class ClipRequest(BaseRequest):
+    """Request object for clip extraction."""
+
     resize: float = 1.0
     rotate: int = 0
     speed: float = 1.0
@@ -132,6 +144,7 @@ class ClipRequest(BaseRequest):
     filepath: Path = field(init=False)
 
     def __post_init__(self) -> None:
+        """Validate `ClipRequest` attributes, call `prepare_request` method."""
         super().__post_init__()
 
         self.resize = V.valid_resize_value(self.resize)
@@ -145,6 +158,7 @@ class ClipRequest(BaseRequest):
         self.prepare_request()
 
     def prepare_request(self) -> None:
+        """Prepare `ClipRequest` attributes."""
         super().prepare_request()
 
         self.destdir = P.prepare_destdir(self.video.filepath.parent, self.destdir)
@@ -163,6 +177,8 @@ class ClipRequest(BaseRequest):
 
 @dataclass
 class FramesRequest(BaseRequest):
+    """Request object for frames extraction."""
+
     image_format: str = "jpg"
     capture_rate: int = 1
     resize: float = 1.0
@@ -172,6 +188,7 @@ class FramesRequest(BaseRequest):
     images_expected: int = field(init=False)
 
     def __post_init__(self) -> None:
+        """Validate `FramesRequest` attributes, call `prepare_request` method."""
         super().__post_init__()
 
         self.image_format = V.valid_image_format(self.image_format)
@@ -185,6 +202,7 @@ class FramesRequest(BaseRequest):
         self.prepare_request()
 
     def prepare_request(self) -> None:
+        """Prepare `FramesRequest` attributes."""
         super().prepare_request()
 
         self.capture_rate = V.valid_capture_rate(
@@ -211,6 +229,8 @@ class FramesRequest(BaseRequest):
 
 @dataclass
 class GifRequest(BaseRequest):
+    """Request object for gif extraction."""
+
     resize: float = 1.0
     rotate: int = 0
     speed: float = 1.0
@@ -221,6 +241,7 @@ class GifRequest(BaseRequest):
     filepath: Path = field(init=False)
 
     def __post_init__(self) -> None:
+        """Validate `GifRequest` attributes, call `prepare_request` method."""
         super().__post_init__()
 
         self.resize = V.valid_resize_value(self.resize)
@@ -233,6 +254,7 @@ class GifRequest(BaseRequest):
         self.prepare_request()
 
     def prepare_request(self) -> None:
+        """Prepare `GifRequest` attributes."""
         super().prepare_request()
 
         self.destdir = P.prepare_destdir(self.video.filepath.parent, self.destdir)

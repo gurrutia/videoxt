@@ -9,6 +9,18 @@ from videoxt.exceptions import ValidationException
 
 
 def process_args(args: argparse.Namespace) -> int:
+    """Process the arguments from the CLI.
+
+    Args:
+    ------------
+    `args` (argparse.Namespace) :
+        The arguments from the CLI.
+
+    Returns:
+    ------------
+        `int` :
+            `0` if successful, `1` if not.
+    """
     subparser_name = args.subparser_name
     del args.subparser_name
 
@@ -34,6 +46,8 @@ def process_args(args: argparse.Namespace) -> int:
 
 
 def main(argv: t.Optional[t.Sequence[str]] = None) -> int:
+    """The main entry point for the CLI."""
+
     # parent_parser houses arguments common to all subparsers
     parent_parser = argparse.ArgumentParser(add_help=False)
     parent_parser.add_argument(

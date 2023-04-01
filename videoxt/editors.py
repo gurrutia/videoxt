@@ -13,13 +13,14 @@ import videoxt.constants as C
 def trim_clip(
     clip: VideoFileClip, start_second: float, stop_second: float
 ) -> VideoFileClip:
+    """Trim a VideoFileClip to a specific time range in seconds."""
     return clip.subclip(start_second, stop_second)
 
 
 def edit_clip_audio(
     clip: VideoFileClip, volume: float, normalize: bool
 ) -> VideoFileClip:
-    """Edit VideoFileClip audio. The parameters match those in AudioRequest object."""
+    """Edit a VideoFileClip's audio."""
     if normalize:
         clip = clip.fx(afx.audio_normalize)
 
@@ -32,6 +33,7 @@ def edit_clip_audio(
 def edit_clip_image(
     clip: VideoFileClip, dimensions: t.Tuple[int, int], rotate: int, monochrome: bool
 ) -> VideoFileClip:
+    """Edit a VideoFileClip's image properties."""
     clip = clip.resize(dimensions)
 
     if rotate != 0:
@@ -46,6 +48,7 @@ def edit_clip_image(
 def edit_clip_motion(
     clip: VideoFileClip, speed: float, reverse: bool, bounce: bool
 ) -> VideoFileClip:
+    """Edit a VideoFileClip's moving image properties."""
     if reverse:
         clip = clip.fx(vfx.time_mirror)
 
@@ -61,6 +64,7 @@ def edit_clip_motion(
 def edit_image(
     image: np.ndarray, dimensions: t.Tuple[int, int], rotate: int, monochrome: bool
 ) -> np.ndarray:
+    """Edit a `numpy.ndarray` image properties."""
     image = cv2.resize(image, dimensions)
 
     if rotate != 0:

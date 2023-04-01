@@ -28,7 +28,7 @@ def extract_audio(filepath: Path, **kwargs: t.Dict[str, t.Any]) -> None:
             a string in the format `HH:MM:SS`, `H:MM:SS`, `MM:SS`, or `M:SS`.
         `fps` (float) :
             Override the video's frames per second. If `None`, the video fps is used.
-        `dir` (Path, str) :
+        `destdir` (Path, str) :
             Directory to save the media to. If `None`, the video directory is used.
         `filename` (str) :
             Filename of the resulting media without extension. If `None`, the video filename is used.
@@ -69,7 +69,7 @@ def extract_clip(filepath: Path, **kwargs: t.Dict[str, t.Any]) -> None:
             a string in the format `HH:MM:SS`, `H:MM:SS`, `MM:SS`, or `M:SS`.
         `fps` (float) :
             Override the video's frames per second. If `None`, the video fps is used.
-        `dir` (Path, str) :
+        `destdir` (Path, str) :
             Directory to save the media to. If `None`, the video directory is used.
         `filename` (str) :
             Filename of the resulting media without extension. If `None`, the video filename is used.
@@ -115,7 +115,7 @@ def extract_frames(filepath: Path, **kwargs: t.Dict[str, t.Any]) -> None:
             a string in the format `HH:MM:SS`, `H:MM:SS`, `MM:SS`, or `M:SS`.
         `fps` (float) :
             Override the video's frames per second. If `None`, the video fps is used.
-        `dir` (Path, str) :
+        `destdir` (Path, str) :
             Directory to save the media to. If `None`, the video directory is used.
         `filename` (str) :
             Filename of the resulting media without extension. If `None`, the video filename is used.
@@ -157,7 +157,7 @@ def extract_gif(filepath: Path, **kwargs: t.Dict[str, t.Any]) -> None:
             a string in the format `HH:MM:SS`, `H:MM:SS`, `MM:SS`, or `M:SS`.
         `fps` (float) :
             Override the video's frames per second. If `None`, the video fps is used.
-        `dir` (Path, str) :
+        `destdir` (Path, str) :
             Directory to save the media to. If `None`, the video directory is used.
         `filename` (str) :
             Filename of the resulting media without extension. If `None`, the video filename is used.

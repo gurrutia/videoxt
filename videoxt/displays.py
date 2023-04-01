@@ -11,6 +11,7 @@ from videoxt.extractors import Video
 
 
 def video_str(video: Video) -> str:
+    """String representation of a Video that gets printed to the console."""
     length_display = (
         f"{video.properties.length_timestamp} | "
         f"{video.properties.length_seconds} seconds"
@@ -28,6 +29,7 @@ def video_str(video: Video) -> str:
 
 
 def base_request_str(request: BaseRequest) -> str:
+    """String representation of a BaseRequest that gets printed to the console."""
     start_time_display = (
         f"{request.time_range.start_timestamp} | "
         f"{request.time_range.start_second} seconds | "
@@ -51,6 +53,7 @@ def base_request_str(request: BaseRequest) -> str:
 
 
 def audio_request_str(request: AudioRequest) -> str:
+    """String representation of an AudioRequest that gets printed to the console."""
     return dedent(
         f"""
         {C.EMOJI_MAP['audio']}
@@ -66,6 +69,7 @@ def audio_request_str(request: AudioRequest) -> str:
 
 
 def clip_request_str(request: ClipRequest) -> str:
+    """String representation of a ClipRequest that gets printed to the console."""
     return dedent(
         f"""
         {C.EMOJI_MAP['clip']}
@@ -85,6 +89,7 @@ def clip_request_str(request: ClipRequest) -> str:
 
 
 def frames_request_str(request: FramesRequest) -> str:
+    """String representation of a FramesRequest that gets printed to the console."""
     return dedent(
         f"""
         {C.EMOJI_MAP['frames']}
@@ -101,6 +106,7 @@ def frames_request_str(request: FramesRequest) -> str:
 
 
 def gif_request_str(request: GifRequest) -> str:
+    """String representation of a GifRequest that gets printed to the console."""
     return dedent(
         f"""
         {C.EMOJI_MAP['gif']}

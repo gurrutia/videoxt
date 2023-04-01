@@ -12,6 +12,8 @@ import videoxt.validators as V
 
 @dataclass
 class VideoProperties:
+    """A dataclass to hold the properties of a video."""
+
     dimensions: t.Tuple[int, int]
     fps: float
     frame_count: int

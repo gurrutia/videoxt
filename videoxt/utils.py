@@ -13,7 +13,7 @@ def timestamp_to_seconds(timestamp: str) -> float:
 
 
 def seconds_to_timestamp(seconds: float) -> str:
-    """Converts seconds to a timestamp string."""
+    """Converts seconds to a timestamp string. Microseconds are truncated."""
     if seconds < 0:
         return "0:00:00"
 
@@ -21,6 +21,7 @@ def seconds_to_timestamp(seconds: float) -> str:
 
 
 def enumerate_dir(dir_path: Path) -> Path:
+    """Creates a new Path object with an enumerated name if the given directory already exists."""
     if not dir_path.exists():
         return dir_path
 
@@ -33,7 +34,7 @@ def enumerate_dir(dir_path: Path) -> Path:
 
 
 def enumerate_filepath(filepath: Path) -> Path:
-    """Enumerates a Path object filepath if it already exists."""
+    """Creates a new Path object with an enumerated name if the given filepath already exists."""
     if not filepath.exists():
         return filepath
 

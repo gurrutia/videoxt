@@ -5,7 +5,6 @@ from pathlib import Path
 
 import cv2  # type: ignore
 
-import videoxt.preppers as P
 import videoxt.utils as U
 import videoxt.validators as V
 
@@ -41,7 +40,7 @@ def get_video_properties(video_filepath: Path) -> VideoProperties:
 
     video_capture.release()
 
-    length_seconds = P.prepare_seconds(frame_count, fps)
+    length_seconds = round(frame_count / fps, 2)
     length_timestamp = U.seconds_to_timestamp(length_seconds)
 
     return VideoProperties(

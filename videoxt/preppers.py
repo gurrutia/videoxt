@@ -12,11 +12,11 @@ class TimeRange:
     """A dataclass to hold the time range for extraction."""
 
     start_timestamp: str
-    start_frame: int
     start_second: float
+    start_frame: int
     stop_timestamp: str
-    stop_frame: int
     stop_second: float
+    stop_frame: int
 
 
 def prepare_time_range(
@@ -27,53 +27,70 @@ def prepare_time_range(
     video_frame_count: int,
     fps: float,
 ) -> TimeRange:
-    """Prepare the time range for extraction by parsing the range requested to a
-    timestamp, seconds, and frames.
+    """Prepare a TimeRange object to use for extraction.
+
+    If a float is requested, the requested second is rounded to two decimal places,
+    then used to calculate the timestamp and frame number.
+
+    If a string representing a timestamp is requested, the timestamp is read as is,
+    then converted to seconds which is used to calculate the frame number.
+
+    If no stop time is requested, the video's length is used.
     """
-    start_frame = prepare_time_range_frame(start_time_request, fps)
-    start_second = prepare_seconds(start_frame, fps)
-    start_timestamp = U.seconds_to_timestamp(start_second)
+    if isinstance(start_time_request, float):
+        start_time = prepare_time_request_float(start_time_request, fps)
+    else:
+        start_time = prepare_time_request_str(start_time_request, fps)
 
     if stop_time_request is None:
-        stop_timestamp = video_length_timestamp
-        stop_frame = video_frame_count
-        stop_second = video_length_seconds
+        stop_time = video_length_timestamp, video_length_seconds, video_frame_count
+    elif isinstance(stop_time_request, float):
+        stop_time = prepare_time_request_float(stop_time_request, fps)
     else:
-        stop_frame = prepare_time_range_frame(stop_time_request, fps)
-        stop_second = prepare_seconds(stop_frame, fps)
-        stop_timestamp = U.seconds_to_timestamp(stop_second)
+        stop_time = prepare_time_request_str(stop_time_request, fps)
 
     return TimeRange(
-        start_timestamp=start_timestamp,
-        start_frame=start_frame,
-        start_second=start_second,
-        stop_timestamp=stop_timestamp,
-        stop_frame=stop_frame,
-        stop_second=stop_second,
+        start_timestamp=start_time[0],
+        start_second=start_time[1],
+        start_frame=start_time[2],
+        stop_timestamp=stop_time[0],
+        stop_second=stop_time[1],
+        stop_frame=stop_time[2],
     )
 
 
-def prepare_time_range_frame(time_request: t.Union[float, str], fps: float) -> int:
-    """Prepare the start and stop frame numbers to use for extraction."""
-    seconds = (
-        U.timestamp_to_seconds(time_request)
-        if isinstance(time_request, str)
-        else time_request
-    )
-
-    return math.floor(seconds * fps)
-
-
-def prepare_seconds(frame: int, fps: float) -> float:
-    """Prepare the start and stop seconds to use for extraction. Seconds are rounded
-    to 2 decimal places.
+def prepare_time_request_float(
+    time_request: float, fps: float
+) -> t.Tuple[str, float, int]:
+    """Prepare the requested second by rounding it to two decimal places, then use it to
+    calculate the timestamp and frame number.
     """
-    return round(frame / fps, 2)
+    second = round(time_request, 2)
+    timestamp = U.seconds_to_timestamp(second)
+    frame_num = prepare_frame_number(second, fps)
+
+    return timestamp, second, frame_num
+
+
+def prepare_time_request_str(time_request: str, fps: float) -> t.Tuple[str, float, int]:
+    """Prepare the requested timestamp by reading it as is, then use it to calculate the
+    second and frame number.
+    """
+    timestamp = time_request
+    second = U.timestamp_to_seconds(timestamp)
+    frame_num = prepare_frame_number(second, fps)
+
+    return timestamp, second, frame_num
+
+
+def prepare_frame_number(second: float, fps: float) -> int:
+    """Prepare the start and stop frame numbers to use for extraction."""
+    return math.floor(second * fps)
 
 
 def prepare_fps(video_fps: float, request_fps: t.Optional[float]) -> float:
     """Prepare the fps to use for extraction. If no fps is requested, the video's fps is used."""
-    return request_fps or video_fps
+    return video_fps if request_fps is None else round(request_fps, 2)
 
 
 def prepare_destdir(video_dir: Path, reqeust_dir: t.Optional[Path]) -> Path:
@@ -95,11 +112,13 @@ def prepare_destdir_frames(
     return request_dir
 
 
-def prepare_filename_frames(video_stem: str, request_filename: t.Optional[str]) -> str:
+def prepare_filename_frames(
+    video_filename: str, request_filename: t.Optional[str]
+) -> str:
     """Prepare the filename to use for the 'frames' extraction request. If no filename
     is requested, the video's filename is used.
     """
-    return request_filename or video_stem
+    return request_filename or video_filename
 
 
 def prepare_filepath(

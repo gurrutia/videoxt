@@ -1,16 +1,8 @@
 import typing as t
 from pathlib import Path
 
-from videoxt.extractors import AudioExtractor
-from videoxt.extractors import ClipExtractor
-from videoxt.extractors import extraction_factory
-from videoxt.extractors import FramesExtractor
-from videoxt.extractors import GifExtractor
-from videoxt.requestors import AudioRequest
-from videoxt.requestors import ClipRequest
-from videoxt.requestors import FramesRequest
-from videoxt.requestors import GifRequest
-from videoxt.video import Video
+import videoxt.extractors as E
+import videoxt.requestors as R
 
 
 def extract_audio(filepath: Path, **kwargs: t.Dict[str, t.Any]) -> None:
@@ -51,7 +43,7 @@ def extract_audio(filepath: Path, **kwargs: t.Dict[str, t.Any]) -> None:
 
     Note: Unrecognized arguments are ignored.
     """
-    extraction_factory(filepath, AudioRequest, AudioExtractor, **kwargs)
+    E.extraction_factory(filepath, R.AudioRequest, E.AudioExtractor, **kwargs)
 
 
 def extract_clip(filepath: Path, **kwargs: t.Dict[str, t.Any]) -> None:
@@ -97,7 +89,7 @@ def extract_clip(filepath: Path, **kwargs: t.Dict[str, t.Any]) -> None:
 
     Note: Unrecognized arguments are ignored.
     """
-    extraction_factory(filepath, ClipRequest, ClipExtractor, **kwargs)
+    E.extraction_factory(filepath, R.ClipRequest, E.ClipExtractor, **kwargs)
 
 
 def extract_frames(filepath: Path, **kwargs: t.Dict[str, t.Any]) -> None:
@@ -139,7 +131,7 @@ def extract_frames(filepath: Path, **kwargs: t.Dict[str, t.Any]) -> None:
 
     Note: Unrecognized arguments are ignored.
     """
-    extraction_factory(filepath, FramesRequest, FramesExtractor, **kwargs)
+    E.extraction_factory(filepath, R.FramesRequest, E.FramesExtractor, **kwargs)
 
 
 def extract_gif(filepath: Path, **kwargs: t.Dict[str, t.Any]) -> None:
@@ -181,4 +173,4 @@ def extract_gif(filepath: Path, **kwargs: t.Dict[str, t.Any]) -> None:
 
     Note: Unrecognized arguments are ignored.
     """
-    extraction_factory(filepath, GifRequest, GifExtractor, **kwargs)
+    E.extraction_factory(filepath, R.GifRequest, E.GifExtractor, **kwargs)

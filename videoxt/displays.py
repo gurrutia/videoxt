@@ -2,12 +2,8 @@
 from textwrap import dedent
 
 import videoxt.constants as C
-from videoxt.extractors import AudioRequest
-from videoxt.extractors import BaseRequest
-from videoxt.extractors import ClipRequest
-from videoxt.extractors import FramesRequest
-from videoxt.extractors import GifRequest
-from videoxt.extractors import Video
+import videoxt.requestors as R
+from videoxt.video import Video
 
 
 def video_str(video: Video) -> str:
@@ -28,7 +24,7 @@ def video_str(video: Video) -> str:
     )
 
 
-def base_request_str(request: BaseRequest) -> str:
+def base_request_str(request: R.BaseRequest) -> str:
     """String representation of a BaseRequest that gets printed to the console."""
     start_time_display = (
         f"{request.time_range.start_timestamp} | "
@@ -51,7 +47,7 @@ def base_request_str(request: BaseRequest) -> str:
     )
 
 
-def audio_request_str(request: AudioRequest) -> str:
+def audio_request_str(request: R.AudioRequest) -> str:
     """String representation of an AudioRequest that gets printed to the console."""
     return dedent(
         f"""
@@ -67,7 +63,7 @@ def audio_request_str(request: AudioRequest) -> str:
     )
 
 
-def clip_request_str(request: ClipRequest) -> str:
+def clip_request_str(request: R.ClipRequest) -> str:
     """String representation of a ClipRequest that gets printed to the console."""
     return dedent(
         f"""
@@ -87,7 +83,7 @@ def clip_request_str(request: ClipRequest) -> str:
     )
 
 
-def frames_request_str(request: FramesRequest) -> str:
+def frames_request_str(request: R.FramesRequest) -> str:
     """String representation of a FramesRequest that gets printed to the console."""
     return dedent(
         f"""
@@ -105,7 +101,7 @@ def frames_request_str(request: FramesRequest) -> str:
     )
 
 
-def gif_request_str(request: GifRequest) -> str:
+def gif_request_str(request: R.GifRequest) -> str:
     """String representation of a GifRequest that gets printed to the console."""
     return dedent(
         f"""

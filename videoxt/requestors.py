@@ -31,7 +31,8 @@ class Request(ABC):
     def __str__(self) -> str:
         """Human-readable representation of the request.
 
-        Prints to console prior to extraction if `verbose` is `True`."""
+        Prints to console prior to extraction if `verbose` is `True`.
+        """
         pass
 
 

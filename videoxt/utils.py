@@ -14,14 +14,16 @@ def timestamp_to_seconds(timestamp: str) -> float:
 
 def seconds_to_timestamp(seconds: float) -> str:
     """Converts seconds to a timestamp string. Microseconds are truncated."""
-    if seconds < 0:
+    if seconds <= 0:
         return "0:00:00"
 
     return str(datetime.timedelta(seconds=int(seconds)))
 
 
 def enumerate_dir(dir_path: Path) -> Path:
-    """Creates a new Path object with an enumerated name if the given directory already exists."""
+    """Returns a new Path object with an enumerated name if a directory with the same
+    name already exists. If the directory does not exist, the original path is returned.
+    """
     if not dir_path.exists():
         return dir_path
 
@@ -34,7 +36,9 @@ def enumerate_dir(dir_path: Path) -> Path:
 
 
 def enumerate_filepath(filepath: Path) -> Path:
-    """Creates a new Path object with an enumerated name if the given filepath already exists."""
+    """Returns a new Path object with an enumerated name if a file with the same name
+    already exists. If the file does not exist, the original path is returned.
+    """
     if not filepath.exists():
         return filepath
 
@@ -47,5 +51,7 @@ def enumerate_filepath(filepath: Path) -> Path:
 
 
 def parse_kwargs(kwargs: t.Dict[str, t.Any], cls: t.Type[t.Any]) -> t.Dict[str, t.Any]:
-    """Parse kwargs and return only the keywords that match a given class."""
+    """Parses a dictionary of keyword arguments and returns only those that match a
+    given dataclass.
+    """
     return {k: v for k, v in kwargs.items() if k in cls.__dataclass_fields__}

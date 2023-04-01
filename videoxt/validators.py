@@ -68,7 +68,7 @@ def non_negative_int(num: t.Union[float, int, str], from_cli: bool = False) -> i
 
 
 def non_negative_float(num: t.Union[float, int, str], from_cli: bool = False) -> float:
-    """Validates floats, integers or strings are non-negative floats andreturns a float
+    """Validates floats, integers or strings are non-negative floats and returns a float
     if valid.
     """
     try:

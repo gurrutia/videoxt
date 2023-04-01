@@ -15,12 +15,8 @@ from rich.progress import Progress
 
 import videoxt.editors as E
 import videoxt.preppers as P
+import videoxt.requestors as R
 import videoxt.utils as U
-from videoxt.requestors import AudioRequest
-from videoxt.requestors import BaseRequest
-from videoxt.requestors import ClipRequest
-from videoxt.requestors import FramesRequest
-from videoxt.requestors import GifRequest
 from videoxt.video import Video
 
 
@@ -28,7 +24,7 @@ from videoxt.video import Video
 class Extractor(ABC):
     """Abstract class for all extractors. All extractors adhere to this interface."""
 
-    request: BaseRequest
+    request: R.BaseRequest
 
     @abstractmethod
     def apply_edits(
@@ -47,7 +43,7 @@ class Extractor(ABC):
 class AudioExtractor(Extractor):
     """Applies edits to a VideoFileClip and extracts the audio from the clip."""
 
-    request: AudioRequest
+    request: R.AudioRequest
 
     def apply_edits(self, clip: VideoFileClip) -> VideoFileClip:
         """Apply edits to the clip prior to audio extraction."""
@@ -65,7 +61,6 @@ class AudioExtractor(Extractor):
 
     def extract(self) -> None:
         """Extract audio from a video and save to a file."""
-
         with VideoFileClip(str(self.request.video.filepath)) as clip:
             subclip = self.apply_edits(clip)
 
@@ -89,7 +84,7 @@ class AudioExtractor(Extractor):
 class ClipExtractor(Extractor):
     """Applies edits to a VideoFileClip and extracts the clip."""
 
-    request: ClipRequest
+    request: R.ClipRequest
 
     def apply_edits(self, clip: VideoFileClip) -> VideoFileClip:
         """Apply edits to a VideoFileClip to create a subclip."""
@@ -109,7 +104,6 @@ class ClipExtractor(Extractor):
 
     def extract(self) -> None:
         """Extract a clip from a video and save it to disk as a video."""
-
         with VideoFileClip(str(self.request.video.filepath)) as clip:
             subclip = self.apply_edits(clip)
 
@@ -131,7 +125,7 @@ class ClipExtractor(Extractor):
 class FramesExtractor(Extractor):
     """Applies edits to an image `numpy.ndarray` and extracts the frames."""
 
-    request: FramesRequest
+    request: R.FramesRequest
 
     def apply_edits(self, image: np.ndarray) -> np.ndarray:
         """Apply edits to an image `numpy.ndarray`."""
@@ -140,8 +134,7 @@ class FramesExtractor(Extractor):
         )
 
     def extract(self) -> None:
-        """Extract frames from a video and save them to disk as images."""
-
+        """Extract frames from a video and save them to a directory as images."""
         video_capture = cv2.VideoCapture(str(self.request.video.filepath))
         video_capture.set(cv2.CAP_PROP_POS_FRAMES, self.request.time_range.start_frame)
 
@@ -204,11 +197,10 @@ class FramesExtractor(Extractor):
 class GifExtractor(Extractor):
     """Applies edits to a VideoFileClip and extracts the gif from the clip."""
 
-    request: GifRequest
+    request: R.GifRequest
 
     def apply_edits(self, clip: VideoFileClip) -> VideoFileClip:
         """Apply edits to a VideoFileClip and return the edited clip for gif extraction."""
-
         clip = E.trim_clip(
             clip,
             self.request.time_range.start_second,
@@ -225,7 +217,6 @@ class GifExtractor(Extractor):
 
     def extract(self) -> None:
         """Extract a gif from a video and save it to disk."""
-
         with VideoFileClip(str(self.request.video.filepath)) as clip:
             subclip = self.apply_edits(clip)
 
@@ -245,7 +236,7 @@ class GifExtractor(Extractor):
 
 def extraction_factory(
     filepath: Path,
-    request_cls: t.Type[BaseRequest],
+    request_cls: t.Type[R.BaseRequest],
     extractor_cls: t.Type[Extractor],
     **kwargs: t.Dict[str, t.Any],
 ) -> None:

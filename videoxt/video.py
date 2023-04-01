@@ -24,8 +24,6 @@ class VideoProperties:
 def get_video_properties(video_filepath: Path) -> VideoProperties:
     """Gets video properties from a video filepath.
 
-    Properties include: dimensions, fps, frame count, length in seconds, and length as a timestamp.
-
     Returns: `VideoProperties` object.
     """
     suffix = video_filepath.suffix[1:]
@@ -83,6 +81,7 @@ class Video:
     properties: VideoProperties = field(init=False)
 
     def __post_init__(self) -> None:
+        """Validate the filepath and get the video properties."""
         self.filepath = V.valid_filepath(self.filepath)
         self.properties = get_video_properties(self.filepath)
 

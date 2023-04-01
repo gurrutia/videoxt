@@ -4,6 +4,7 @@ import typing as t
 from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
+from pathlib import Path
 
 import cv2  # type: ignore
 import numpy as np
@@ -127,8 +128,8 @@ class FramesExtractor(Extractor):
         video_capture = cv2.VideoCapture(str(self.request.video.filepath))
         video_capture.set(cv2.CAP_PROP_POS_FRAMES, self.request.time_range.start_frame)
 
-        if not self.request.dir.exists():
-            self.request.dir.mkdir()
+        if not self.request.destdir.exists():
+            self.request.destdir.mkdir()
 
         if self.request.verbose:
             print(self.request.video.__str__() + str(self.request))
@@ -176,7 +177,7 @@ class FramesExtractor(Extractor):
 
         video_capture.release()
 
-        print(f"[green]FRAMES EXTRACTED: {self.request.dir.resolve()}[/green]")
+        print(f"[green]FRAMES EXTRACTED: {self.request.destdir.resolve()}[/green]")
 
 
 @dataclass

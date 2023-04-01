@@ -46,7 +46,7 @@ def base_request_str(request: BaseRequest) -> str:
             start time:         {start_time_display}
             stop time:          {stop_time_display}
             fps:                {request.fps}
-            output folder:      {request.dir.resolve()}"""  # type: ignore
+            destination dir:    {request.destdir.resolve()}"""  # type: ignore
     )
 
 

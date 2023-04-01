@@ -66,12 +66,12 @@ def main(argv: t.Optional[t.Sequence[str]] = None) -> int:
         help="Override the video's frames per second.",
     )
     parent_parser.add_argument(
-        "--dir",
+        "--destdir",
         "-d",
         type=V.valid_dir_cli,
         metavar="",
-        dest="dir",
-        help="Directory to save the media to. Default is the video's directory.",
+        dest="destdir",
+        help="Destination directory to save the media to. Default is the video's directory.",
     )
     parent_parser.add_argument(
         "--filename",

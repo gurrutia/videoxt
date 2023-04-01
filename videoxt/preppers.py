@@ -70,11 +70,14 @@ def prepare_frame_number(fps: float, second: float) -> int:
     return int(second * fps)
 
 
-def prepare_dir(video_dir: Path, reqeust_dir: t.Optional[Path]) -> Path:
-    return video_dir if reqeust_dir is None else reqeust_dir
+def prepare_destdir(video_dir: Path, reqeust_dir: t.Optional[Path]) -> Path:
+    """Prepare the directory to use for extraction. If no directory is requested,
+    the video's directory is used.
+    """
+    return reqeust_dir or video_dir
 
 
-def prepare_dir_frames(
+def prepare_destdir_frames(
     video_dir: Path, video_filename: str, request_dir: t.Optional[Path]
 ) -> Path:
     if request_dir is None:

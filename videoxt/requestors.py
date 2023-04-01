@@ -39,7 +39,7 @@ class BaseRequest(Request):
     start_time: t.Union[float, str] = "0:00:00"
     stop_time: t.Optional[t.Union[float, str]] = None
     fps: t.Optional[float] = None
-    dir: t.Optional[Path] = None
+    destdir: t.Optional[Path] = None
     filename: t.Optional[str] = None
     verbose: bool = False
     time_range: P.TimeRange = field(init=False)
@@ -53,8 +53,8 @@ class BaseRequest(Request):
         if self.fps is not None:
             self.fps = V.positive_float(self.fps)
 
-        if self.dir is not None:
-            self.dir = V.valid_dir(self.dir)
+        if self.destdir is not None:
+            self.destdir = V.valid_dir(self.destdir)
 
         if self.filename is not None:
             self.filename = V.valid_filename(self.filename)
@@ -104,11 +104,11 @@ class AudioRequest(BaseRequest):
     def prepare_request(self) -> None:
         super().prepare_request()
 
-        self.dir = P.prepare_dir(self.video.filepath.parent, self.dir)
+        self.destdir = P.prepare_destdir(self.video.filepath.parent, self.destdir)
         self.filepath = P.prepare_filepath(
             self.video.filepath.stem,
             self.filename,
-            self.dir,
+            self.destdir,
             self.audio_format,
         )
 
@@ -147,12 +147,12 @@ class ClipRequest(BaseRequest):
     def prepare_request(self) -> None:
         super().prepare_request()
 
-        self.dir = P.prepare_dir(self.video.filepath.parent, self.dir)
+        self.destdir = P.prepare_destdir(self.video.filepath.parent, self.destdir)
         self.dimensions = P.prepare_dimensions(
             self.video.properties.dimensions, self.dimensions, self.resize
         )
         self.filepath = P.prepare_filepath(
-            self.video.filepath.stem, self.filename, self.dir, "mp4"
+            self.video.filepath.stem, self.filename, self.destdir, "mp4"
         )
 
     def __str__(self) -> str:
@@ -193,8 +193,8 @@ class FramesRequest(BaseRequest):
         self.images_expected = P.prepare_images_expected(
             self.time_range.start_frame, self.time_range.stop_frame, self.capture_rate
         )
-        self.dir = P.prepare_dir_frames(
-            self.video.filepath.parent, self.video.filepath.name, self.dir
+        self.destdir = P.prepare_destdir_frames(
+            self.video.filepath.parent, self.video.filepath.name, self.destdir
         )
         self.filename = P.prepare_filename_frames(
             self.video.filepath.stem, self.filename
@@ -235,12 +235,12 @@ class GifRequest(BaseRequest):
     def prepare_request(self) -> None:
         super().prepare_request()
 
-        self.dir = P.prepare_dir(self.video.filepath.parent, self.dir)
+        self.destdir = P.prepare_destdir(self.video.filepath.parent, self.destdir)
         self.dimensions = P.prepare_dimensions(
             self.video.properties.dimensions, self.dimensions, self.resize
         )
         self.filepath = P.prepare_filepath(
-            self.video.filepath.stem, self.filename, self.dir, "gif"
+            self.video.filepath.stem, self.filename, self.destdir, "gif"
         )
 
     def __str__(self) -> str:

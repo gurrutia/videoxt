@@ -51,7 +51,7 @@ def extract_audio(filepath: Path, **kwargs: t.Dict[str, t.Any]) -> None:
 
     Note: Unrecognized arguments are ignored.
     """
-    extraction_factory(Video(filepath), AudioRequest, AudioExtractor, **kwargs)
+    extraction_factory(filepath, AudioRequest, AudioExtractor, **kwargs)
 
 
 def extract_clip(filepath: Path, **kwargs: t.Dict[str, t.Any]) -> None:
@@ -97,7 +97,7 @@ def extract_clip(filepath: Path, **kwargs: t.Dict[str, t.Any]) -> None:
 
     Note: Unrecognized arguments are ignored.
     """
-    extraction_factory(Video(filepath), ClipRequest, ClipExtractor, **kwargs)
+    extraction_factory(filepath, ClipRequest, ClipExtractor, **kwargs)
 
 
 def extract_frames(filepath: Path, **kwargs: t.Dict[str, t.Any]) -> None:
@@ -139,7 +139,7 @@ def extract_frames(filepath: Path, **kwargs: t.Dict[str, t.Any]) -> None:
 
     Note: Unrecognized arguments are ignored.
     """
-    extraction_factory(Video(filepath), FramesRequest, FramesExtractor, **kwargs)
+    extraction_factory(filepath, FramesRequest, FramesExtractor, **kwargs)
 
 
 def extract_gif(filepath: Path, **kwargs: t.Dict[str, t.Any]) -> None:
@@ -181,4 +181,4 @@ def extract_gif(filepath: Path, **kwargs: t.Dict[str, t.Any]) -> None:
 
     Note: Unrecognized arguments are ignored.
     """
-    extraction_factory(Video(filepath), GifRequest, GifExtractor, **kwargs)
+    extraction_factory(filepath, GifRequest, GifExtractor, **kwargs)

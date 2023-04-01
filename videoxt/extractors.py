@@ -218,11 +218,22 @@ class GifExtractor(Extractor):
 
 
 def extraction_factory(
-    video: Video,
+    filepath: Path,
     request_cls: t.Type[BaseRequest],
     extractor_cls: t.Type[Extractor],
     **kwargs: t.Dict[str, t.Any],
 ) -> None:
+    """
+    Factory function that creates instances of a `Video` class, a `Request` class, and
+    an `Extractor` class to extract data from a `Video`.
+
+    Args:
+        filepath: A `Path` object to the video file.
+        request_cls: A subclass of a `BaseRequest` class for creating an extraction request.
+        extractor_cls: A subclass of an `Extractor` class that performs the extraction.
+        **kwargs: Optional keyword arguments to use for creating the request.
+    """
+    video = Video(filepath)
     request_kwargs = U.parse_kwargs(kwargs, request_cls) if kwargs else kwargs
     request = request_cls(video, **request_kwargs)
     extractor = extractor_cls(request)

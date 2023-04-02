@@ -52,7 +52,7 @@ def audio_request_str(request: R.AudioRequest) -> str:
     return dedent(
         f"""
         {C.EMOJI_MAP['audio']}
-            filepath:           {request.filepath}
+            filepath:           {request.filepath.resolve()}
             format:             {request.audio_format!r}
             volume:             {request.volume}
             speed:              {request.speed}
@@ -68,7 +68,7 @@ def clip_request_str(request: R.ClipRequest) -> str:
     return dedent(
         f"""
         {C.EMOJI_MAP['clip']}
-            filepath:           {request.filepath}
+            filepath:           {request.filepath.resolve()}
             resize:             {request.resize}
             rotate:             {request.rotate}
             speed:              {request.speed}
@@ -88,7 +88,7 @@ def frames_request_str(request: R.FramesRequest) -> str:
     return dedent(
         f"""
         {C.EMOJI_MAP['frames']}
-            destionation dir:   {request.destdir}
+            destination:        {request.destdir.resolve()}
             filenames:          {f"{request.filename}_*.{request.image_format}"!r}
             format:             {request.image_format!r}
             images expected:    {request.images_expected}
@@ -106,7 +106,7 @@ def gif_request_str(request: R.GifRequest) -> str:
     return dedent(
         f"""
         {C.EMOJI_MAP['gif']}
-            filepath:           {request.filepath}
+            filepath:           {request.filepath.resolve()}
             resize:             {request.resize}
             rotate:             {request.rotate}
             speed:              {request.speed}

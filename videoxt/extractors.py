@@ -136,7 +136,6 @@ class FramesExtractor(Extractor):
     def extract(self) -> None:
         """Extract frames from a video and save them to a directory as images."""
         video_capture = cv2.VideoCapture(str(self.request.video.filepath))
-        video_capture.set(cv2.CAP_PROP_POS_FRAMES, self.request.time_range.start_frame)
 
         if not self.request.destdir.exists():
             self.request.destdir.mkdir()
@@ -157,6 +156,7 @@ class FramesExtractor(Extractor):
             images_written = 0
 
             for frame_num in frame_numbers:
+                video_capture.set(cv2.CAP_PROP_POS_FRAMES, frame_num)
                 read_successful, image = video_capture.read()
 
                 if not read_successful:

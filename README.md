@@ -1,22 +1,24 @@
 <h1 align="center">
-  <img src="https://user-images.githubusercontent.com/3451528/222875688-e8d60da9-0439-4996-936d-c75ffd47cb58.png" alt="videoxt" width="210"></a>
+  <img src="https://user-images.githubusercontent.com/3451528/222875688-e8d60da9-0439-4996-936d-c75ffd47cb58.png" alt="videoxt" width="200"></a>
 </h1>
 
 [![PyPI](https://img.shields.io/pypi/v/videoxt)](https://pypi.org/project/videoxt) [![Downloads](https://static.pepy.tech/badge/videoxt)](https://pepy.tech/project/videoxt)
 
-<p align="center">
-  <b>videoxt</b> is a Python library and command-line tool that allows you to convert video frames to images, or create a GIF between two points in a video.<br/><br/>
-  <a href="#installation">Installation</a> •
-  <a href="#examples">Examples</a> •
-  <a href="#options">Options</a> •
-  <a href="#used-by">Used by</a>
-</p>
+<b>VideoXT</b> is a Python library and command-line tool that allows you to easily extract audio, clips, frames or create a GIF between two points in a video.
 
-<div align="center">
-  <b>View demo on Vimeo:</b><br/>
-  <a href="https://vimeo.com/804903665"><img src="https://i.vimeocdn.com/video/1625119839-dd58766e279a6ff55dc505a718c721da027467575bf25f844d909558cc7fa2f0-d_640" alt="videoxt demo" title="View videoxt demo on Vimeo"></a>
-</div>
 
+[![demo](https://user-images.githubusercontent.com/3451528/229325416-30faad6c-725f-4783-9a9f-1b83245810ec.jpg)](https://user-images.githubusercontent.com/3451528/229325422-0da43958-34b0-438e-9049-73a98a7924d7.mp4)
+
+## Contents
+
+* <a href="#installation">Installation</a><br/>
+* <a href="#examples">Examples</a><br/>
+* <a href="#command-line-usage">Command-line usage</a><br/>
+* <a href="#frames">*frames* usage</a><br/>
+* <a href="#gif">*gif* usage</a><br/>
+* <a href="#audio">*audio* usage</a><br/>
+* <a href="#clip">*clip* usage</a><br/>
+* <a href="#used-by">Used by</a>
 
 ---
 
@@ -37,107 +39,243 @@ git clone https://github.com/gurrutia/videoxt.git
 ## Examples
 
 > **NOTE**: All command-line examples are run from the directory where the video is located. You can run the commands from any directory by specifying the full path to the video.
->
-> **vxt** cli entry point will be deprecated in a future release, use **videoxt** instead.
 
-**Example 1**: Extract all video frames.
+**Example 1**: Extract every `30th` **frame** of a video, save the frames as `png` images, set the dimensions of the images to `800x600`, apply a `monochrome` (black and white) filter to the images and print extraction details to the console.
 
 ```python
-from videoxt.extractors import VideoToImages
+import videoxt
 
-vti = VideoToImages("C:/Users/gurrutia/Videos/video.mp4")
-
-vti.extract_images()
-```
-
-Command-line equivalent:
-
-```sh
-videoxt images video.mp4
-```
-
-<img src="https://user-images.githubusercontent.com/3451528/222924597-da48b568-cf13-4117-b5bf-cdecf4e006ce.jpg" alt="videoxt_example_1" width="700"></a>
-
-**Example 2**: Extract every `30th` frame from `50` seconds to the end of the video, save the images as `png`, resize the frames by `50%` and rotate the frames by `180` degrees.
-
-```python
-from videoxt.extractors import VideoToImages
-
-vti = VideoToImages(
-  "C:/Users/gurrutia/Videos/video.mp4",
-  start_time=50,
+videoxt.extract_frames(
+  'C:/Users/gurrutia/Videos/video.avi',  # pathlib.Path also works
   capture_rate=30,
-  image_format="png",
-  resize=0.5,
-  rotate=180,
+  image_format='png',  # default is 'jpg'
+  dimension=(800, 600),
+  monochrome=True,
+  verbose=True,
 )
-
-vti.extract_images()
 ```
 
 Command-line equivalent:
 
 ```sh
-videoxt images video.mp4 --start-time 50 --capture-rate 30 --image-format png --resize 0.5 --rotate 180
+>> videoxt frames video.avi --capture-rate 30 --image-format png --dimensions 800 600 --monochrome
+or
+>> videoxt frames video.avi -cr 30 -if png --dm 800 600 --monochrome
 ```
 
-<img src="https://user-images.githubusercontent.com/3451528/222924619-f4e5b3d8-e743-476c-af86-da3b50b8b1a3.jpg" alt="videoxt_example_2" width="700"></a>
+Extraction details printed to console:
 
-**Example 3**: Create a GIF between `01:10` and `01:12` of the video at 1/4 the video speed, and resize the GIF to 640x480.
+![example1](https://user-images.githubusercontent.com/3451528/229313078-10b2ccc5-b643-4d2b-acdc-e75dcd7346fd.jpg)
+
+**Example 2**: Extract and `normalize` the **audio** from a list of video filepaths, save the audio as `wav` files in a directory named `to_sample` that exists in the same directory as the video file.
 
 ```python
-from videoxt.extractors import VideoToGIF
+from pathlib import Path
+import videoxt
 
-vtg = VideoToGIF(
-  "C:/Users/gurrutia/Videos/video.mp4",
-  start_time="01:10",
-  stop_time="01:12",
-  speed=.25,
-  dimensions=(640, 480),
+filepaths = [
+  Path('C:/Users/gurrutia/Videos/video.mp4'),
+  Path('C:/Users/gurrutia/Videos/video2.mp4'),
+  Path('C:/Users/gurrutia/Videos/video3.mp4'),
+]
+
+for filepath in filepaths:
+  videoxt.extract_audio(
+    filepath,
+    audio_format='wav',  # default is 'mp3'
+    destdir=filepath.parent / 'to_sample',  # directory must exist
+    normalize=True,
+  )
+```
+
+Command-line equivalent (for a single video file):
+
+```sh
+>> videoxt audio video.mp4 --audio-format wav --destdir to_sample --normalize
+or
+>> videoxt audio video.mp4 -af wav -d to_sample --normalize
+```
+
+**Example 3**: Create a **subclip** between `1:08` and `1:10` of the video, `resize` the subclip up by `25%`, slow the `speed` of subclip down by `75%`, `reverse` the subclip, and `normalize` the subclip audio. *Only `mp4` output is supported*.
+
+```python
+from pathlib import Path
+import videoxt
+
+videoxt.extract_clip(
+  Path('C:/Users/gurrutia/Videos/video.mp4'),
+  start_time='1:08',  # or 68.0
+  stop_time=70,  # or '1:10'
+  resize=1.25,
+  speed=0.25,
+  normalize=True,
 )
-
-vtg.create_gif()
 ```
 
 Command-line equivalent:
 
 ```sh
-videoxt gif video.mp4 --start-time 01:10 --stop-time 01:12 --speed 0.25 --dimensions 640 480
+>> videoxt clip video.mp4 --start-time 1:08 --stop-time 70 --resize 1.25 --speed 0.25 --normalize
+or
+>> videoxt clip video.mp4 -s 1:08 -S 70 -rs 1.25 -sp 0.25 --normalize
 ```
 
-<img src="https://user-images.githubusercontent.com/3451528/222924624-583b2ad2-b34c-4278-871b-094e13f83034.jpg" alt="videoxt_example_2" width="700"></a>
+---
 
-## Options
+## Command-line usage
 
-### General options
+```sh
+>> videoxt --help
+usage: videoxt [-h] [--version] {audio,clip,frames,gif} ...
 
-Argument&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Description
----|---
-**`video_path`** | Path to the video file with the extension. **(Required)**<br/><br/>Example: `C:/Users/gurrutia/Videos/video.mp4`
-**`--start-time`** | Specify the video extraction start time, in seconds or as a timestamp in the format `HH:MM:SS`, `H:MM:SS`, `MM:SS` or `M:SS`.<br/><br/>Example: `--start-time 1:30` or `--start-time 90`<br/><br/>Default: the start of the video.
-**`--stop-time`** | Specify the video extraction stop time, in seconds or as a timestamp in the format `HH:MM:SS`, `H:MM:SS`, `MM:SS` or `M:SS`.<br/><br/>Example: `--stop-time 2:00` or `--stop-time 120`<br/><br/>Default: the end of the video.
-**`--fps`** | Number of frames per second in the video file, overrides the video metadata frames per second. Use this option sparingly and only when the video metadata fps is incorrectly detected.<br/><br/>Example: `--fps 30`<br/><br/>Default: the video metadata fps.
-**`--dimensions`** | Specify the media output dimensions as space-separated values.<br/><br/>Example: `--dimensions 1920 1080`<br/><br/>Default: the native video dimensions.
-**`--resize`** | Resize the media output by a factor of *n*.<br/><br/>Example: `--resize 1.5` to increase the media output size by 50%<br/><br/>Default: `1.0`, no resize.
-**`--rotate`** | Rotate the media output by 90, 180, or 270 degrees.<br/><br/>Valid rotate values: 0, 90, 180, 270<br/><br/>Example: `--rotate 270` to rotate the media counter-clockwise by 90 degrees.<br/><br/>Default: `0`, no rotation.
-**`--output-dir`** | Directory to save the media output to.<br/><br/>Example: `--output-dir C:/Users/gurrutia/Videos/custom_folder`<br/><br/>Default for *images*: `same/directory/as/video/video_frames`<br/>Default for *gif*: `same/directory/as/video`.
-**`--output-filename`** | Specify the file name of the media output.<br/><br/>Example for *images*: `--output-filname my_images`, which will name all the images as `my_images_*.jpg` where `*` is the frame number.<br/>Example for *gif*: `--output-filename my.gif`<br/><br/>Default for *images*: `video_filename_*.jpg`<br/>Default for *gif*: `video_filename.gif`
-**`--monochrome`** | Convert the media output to monochrome (black and white).<br/><br/>Example: `--monochrome`.<br/><br/>Default: `False`
-**`--quiet`** | Disable extraction details in terminal.<br/><br/>Example: `--quiet` to disable extraction details from being printed.<br/><br/>Default: `False`
-**`--emoji`** | Enable emoji's in terminal. Added by special request 👍.<br/><br/>Example: `--emoji` to enable emoji's.<br/><br/>Default: `False`
+Extract audio, clips, frames and create gifs from a video.
 
-### Image only options
-Argument&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Description
----|---
-**`---capture-rate`** | Capture every *nth* video frame.<br/><br/>Example: `--capture-rate 30` to every 30th frame.<br/><br/>Default: `1`, every frame.
-**`--image-format`** | Specify the image format to save the frames as.<br/><br/>Valid image formats: bmp, dib, jpeg, jpg, png, tiff, tif, webp<br/><br/>Example: `--image-format png` or `--image-format .png`<br/><br/>Default: `jpg`
-### GIF only options
-Argument&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Description
----|---
-**`--speed`** | Speed of the GIF animation.<br/><br/>Example: `--speed 0.5` to create a GIF at half the video speed.<br/><br/>Default: `1.0`, same speed as the video.
-**`--bounce`** | Make GIF bounce forwards and backwards, boomerang style.<br/><br/>Example: `--bounce`<br/><br/>Default: `False`
+positional arguments:
+  {audio,clip,frames,gif}
+    audio               Extract audio from video.
+    clip                Extract a clip of a video file. Only supports 'mp4' output.
+    frames              Extract individual frames from a video and save them as images.
+    gif                 Create a GIF between two points in a video.
+
+options:
+  -h, --help            show this help message and exit
+  --version, -V         show program's version number and exit
+```
+
+### *frames*
+
+```sh
+>> videoxt frames --help
+usage: videoxt frames [-h] [--start-time] [--stop-time] [--fps] [--destdir] [--filename] [--quiet] [--dimensions ]
+                      [--resize] [--rotate] [--monochrome] [--image-format] [--capture-rate]
+                      filepath
+
+positional arguments:
+  filepath              Path to the video file with extension.
+
+options:
+  -h, --help            show this help message and exit
+  --start-time , -s     Time to start extraction. Can be a number representing seconds or a timestamp (Ex: --start-
+                        time 0:45 or -s 45).
+  --stop-time , -S      Time to stop extraction. Can be a number representing seconds or a timestamp (Ex: --stop-time
+                        1:30 or -S 90).
+  --fps , -f            Manually set the frames per second (FPS). Helpful if the FPS is not read accurately.
+  --destdir , -d        Specify the directory you want to save the media to. If not provided, media is saved in the
+                        video directory.
+  --filename , -fn      Set the name of the output media file(s), without the extension. If not provided, the video
+                        filename is used.
+  --quiet, -q           Disable extraction details from being printed to the console.
+  --dimensions  , -dm
+                        Resize the output to a specific width and height (Ex: --dm 1920 1080).
+  --resize , -rs        Increase or decrease the dimensions of the output by a factor of N.
+  --rotate , -rt        Rotate the output by 90, 180, or 270 degrees.
+  --monochrome          Apply a black and white filter to the output.
+  --image-format , -if
+                        Set the image format to save the frames as. Default is 'jpg'.
+  --capture-rate , -cr
+                        Capture every Nth video frame. Default is 1, which captures every frame.
+```
+
+### *gif*
+
+```sh
+>> videoxt gif --help
+usage: videoxt gif [-h] [--start-time] [--stop-time] [--fps] [--destdir] [--filename] [--quiet] [--dimensions ]
+                   [--resize] [--rotate] [--monochrome] [--speed] [--bounce] [--reverse]
+                   filepath
+
+positional arguments:
+  filepath              Path to the video file with extension.
+
+options:
+  -h, --help            show this help message and exit
+  --start-time , -s     Time to start extraction. Can be a number representing seconds or a timestamp (Ex: --start-
+                        time 0:45 or -s 45).
+  --stop-time , -S      Time to stop extraction. Can be a number representing seconds or a timestamp (Ex: --stop-time
+                        1:30 or -S 90).
+  --fps , -f            Manually set the frames per second (FPS). Helpful if the FPS is not read accurately.
+  --destdir , -d        Specify the directory you want to save the media to. If not provided, media is saved in the
+                        video directory.
+  --filename , -fn      Set the name of the output media file(s), without the extension. If not provided, the video
+                        filename is used.
+  --quiet, -q           Disable extraction details from being printed to the console.
+  --dimensions  , -dm
+                        Resize the output to a specific width and height (Ex: --dm 1920 1080).
+  --resize , -rs        Increase or decrease the dimensions of the output by a factor of N.
+  --rotate , -rt        Rotate the output by 90, 180, or 270 degrees.
+  --monochrome          Apply a black and white filter to the output.
+  --speed , -sp         Increase or decrease the speed of the output by a factor of N.
+  --bounce              Make the output bounce back-and-forth, boomerang style.
+  --reverse             Reverse the output.
+```
+
+### *audio*
+
+```sh
+>> videoxt audio --help
+usage: videoxt audio [-h] [--start-time] [--stop-time] [--fps] [--destdir] [--filename] [--quiet] [--volume]
+                     [--normalize] [--audio-format]
+                     filepath
+
+positional arguments:
+  filepath              Path to the video file with extension.
+
+options:
+  -h, --help            show this help message and exit
+  --start-time , -s     Time to start extraction. Can be a number representing seconds or a timestamp (Ex: --start-
+                        time 0:45 or -s 45).
+  --stop-time , -S      Time to stop extraction. Can be a number representing seconds or a timestamp (Ex: --stop-time
+                        1:30 or -S 90).
+  --fps , -f            Manually set the frames per second (FPS). Helpful if the FPS is not read accurately.
+  --destdir , -d        Specify the directory you want to save the media to. If not provided, media is saved in the
+                        video directory.
+  --filename , -fn      Set the name of the output media file(s), without the extension. If not provided, the video
+                        filename is used.
+  --quiet, -q           Disable extraction details from being printed to the console.
+  --volume , -v         Increase or decrease the output audio volume by a factor of N.
+  --normalize           Normalize the audio output to a maximum of 0dB.
+  --audio-format , -af
+                        Set the audio format to as. Default is 'mp3'.
+```
+
+### *clip*
+
+```sh
+>> videoxt clip --help
+usage: videoxt clip [-h] [--start-time] [--stop-time] [--fps] [--destdir] [--filename] [--quiet] [--volume]
+                    [--normalize] [--dimensions ] [--resize] [--rotate] [--monochrome] [--speed] [--bounce]
+                    [--reverse]
+                    filepath
+
+positional arguments:
+  filepath              Path to the video file with extension.
+
+options:
+  -h, --help            show this help message and exit
+  --start-time , -s     Time to start extraction. Can be a number representing seconds or a timestamp (Ex: --start-
+                        time 0:45 or -s 45).
+  --stop-time , -S      Time to stop extraction. Can be a number representing seconds or a timestamp (Ex: --stop-time
+                        1:30 or -S 90).
+  --fps , -f            Manually set the frames per second (FPS). Helpful if the FPS is not read accurately.
+  --destdir , -d        Specify the directory you want to save the media to. If not provided, media is saved in the
+                        video directory.
+  --filename , -fn      Set the name of the output media file(s), without the extension. If not provided, the video
+                        filename is used.
+  --quiet, -q           Disable extraction details from being printed to the console.
+  --volume , -v         Increase or decrease the output audio volume by a factor of N.
+  --normalize           Normalize the audio output to a maximum of 0dB.
+  --dimensions  , -dm
+                        Resize the output to a specific width and height (Ex: --dm 1920 1080).
+  --resize , -rs        Increase or decrease the dimensions of the output by a factor of N.
+  --rotate , -rt        Rotate the output by 90, 180, or 270 degrees.
+  --monochrome          Apply a black and white filter to the output.
+  --speed , -sp         Increase or decrease the speed of the output by a factor of N.
+  --bounce              Make the output bounce back-and-forth, boomerang style.
+  --reverse             Reverse the output.
+```
+
 ---
 
 ## Used by
 
-- **Grand St. Settlement** *(non-profit)* filmmaking instructors to gather film stills that aid in constructing lesson plans for their youth workshops. [Download workshop example here.](https://github.com/gurrutia/videoxt/files/10887456/GSS_Filmmaking_Fall_2022_Transfiguration_Schools_W1.pdf)
+* **Best Buy Teen Tech Center** at **Grand St. Settlement**, allowing filmmaking instructors to gather film stills that aid in constructing lesson plans for their youth workshops. [Download workshop example here.](https://github.com/gurrutia/videoxt/files/10887456/GSS_Filmmaking_Fall_2022_Transfiguration_Schools_W1.pdf)

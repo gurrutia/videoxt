@@ -1,5 +1,13 @@
+import os
+import tempfile
+from dataclasses import dataclass
+from pathlib import Path
+
 import pytest
 
+from videoxt.utils import enumerate_dir
+from videoxt.utils import enumerate_filepath
+from videoxt.utils import parse_kwargs
 from videoxt.utils import seconds_to_timestamp
 from videoxt.utils import timestamp_to_seconds
 
@@ -35,3 +43,79 @@ def test_seconds_to_timestamp_valid_input():
 def test_seconds_to_timestamp_invalid_input():
     with pytest.raises(TypeError):
         seconds_to_timestamp("invalid")
+
+
+@pytest.fixture
+def temp_dir():
+    temp_dir = Path("temp_dir")
+    temp_dir.mkdir()
+    yield temp_dir
+    temp_dir.rmdir()
+
+
+def test_enumerate_dir_existing_dir(temp_dir):
+    # Test case 1: directory with same name already exists
+    expected_output = temp_dir.with_name(f"{temp_dir.name} (2)")
+    assert enumerate_dir(temp_dir) == expected_output
+
+
+def test_enumerate_dir_new_dir(tmp_path):
+    new_dir_path = tmp_path / "new_dir"
+    assert enumerate_dir(new_dir_path) == new_dir_path
+
+
+@pytest.fixture
+def temp_file():
+    with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
+        tmp_file.write(b"test file contents")
+    filepath = Path(tmp_file.name)
+    yield filepath
+    os.unlink(tmp_file.name)
+
+
+def test_enumerate_filepath_existing_file(temp_file):
+    # Test case 1: file with same name already exists
+    expected_output = temp_file.with_name(f"{temp_file.stem} (2){temp_file.suffix}")
+    assert enumerate_filepath(temp_file) == expected_output
+
+
+def test_enumerate_filepath_new_file(temp_file):
+    # Test case 2: file with same name does not exist
+    new_filepath = temp_file.with_name("new_file.txt")
+    assert enumerate_filepath(new_filepath) == new_filepath
+
+
+@dataclass
+class Image:
+    width: int
+    height: int
+
+
+@dataclass
+class Audio:
+    artist: str
+    title: str
+
+
+def test_parse_kwargs_image():
+    # Test case: parse kwargs for Image dataclass
+    kwargs = {
+        "filename": "my_image.jpg",
+        "width": 1920,
+        "height": 1080,
+        "format": "jpg",
+    }
+    expected_output = {"width": 1920, "height": 1080}
+    assert parse_kwargs(kwargs, Image) == expected_output
+
+
+def test_parse_kwargs_audio():
+    # Test case: parse kwargs for Audio dataclass
+    kwargs = {
+        "title": "Bohemian Rhapsody",
+        "artist": "Queen",
+        "format": "mp3",
+        "genre": "Rock",
+    }
+    expected_output = {"title": "Bohemian Rhapsody", "artist": "Queen"}
+    assert parse_kwargs(kwargs, Audio) == expected_output

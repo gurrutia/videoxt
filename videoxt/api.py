@@ -11,31 +11,40 @@ def extract_audio(filepath: Path, **kwargs: t.Dict[str, t.Any]) -> None:
     Args:
     ------------
         `filepath` (Path, str) :
-            Path to the video file.
+            Path to the video file with extension.
         `start_time` (float, str) :
-            Time to start extraction. Can be a float representing seconds or
-            a string in the format `HH:MM:SS`, `H:MM:SS`, `MM:SS`, or `M:SS`.
+            Time to start extraction. Can be a float representing seconds or a string
+            in timestamp format:
+
+            `HH:MM:SS`, `H:MM:SS`, `MM:SS`, or `M:SS`.
         `stop_time` (float, str) :
-            Time to stop extraction. Can be a float representing seconds or
-            a string in the format `HH:MM:SS`, `H:MM:SS`, `MM:SS`, or `M:SS`.
+            Time to stop extraction. Can be a float representing seconds or a string
+            in timestamp format:
+
+            `HH:MM:SS`, `H:MM:SS`, `MM:SS`, or `M:SS`.
         `fps` (float) :
-            Override the video's frames per second. If `None`, the video fps is used.
+            Manually set the frames per second (FPS). Helpful if the FPS is not read
+            by cv2 accurately.
         `destdir` (Path, str) :
-            Directory to save the media to. If `None`, the video directory is used.
+            Specify the directory you want to save the audio to. If not provided, media
+            is saved in the video directory.
         `filename` (str) :
-            Filename of the resulting media without extension. If `None`, the video filename is used.
+            Set the name of the output audio file, without the extension. If not
+            provided, the video filename is used.
         `verbose` (bool) :
             If `True`, prints extraction details to console prior to extraction.
         `audio_format` (str) :
-            Audio format to save as.
+            Set the audio format to as.
+
             Valid values are `mp3`, `wav`, `ogg`, or `m4a`.
-            Defaults to `mp3`.
+
+            Default: `mp3`
         `speed` (float) :
             Increase or decrease the speed of the audio playback by a factor of `n`.
         `volume` (float) :
             Increase or decrease the audio volume by a factor of `n`.
         `bounce` (bool) :
-            If `True`, bounces the audio back and forth. Can be used in conjunction with `reverse`.
+            If `True`, bounces the audio back-and-forth. Can be used in conjunction with `reverse`.
         `reverse` (bool) :
             If `True`, reverses the audio. Can be used in conjunction with `bounce`.
         `normalize` (bool) :
@@ -52,25 +61,33 @@ def extract_clip(filepath: Path, **kwargs: t.Dict[str, t.Any]) -> None:
     Args:
     ------------
         `filepath` (Path, str) :
-            Path to the video file.
+            Path to the video file with extension.
         `start_time` (float, str) :
-            Time to start extraction. Can be a float representing seconds or
-            a string in the format `HH:MM:SS`, `H:MM:SS`, `MM:SS`, or `M:SS`.
+            Time to start extraction. Can be a float representing seconds or a string
+            in timestamp format:
+
+            `HH:MM:SS`, `H:MM:SS`, `MM:SS`, or `M:SS`.
         `stop_time` (float, str) :
-            Time to stop extraction. Can be a float representing seconds or
-            a string in the format `HH:MM:SS`, `H:MM:SS`, `MM:SS`, or `M:SS`.
+            Time to stop extraction. Can be a float representing seconds or a string
+            in timestamp format:
+
+            `HH:MM:SS`, `H:MM:SS`, `MM:SS`, or `M:SS`.
         `fps` (float) :
-            Override the video's frames per second. If `None`, the video fps is used.
+            Manually set the frames per second (FPS). Helpful if the FPS is not read
+            by cv2 accurately.
         `destdir` (Path, str) :
-            Directory to save the media to. If `None`, the video directory is used.
+            Specify the directory you want to save the clip to. If not provided, the
+            clip is saved in the video directory.
         `filename` (str) :
-            Filename of the resulting media without extension. If `None`, the video filename is used.
+            Set the name of the output video file, without the extension. If not
+            provided, the video filename is used.
         `verbose` (bool) :
             If `True`, prints extraction details to console prior to extraction.
         `resize` (float) :
             Resize the clip by a factor of `n`.
         `rotate` (int) :
             Rotate the clip by `n` degrees.
+
             Valid values are `0`, `90`, `180`, or `270`.
         `speed` (float) :
             Increase or decrease the speed of the clip by a factor of `n`.
@@ -79,7 +96,7 @@ def extract_clip(filepath: Path, **kwargs: t.Dict[str, t.Any]) -> None:
         `monochrome` (bool) :
             If `True`, applies a black and white filter to the clip.
         `bounce` (bool) :
-            If `True`, bounces the clip back and forth. Can be used in conjunction with `reverse`.
+            If `True`, bounces the clip back-and-forth. Can be used in conjunction with `reverse`.
         `reverse` (bool) :
             If `True`, reverses the clip. Can be used in conjunction with `bounce`.
         `normalize` (bool) :
@@ -98,31 +115,41 @@ def extract_frames(filepath: Path, **kwargs: t.Dict[str, t.Any]) -> None:
     Args:
     ------------
         `filepath` (Path, str) :
-            Path to the video file.
+            Path to the video file with extension.
         `start_time` (float, str) :
-            Time to start extraction. Can be a float representing seconds or
-            a string in the format `HH:MM:SS`, `H:MM:SS`, `MM:SS`, or `M:SS`.
+            Time to start extraction. Can be a float representing seconds or a string
+            in timestamp format:
+
+            `HH:MM:SS`, `H:MM:SS`, `MM:SS`, or `M:SS`.
         `stop_time` (float, str) :
-            Time to stop extraction. Can be a float representing seconds or
-            a string in the format `HH:MM:SS`, `H:MM:SS`, `MM:SS`, or `M:SS`.
+            Time to stop extraction. Can be a float representing seconds or a string
+            in timestamp format:
+
+            `HH:MM:SS`, `H:MM:SS`, `MM:SS`, or `M:SS`.
         `fps` (float) :
-            Override the video's frames per second. If `None`, the video fps is used.
+            Manually set the frames per second (FPS). Helpful if the FPS is not read
+            by cv2 accurately.
         `destdir` (Path, str) :
-            Directory to save the media to. If `None`, the video directory is used.
+            Specify the directory you want to save the images to. If not provided, media
+            is saved to a subfolder in the video directory.
         `filename` (str) :
-            Filename of the resulting media without extension. If `None`, the video filename is used.
+            Set the name of the output image file(s), without the extension. If not
+            provided, the video filename is used.
         `verbose` (bool) :
             If `True`, prints extraction details to console prior to extraction.
         `image_format` (str) :
             Image format to save as.
+
             Valid values are `jpg`, `jpeg`, `png`,`webp`, `bmp`, `dib`, `tif`, or `tiff`.
-            Defaults to `jpg`.
+
+            Default: `jpg`
         `capture_rate` (int) :
             Capture every nth video frame. Default is 1, which captures every frame.
         `resize` (float) :
             Resize the images by a factor of `n`.
         `rotate` (int) :
             Rotate the images by `n` degrees.
+
             Valid values are `0`, `90`, `180`, or `270`.
         `monochrome` (bool) :
             If `True`, applies a black and white filter to the images.
@@ -140,32 +167,40 @@ def extract_gif(filepath: Path, **kwargs: t.Dict[str, t.Any]) -> None:
     Args:
     ------------
         `filepath` (Path, str) :
-            Path to the video file.
+            Path to the video file with extension.
         `start_time` (float, str) :
-            Time to start extraction. Can be a float representing seconds or
-            a string in the format `HH:MM:SS`, `H:MM:SS`, `MM:SS`, or `M:SS`.
+            Time to start extraction. Can be a float representing seconds or a string
+            in timestamp format:
+
+            `HH:MM:SS`, `H:MM:SS`, `MM:SS`, or `M:SS`.
         `stop_time` (float, str) :
-            Time to stop extraction. Can be a float representing seconds or
-            a string in the format `HH:MM:SS`, `H:MM:SS`, `MM:SS`, or `M:SS`.
+            Time to stop extraction. Can be a float representing seconds or a string
+            in timestamp format:
+
+            `HH:MM:SS`, `H:MM:SS`, `MM:SS`, or `M:SS`.
         `fps` (float) :
-            Override the video's frames per second. If `None`, the video fps is used.
+            Manually set the frames per second (FPS). Helpful if the FPS is not read
+            by cv2 accurately.
         `destdir` (Path, str) :
-            Directory to save the media to. If `None`, the video directory is used.
+            Specify the directory you want to save the gif to. If not provided, the
+            gif is saved in the video directory.
         `filename` (str) :
-            Filename of the resulting media without extension. If `None`, the video filename is used.
+            Set the name of the output gif file, without the extension. If not
+            provided, the video filename is used.
         `verbose` (bool) :
             If `True`, prints extraction details to console prior to extraction.
         `resize` (float) :
             Resize the gif by a factor of `n`.
         `rotate` (int) :
             Rotate the gif by `n` degrees.
+
             Valid values are `0`, `90`, `180`, or `270`.
         `speed` (float) :
             Increase or decrease the speed of the gif by a factor of `n`.
         `monochrome` (bool) :
             If `True`, applies a black and white filter to the gif.
         `bounce` (bool) :
-            If `True`, bounces the gif back and forth. Can be used in conjunction with `reverse`.
+            If `True`, bounces the gif back-and-forth. Can be used in conjunction with `reverse`.
         `reverse` (bool) :
             If `True`, reverses the gif. Can be used in conjunction with `bounce`.
         `dimensions` (Tuple[int, int]) :

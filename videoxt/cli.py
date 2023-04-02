@@ -62,7 +62,7 @@ def main(argv: t.Optional[t.Sequence[str]] = None) -> int:
         default="0:00:00",
         metavar="",
         dest="start_time",
-        help="Time to start extraction. Can be a number representing seconds or a timestamp. Example: 0:55 or 55.",
+        help="Time to start extraction. Can be a number representing seconds or a timestamp (Ex: --start-time 0:45 or -s 45).",
     )
     parent_parser.add_argument(
         "--stop-time",
@@ -70,14 +70,14 @@ def main(argv: t.Optional[t.Sequence[str]] = None) -> int:
         type=V.valid_stop_time_cli,
         metavar="",
         dest="stop_time",
-        help="Time to stop extraction. Can be a number representing seconds or a timestamp. Example: 1:30 or 90.",
+        help="Time to stop extraction. Can be a number representing seconds or a timestamp (Ex: --stop-time 1:30 or -S 90).",
     )
     parent_parser.add_argument(
         "--fps",
         "-f",
         type=V.positive_float_cli,
         metavar="",
-        help="Override the video's frames per second.",
+        help="Manually set the frames per second (FPS). Helpful if the FPS is not read accurately.",
     )
     parent_parser.add_argument(
         "--destdir",
@@ -85,7 +85,7 @@ def main(argv: t.Optional[t.Sequence[str]] = None) -> int:
         type=V.valid_dir_cli,
         metavar="",
         dest="destdir",
-        help="Destination directory to save the media to. Default is the video's directory.",
+        help="Specify the directory you want to save the media to. If not provided, media is saved in the video directory.",
     )
     parent_parser.add_argument(
         "--filename",
@@ -93,7 +93,7 @@ def main(argv: t.Optional[t.Sequence[str]] = None) -> int:
         type=V.valid_filename_cli,
         metavar="",
         dest="filename",
-        help="Filename of the resulting media without extension. Default is the input video filename.",
+        help="Set the name of the output media file(s), without the extension. If not provided, the video filename is used.",
     )
     parent_parser.add_argument(
         "--quiet",
@@ -111,7 +111,7 @@ def main(argv: t.Optional[t.Sequence[str]] = None) -> int:
         type=V.non_negative_float_cli,
         default=1.0,
         metavar="",
-        help="Increase or decrease the audio volume by a factor of n.",
+        help="Increase or decrease the output audio volume by a factor of N.",
     )
     parent_parser_audio.add_argument(
         "--normalize",
@@ -127,7 +127,7 @@ def main(argv: t.Optional[t.Sequence[str]] = None) -> int:
         type=V.positive_int_cli,
         nargs=2,
         metavar="",
-        help="The output media dimensions as space-separated values (Ex: 1920 1080). Defaults to the input video dimensions.",
+        help="Resize the output to a specific width and height (Ex: --dm 1920 1080).",
     )
     parent_parser_image.add_argument(
         "--resize",
@@ -135,7 +135,7 @@ def main(argv: t.Optional[t.Sequence[str]] = None) -> int:
         type=V.valid_resize_value_cli,
         default=1.0,
         metavar="",
-        help="Resize the media output by a factor of n.",
+        help="Increase or decrease the dimensions of the output by a factor of N.",
     )
     parent_parser_image.add_argument(
         "--rotate",
@@ -144,12 +144,12 @@ def main(argv: t.Optional[t.Sequence[str]] = None) -> int:
         default=0,
         metavar="",
         dest="rotate",
-        help="Rotate the media output by 90, 180, or 270 degrees.",
+        help="Rotate the output by 90, 180, or 270 degrees.",
     )
     parent_parser_image.add_argument(
         "--monochrome",
         action="store_true",
-        help="Apply a black and white filter to the media output.",
+        help="Apply a black and white filter to the output.",
     )
 
     # parent_parser_motion houses arguments common to audio, clip and gif subparsers
@@ -160,26 +160,23 @@ def main(argv: t.Optional[t.Sequence[str]] = None) -> int:
         type=V.positive_float_cli,
         default=1.0,
         metavar="",
-        help="Increase or decrease the speed of the output media by a factor of n.",
+        help="Increase or decrease the speed of the output by a factor of N.",
     )
     parent_parser_motion.add_argument(
         "--bounce",
         action="store_true",
-        help="Make the output media bounce back and forth, boomerang style.",
+        help="Make the output bounce back-and-forth, boomerang style.",
     )
     parent_parser_motion.add_argument(
         "--reverse",
         action="store_true",
-        help="Reverse the output media.",
+        help="Reverse the output.",
     )
 
     # main_parser encompasses all subparsers
     main_parser = argparse.ArgumentParser(
         prog="videoxt",
-        description=(
-            "A video extraction tool allowing you to extract "
-            "audio, clips, frames and gifs from videos."
-        ),
+        description="Extract audio, clips, frames and create gifs from a video.",
     )
     main_parser.add_argument(
         "--version",
@@ -202,7 +199,7 @@ def main(argv: t.Optional[t.Sequence[str]] = None) -> int:
         metavar="",
         default="mp3",
         dest="audio_format",
-        help="Audio format to save as. Default is 'mp3'.",
+        help="Set the audio format to as. Default is 'mp3'.",
     )
 
     # clip subparser
@@ -230,7 +227,7 @@ def main(argv: t.Optional[t.Sequence[str]] = None) -> int:
         metavar="",
         default="jpg",
         dest="image_format",
-        help="Image format to save the frames as. Default is 'jpg'.",
+        help="Set the image format to save the frames as. Default is 'jpg'.",
     )
     subparser_frames.add_argument(
         "--capture-rate",
@@ -239,7 +236,7 @@ def main(argv: t.Optional[t.Sequence[str]] = None) -> int:
         default=1,
         metavar="",
         dest="capture_rate",
-        help="Capture every nth video frame. Default is 1, which captures every frame.",
+        help="Capture every Nth video frame. Default is 1, which captures every frame.",
     )
 
     # gif subparser

@@ -135,8 +135,6 @@ class FramesExtractor(Extractor):
 
     def extract(self) -> None:
         """Extract frames from a video and save them to a directory as images."""
-        video_capture = cv2.VideoCapture(str(self.request.video.filepath))
-
         if not self.request.destdir.exists():
             self.request.destdir.mkdir()
 
@@ -145,50 +143,48 @@ class FramesExtractor(Extractor):
 
         with Progress(transient=True) as progress:
             task = progress.add_task(
-                "EXTRACTING FRAMES", total=self.request.images_expected
-            )
-
-            frame_numbers = itertools.count(
-                start=self.request.time_range.start_frame,
-                step=self.request.capture_rate,
+                "EXTRACTING FRAMES",
+                total=self.request.images_expected,
             )
 
             images_written = 0
+            frame_queue = itertools.count(
+                start=self.request.time_range.start_frame,
+                step=self.request.capture_rate,
+            )
+            for frame_num in frame_queue:
+                with self.request.video.open_capture() as opencap:
+                    opencap.set(cv2.CAP_PROP_POS_FRAMES, frame_num)
+                    read_successful, image = opencap.read()
 
-            for frame_num in frame_numbers:
-                video_capture.set(cv2.CAP_PROP_POS_FRAMES, frame_num)
-                read_successful, image = video_capture.read()
+                    if not read_successful:
+                        break
 
-                if not read_successful:
-                    break
+                    # Generate the filepath for the next image to be written
+                    image_filepath = P.prepare_filepath_image(
+                        self.request.destdir,
+                        self.request.filename,
+                        frame_num,
+                        self.request.image_format,
+                    )
+                    image = self.apply_edits(image)
+                    cv2.imwrite(image_filepath, image)
+                    images_written += 1
 
-                # Generate the filepath for the next image to be written
-                image_filepath = P.prepare_filepath_image(
-                    self.request.destdir,
-                    self.request.filename,
-                    frame_num,
-                    self.request.image_format,
-                )
-                image = self.apply_edits(image)
-                cv2.imwrite(image_filepath, image)
+                    # Update progress bar
+                    progress.update(
+                        task,
+                        advance=1,
+                        description=(
+                            f"[yellow]EXTRACTING FRAMES FROM "
+                            f"{self.request.video.filepath.name!r} "
+                            f"[{images_written}/{self.request.images_expected}]"
+                            f"[/yellow]"
+                        ),
+                    )
 
-                images_written += 1
-
-                # Update progress bar
-                progress.update(
-                    task,
-                    advance=1,
-                    description=(
-                        f"[yellow]EXTRACTING FRAMES FROM {self.request.video.filepath.name!r} "
-                        f"[{images_written}/{self.request.images_expected}][/yellow]"
-                    ),
-                )
-
-                # Stop extracting frames when the expected number of frames have been written
-                if images_written == self.request.images_expected:
-                    break
-
-        video_capture.release()
+                    if images_written == self.request.images_expected:
+                        break
 
         print(f"[green]FRAMES EXTRACTED: {self.request.destdir.resolve()}[/green]")
 

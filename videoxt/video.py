@@ -1,4 +1,5 @@
 import typing as t
+from contextlib import contextmanager
 from dataclasses import dataclass
 from dataclasses import field
 from pathlib import Path
@@ -7,6 +8,30 @@ import cv2  # type: ignore
 
 import videoxt.utils as U
 import videoxt.validators as V
+
+
+@contextmanager
+def open_video_capture(video_filepath: Path) -> t.Iterator[cv2.VideoCapture]:
+    """A context manager for `cv2.VideoCapture` objects.
+
+    Yields:
+    -------
+    `cv2.VideoCapture`
+
+    Example:
+    --------
+    >>> from videoxt import Video
+    >>> with open_video_capture('path/to/video.mp4') as opencap:
+    ...     # do something with opencap
+    """
+    if not video_filepath.exists():
+        raise FileNotFoundError(f"Video file not found: {video_filepath}")
+
+    cap = cv2.VideoCapture(str(video_filepath))
+    try:
+        yield cap
+    finally:
+        cap.release()
 
 
 @dataclass
@@ -22,24 +47,28 @@ class VideoProperties:
 
 
 def get_video_properties(video_filepath: Path) -> VideoProperties:
-    """Gets video properties from a video filepath.
+    """Get video properties from a video filepath using `cv2.VideoCapture`.
 
-    Returns: `VideoProperties` object.
+    Parameters:
+    -----------
+    `video_filepath` : Path
+        Path to the video file with the extension.
+
+    Returns:
+    --------
+    `VideoProperties`
     """
-    suffix = video_filepath.suffix[1:]
-
-    video_capture = cv2.VideoCapture(str(video_filepath))
-    fps = round(video_capture.get(cv2.CAP_PROP_FPS), 2)
-    frame_count = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
-    dimensions = (
-        int(video_capture.get(cv2.CAP_PROP_FRAME_WIDTH)),
-        int(video_capture.get(cv2.CAP_PROP_FRAME_HEIGHT)),
-    )
-
-    video_capture.release()
+    with open_video_capture(video_filepath) as opencap:
+        fps = round(opencap.get(cv2.CAP_PROP_FPS), 2)
+        frame_count = int(opencap.get(cv2.CAP_PROP_FRAME_COUNT))
+        dimensions = (
+            int(opencap.get(cv2.CAP_PROP_FRAME_WIDTH)),
+            int(opencap.get(cv2.CAP_PROP_FRAME_HEIGHT)),
+        )
 
     length_seconds = round(frame_count / fps, 2)
     length_timestamp = U.seconds_to_timestamp(length_seconds)
+    suffix = video_filepath.suffix[1:]
 
     return VideoProperties(
         dimensions=dimensions,
@@ -84,6 +113,15 @@ class Video:
         """Validate the filepath and get the video properties."""
         self.filepath = V.valid_filepath(self.filepath)
         self.properties = get_video_properties(self.filepath)
+
+    def open_capture(self) -> cv2.VideoCapture:
+        """Open the video capture object for the video.
+
+        Returns:
+        --------
+        `cv2.VideoCapture`
+        """
+        return open_video_capture(self.filepath)
 
     def __str__(self) -> str:
         import videoxt.displays

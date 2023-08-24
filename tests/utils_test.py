@@ -138,7 +138,7 @@ def test_enumerate_dir_existing_dir(temp_dir: Path):
     assert enumerate_dir(temp_dir) == expected_output
 
 
-def test_enumerate_dir_new_dir(tmp_path):
+def test_enumerate_dir_new_dir(tmp_path: Path):
     """Test that the same directory path is returned if the directory does not exist."""
     new_dir_path = tmp_path / "new_dir"
     assert enumerate_dir(new_dir_path) == new_dir_path

@@ -134,14 +134,14 @@ def temp_dir():
 
 def test_enumerate_dir_existing_dir(temp_dir: Path):
     """Test that the directory path is enumerated if the directory already exists."""
-    expected_output = temp_dir.with_name(f"{temp_dir.name} (2)")
-    assert enumerate_dir(temp_dir) == expected_output
+    expected_path = temp_dir.with_name(f"{temp_dir.name} (2)")
+    assert enumerate_dir(temp_dir) == expected_path
 
 
 def test_enumerate_dir_new_dir(tmp_path: Path):
     """Test that the same directory path is returned if the directory does not exist."""
-    new_dir_path = tmp_path / "new_dir"
-    assert enumerate_dir(new_dir_path) == new_dir_path
+    expected_path = tmp_path / "new_dir"
+    assert enumerate_dir(expected_path) == expected_path
 
 
 @pytest.fixture

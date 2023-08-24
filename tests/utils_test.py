@@ -119,8 +119,8 @@ def test_seconds_to_timestamp_invalid_input():
 
 def test_seconds_to_timestamp_empty_string():
     """Test that the function raises a ValueError if the input is an empty string."""
-    with pytest.raises(ValueError):
-        timestamp_to_seconds("")
+    with pytest.raises(TypeError):
+        seconds_to_timestamp("")
 
 
 @pytest.fixture

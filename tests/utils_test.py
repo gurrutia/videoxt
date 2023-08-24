@@ -156,14 +156,14 @@ def temp_file():
 
 def test_enumerate_filepath_existing_file(temp_file: Path):
     """Test that the filepath is enumerated if the file already exists."""
-    expected_output = temp_file.with_name(f"{temp_file.stem} (2){temp_file.suffix}")
-    assert enumerate_filepath(temp_file) == expected_output
+    expected_path = temp_file.with_name(f"{temp_file.stem} (2){temp_file.suffix}")
+    assert enumerate_filepath(temp_file) == expected_path
 
 
 def test_enumerate_filepath_new_file(temp_file: Path):
     """Test that the same filepath is returned if the file does not exist."""
-    new_filepath = temp_file.with_name("new_file.txt")
-    assert enumerate_filepath(new_filepath) == new_filepath
+    expected_path = temp_file.with_name("new_file.txt")
+    assert enumerate_filepath(expected_path) == expected_path
 
 
 @dataclass

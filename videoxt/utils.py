@@ -23,10 +23,12 @@ def timestamp_to_seconds(timestamp: str) -> float:
         float: The number of seconds represented by the timestamp.
     """
     timestamp = timestamp.split(".")[0]
-    parts = timestamp.split(":")
-    seconds = sum(float(part) * 60**exp for exp, part in enumerate(reversed(parts)))
+    time_parts = timestamp.split(":")
+    total_seconds = sum(
+        float(part) * 60**pwr for pwr, part in enumerate(reversed(time_parts))
+    )
 
-    return seconds
+    return total_seconds
 
 
 def seconds_to_timestamp(seconds: float) -> str:

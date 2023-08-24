@@ -132,7 +132,7 @@ def temp_dir():
     temp_dir.rmdir()
 
 
-def test_enumerate_dir_existing_dir(temp_dir):
+def test_enumerate_dir_existing_dir(temp_dir: Path):
     """Test that the directory path is enumerated if the directory already exists."""
     expected_output = temp_dir.with_name(f"{temp_dir.name} (2)")
     assert enumerate_dir(temp_dir) == expected_output

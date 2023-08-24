@@ -14,12 +14,33 @@ from videoxt.utils import timestamp_to_seconds
 
 def test_timestamp_to_seconds_valid_input():
     """Test that the function returns a valid number of seconds for a given timestamp."""
+    assert timestamp_to_seconds("0") == 0
     assert timestamp_to_seconds("1") == 1
     assert timestamp_to_seconds("1.1") == 1
+    assert timestamp_to_seconds("1.1.1") == 1
     assert timestamp_to_seconds("59") == 59
     assert timestamp_to_seconds("60") == 60
+    assert timestamp_to_seconds("61") == 61
+    assert timestamp_to_seconds("61.1") == 61
+    assert timestamp_to_seconds("61.1.1") == 61
     assert timestamp_to_seconds("0:00") == 0
+    assert timestamp_to_seconds("0:01") == 1
+    assert timestamp_to_seconds("0:59") == 59
+    assert timestamp_to_seconds("1:00") == 60
     assert timestamp_to_seconds("1:01") == 61
+    assert timestamp_to_seconds("1:01.1") == 61
+    assert timestamp_to_seconds("1:01.1.1") == 61
+    assert timestamp_to_seconds("0:00:00") == 0
+    assert timestamp_to_seconds("0:00:01") == 1
+    assert timestamp_to_seconds("0:00:59") == 59
+    assert timestamp_to_seconds("0:01:00") == 60
+    assert timestamp_to_seconds("0:01:01") == 61
+    assert timestamp_to_seconds("0:01:01.1") == 61
+    assert timestamp_to_seconds("0:01:01.1.1") == 61
+    assert timestamp_to_seconds("1:00:00") == 3600
+    assert timestamp_to_seconds("1:00:01") == 3601
+    assert timestamp_to_seconds("1:00:59") == 3659
+    assert timestamp_to_seconds("1:01:00") == 3660
     assert timestamp_to_seconds("1:01:01") == 3661
     assert timestamp_to_seconds("1:01:01.1") == 3661
     assert timestamp_to_seconds("1:01:01.1.1") == 3661

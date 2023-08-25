@@ -28,6 +28,10 @@ def open_video_capture(video_filepath: Path) -> t.Iterator[cv2.VideoCapture]:
         raise FileNotFoundError(f"Video file not found: {video_filepath}")
 
     cap = cv2.VideoCapture(str(video_filepath))
+
+    if not cap.isOpened():
+        raise TypeError(f"Could not open video file: {video_filepath}")
+
     try:
         yield cap
     finally:

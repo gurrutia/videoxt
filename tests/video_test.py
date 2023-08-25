@@ -76,6 +76,24 @@ def tmp_video_properties_cls() -> VideoProperties:
     )
 
 
+@pytest.fixture
+def tmp_text_filepath() -> Path:
+    """Create a temporary text file for testing purposes.
+
+    Yields:
+        Path: Filepath of the temporary text file.
+    """
+    temp_dir = tempfile.mkdtemp()
+    temp_file = os.path.join(temp_dir, "tmp_text.txt")
+    with open(temp_file, "w") as f:
+        f.write("This is a temporary text file.")
+    yield Path(temp_file)
+
+    if os.path.exists(temp_file):
+        os.remove(temp_file)
+        os.rmdir(temp_dir)
+
+
 def test_open_video_capture_when_file_exists(tmp_video_filepath: Path):
     """Test that the `cv2.VideoCapture` object is returned when opening a video file."""
     with open_video_capture(tmp_video_filepath) as opencap:
@@ -90,7 +108,18 @@ def test_open_video_capture_if_file_not_found(tmp_video_filepath: Path):
             assert not opencap.isOpened()
 
 
-def test_video_capture_is_open_when_file_exists(tmp_video_capture: cv2.VideoCapture):
+def test_open_video_capture_if_file_exists_but_is_not_a_video_file(
+    tmp_text_filepath: Path,
+):
+    """Test that TypeError is raised if an existing file is not a video file."""
+    with pytest.raises(TypeError):
+        with open_video_capture(tmp_text_filepath) as opencap:
+            assert not opencap.isOpened()
+
+
+def test_video_capture_is_open_when_video_file_exists(
+    tmp_video_capture: cv2.VideoCapture,
+):
     """Test that an open `cv2.VideoCapture` is detected as open."""
     assert tmp_video_capture.isOpened()
 

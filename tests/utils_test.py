@@ -168,39 +168,77 @@ def test_enumerate_filepath_new_file(temp_file: Path):
 
 @dataclass
 class Image:
-    """Test dataclass for `utils.parse_kwargs` function."""
+    """Test dataclass for the `utils.parse_kwargs` function."""
 
+    filename: str
     width: int
     height: int
 
 
-def test_parse_kwargs_image_cls():
-    """Test that only the fields defined in the `Image` dataclass are returned."""
-    kwargs = {
-        "filename": "my_image.jpg",
-        "width": 1920,
-        "height": 1080,
-        "format": "jpg",
-    }
-    expected_output = {"width": 1920, "height": 1080}
-    assert parse_kwargs(kwargs, Image) == expected_output
-
-
-@dataclass
-class Audio:
-    """Test dataclass for `utils.parse_kwargs` function."""
-
-    artist: str
-    title: str
-
-
-def test_parse_kwargs_audio_cls():
-    """Test that only the fields defined in the `Audio` dataclass are returned."""
-    kwargs = {
-        "title": "Bohemian Rhapsody",
-        "artist": "Queen",
-        "format": "mp3",
-        "genre": "Rock",
-    }
-    expected_output = {"title": "Bohemian Rhapsody", "artist": "Queen"}
-    assert parse_kwargs(kwargs, Audio) == expected_output
+@pytest.mark.parametrize(
+    "kwargs, expected",
+    [
+        # Test case 1: all kwargs are defined as fields in the `Image` dataclass.
+        (
+            {
+                "filename": "image.jpg",
+                "width": 1920,
+                "height": 1080,
+            },
+            {"filename": "image.jpg", "width": 1920, "height": 1080},
+        ),
+        # Test case 2: all kwargs are defined as fields in the `Image` dataclass except `extra_field`.
+        (
+            {
+                "filename": "image.jpg",
+                "width": 1920,
+                "height": 1080,
+                "extra_field": "",
+            },
+            {"filename": "image.jpg", "width": 1920, "height": 1080},
+        ),
+        # Test case 3: select kwargs are defined as fields in the `Image` dataclass.
+        (
+            {"width": 1920, "height": 1080},
+            {"width": 1920, "height": 1080},
+        ),
+        # Test case 4: one of two kwargs are defined as fields in the `Image` dataclass.
+        (
+            {"filename": "image.jpg", "extra_field": ""},
+            {"filename": "image.jpg"},
+        ),
+        # Test case 5: one of one kwarg is defined as a field in the `Image` dataclass.
+        (
+            {"filename": "image.jpg"},
+            {"filename": "image.jpg"},
+        ),
+        # Test case 6: no kwargs are defined as fields in the `Image` dataclass.
+        (
+            {"extra_field": "", "another_extra_field": ""},
+            {},
+        ),
+        # Test case 7: one of one kwarg is not defined as a field in the `Image` dataclass.
+        (
+            {"extra_field": ""},
+            {},
+        ),
+        # Test case 8: empty kwargs passed.
+        (
+            {},
+            {},
+        ),
+        # Test case 9: all kwargs are defined as fields in the `Image` dataclass, but one is None.
+        (
+            {
+                "filename": "image.jpg",
+                "width": 1920,
+                "height": None,
+            },
+            {"filename": "image.jpg", "width": 1920, "height": None},
+        ),
+    ],
+)
+def test_parse_kwargs(kwargs: dict, expected: dict):
+    """Test that the `parse_kwargs` function returns a dictonary containing only the
+    keyword arguments that match the fields in a given dataclass."""
+    assert parse_kwargs(kwargs, Image) == expected

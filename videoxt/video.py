@@ -27,6 +27,9 @@ def open_video_capture(video_filepath: Path) -> t.Iterator[cv2.VideoCapture]:
     if not video_filepath.exists():
         raise FileNotFoundError(f"Video file not found: {video_filepath}")
 
+    if not V.is_video_file(video_filepath):
+        raise TypeError(f"File is not a video file: {video_filepath}")
+
     cap = cv2.VideoCapture(str(video_filepath))
 
     if not cap.isOpened():

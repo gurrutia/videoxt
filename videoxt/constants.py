@@ -4,14 +4,13 @@ import cv2  # type: ignore
 
 VERSION = importlib.metadata.version("videoxt")
 
-VALID_ROTATE_VALUES = (0, 90, 180, 270)
-
-ROTATION_MAP = {
-    90: cv2.ROTATE_90_CLOCKWISE,
-    180: cv2.ROTATE_180,
-    270: cv2.ROTATE_90_COUNTERCLOCKWISE,
-}
-
+VALID_VIDEO_FORMATS = (
+    "mp4",
+    "avi",
+    "mkv",
+    "mov",
+    "wmv",
+)
 
 VALID_AUDIO_FORMATS = (
     "m4a",

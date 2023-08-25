@@ -376,3 +376,19 @@ def valid_start_time_cli(start_time: str) -> t.Union[float, str]:
 def valid_stop_time_cli(stop_time: str) -> t.Union[float, str]:
     """cli version of `valid_stop_time`"""
     return valid_stop_time(stop_time, from_cli=True)
+
+
+def is_video_file(video_filepath: Path) -> bool:
+    """Returns `True` if the file extension is a valid video format as defined in
+    `constants.py`.
+
+    Args:
+    -----
+    `video_filepath` : Path
+        Filepath to the presumed video file.
+
+    Returns:
+    --------
+    bool : `True` if the file extension is a valid video format.
+    """
+    return video_filepath.suffix[1:] in C.VALID_VIDEO_FORMATS

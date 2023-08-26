@@ -53,7 +53,7 @@ def tmp_video_filepath(tmp_path: Path, tmp_video_settings: VideoSettings) -> Pat
     Yields:
         Path: Filepath of the temporary video file.
     """
-    tmp_filepath = tmp_path / "tmp_video.mp4"
+    tmp_filepath = tmp_path / "tmp.video.mp4"
     fourcc = cv2.VideoWriter_fourcc(*tmp_video_settings.codec)
     video_writer = cv2.VideoWriter(
         str(tmp_filepath),

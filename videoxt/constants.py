@@ -6,6 +6,9 @@ import cv2  # type: ignore
 VERSION = importlib.metadata.version("videoxt")
 
 
+VALID_ROTATE_VALUES = (0, 90, 180, 270)
+
+
 VALID_VIDEO_FORMATS = (
     "mp4",
     "avi",

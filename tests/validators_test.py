@@ -92,6 +92,10 @@ def test_non_negative_float_with_non_negative_ints():
 
 
 def test_valid_filepath_with_valid_string_filepath(tmp_path: Path):
+    """Test that a valid filepath is returned when a valid string filepath is passed.
+
+    `tmp_path` is a built-in pytest fixture that creates a temporary directory.
+    """
     filepath = tmp_path / "t.txt"
     filepath.write_text("t")
     assert valid_filepath(str(filepath)) == filepath
@@ -99,6 +103,10 @@ def test_valid_filepath_with_valid_string_filepath(tmp_path: Path):
 
 
 def test_valid_filepath_with_valid_pathlib_filepath(tmp_path: Path):
+    """Test that a valid filepath is returned when a valid pathlib filepath is passed.
+
+    `tmp_path` is a built-in pytest fixture that creates a temporary directory.
+    """
     filepath = tmp_path / "t.txt"
     filepath.write_text("t")
     assert valid_filepath(filepath) == filepath
@@ -106,6 +114,10 @@ def test_valid_filepath_with_valid_pathlib_filepath(tmp_path: Path):
 
 
 def test_valid_dir_with_valid_dir_string(tmp_path: Path):
+    """Test that a valid directory is returned when a valid string directory is passed.
+
+    `tmp_path` is a built-in pytest fixture that creates a temporary directory.
+    """
     dirpath = tmp_path / "t"
     dirpath.mkdir()
     assert valid_dir(str(dirpath)) == dirpath
@@ -113,6 +125,10 @@ def test_valid_dir_with_valid_dir_string(tmp_path: Path):
 
 
 def test_valid_dir_with_valid_dir_pathlib(tmp_path: Path):
+    """Test that a valid directory is returned when a valid pathlib directory is passed.
+
+    `tmp_path` is a built-in pytest fixture that creates a temporary directory.
+    """
     dirpath = tmp_path / "t"
     dirpath.mkdir()
     assert valid_dir(dirpath) == dirpath

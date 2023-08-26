@@ -1,5 +1,3 @@
-import os
-import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -123,46 +121,41 @@ def test_seconds_to_timestamp_empty_string():
         seconds_to_timestamp("")
 
 
-@pytest.fixture
-def temp_dir():
-    """Create a temporary directory and return its path."""
-    temp_dir = Path("temp_dir")
-    temp_dir.mkdir()
-    yield temp_dir
-    temp_dir.rmdir()
+def test_enumerate_dir_existing_dir(tmp_path: Path):
+    """Test that the directory path is enumerated if the directory already exists.
 
-
-def test_enumerate_dir_existing_dir(temp_dir: Path):
-    """Test that the directory path is enumerated if the directory already exists."""
-    expected_path = temp_dir.with_name(f"{temp_dir.name} (2)")
-    assert enumerate_dir(temp_dir) == expected_path
+    `tmp_path` is a built-in pytest fixture that creates a temporary directory.
+    """
+    expected_path = tmp_path.with_name(f"{tmp_path.name} (2)")
+    assert enumerate_dir(tmp_path) == expected_path
 
 
 def test_enumerate_dir_new_dir(tmp_path: Path):
-    """Test that the same directory path is returned if the directory does not exist."""
+    """Test that the same directory path is returned if the directory does not exist.
+
+    `tmp_path` is a built-in pytest fixture that creates a temporary directory.
+    """
     expected_path = tmp_path / "new_dir"
     assert enumerate_dir(expected_path) == expected_path
 
 
-@pytest.fixture
-def temp_file():
-    """Create a temporary file and return its path."""
-    with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
-        tmp_file.write(b"test file contents")
-    filepath = Path(tmp_file.name)
-    yield filepath
-    os.unlink(tmp_file.name)
+def test_enumerate_filepath_existing_file(tmp_text_filepath: Path):
+    """Test that the filepath is enumerated if the file already exists.
+
+    `tmp_text_filepath` is created by the fixture of the same name in `conftest.py`.
+    """
+    expected_path = tmp_text_filepath.with_name(
+        f"{tmp_text_filepath.stem} (2){tmp_text_filepath.suffix}"
+    )
+    assert enumerate_filepath(tmp_text_filepath) == expected_path
 
 
-def test_enumerate_filepath_existing_file(temp_file: Path):
-    """Test that the filepath is enumerated if the file already exists."""
-    expected_path = temp_file.with_name(f"{temp_file.stem} (2){temp_file.suffix}")
-    assert enumerate_filepath(temp_file) == expected_path
+def test_enumerate_filepath_new_file(tmp_text_filepath: Path):
+    """Test that the same filepath is returned if the file does not exist.
 
-
-def test_enumerate_filepath_new_file(temp_file: Path):
-    """Test that the same filepath is returned if the file does not exist."""
-    expected_path = temp_file.with_name("new_file.txt")
+    `tmp_text_filepath` is created by the fixture of the same name in `conftest.py`.
+    """
+    expected_path = tmp_text_filepath.with_name("new_file.txt")
     assert enumerate_filepath(expected_path) == expected_path
 
 

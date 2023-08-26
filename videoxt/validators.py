@@ -318,6 +318,39 @@ def valid_image_format(image_format: str, from_cli: bool = False) -> str:
     return image_format
 
 
+def valid_video_filepath(video_filepath: Path, from_cli: bool = False) -> Path:
+    """Returns the filepath to the video file if the file extension is a valid
+    video format as defined in `constants.py`.
+
+    Args:
+    -----
+    video_filepath : Path
+        Filepath to the presumed video file.
+    from_cli : bool
+        If True, raise an argparse error. Otherwise, raise a ValidationException.
+
+    Returns:
+    --------
+    Path : The filepath to the video file if valid.
+
+    Raises:
+    -------
+    argparse.ArgumentTypeError : If from_cli is True and the video format is invalid.
+    ValidationException : If from_cli is False and the video format is invalid.
+    """
+    video_filepath = valid_filepath(video_filepath, from_cli)
+    video_format = video_filepath.name.split(".")[-1].lower()
+
+    if video_format not in C.VALID_VIDEO_FORMATS:
+        _raise_error(
+            f"invalid video format, got {video_format!r}\n"
+            f"supported video formats: {C.VALID_VIDEO_FORMATS}",
+            from_cli,
+        )
+
+    return video_filepath
+
+
 def positive_int_cli(num: str) -> int:
     """cli version of `positive_int`"""
     return positive_int(num, from_cli=True)
@@ -376,19 +409,3 @@ def valid_start_time_cli(start_time: str) -> t.Union[float, str]:
 def valid_stop_time_cli(stop_time: str) -> t.Union[float, str]:
     """cli version of `valid_stop_time`"""
     return valid_stop_time(stop_time, from_cli=True)
-
-
-def is_video_file(video_filepath: Path) -> bool:
-    """Returns `True` if the file extension is a valid video format as defined in
-    `constants.py`.
-
-    Args:
-    -----
-    `video_filepath` : Path
-        Filepath to the presumed video file.
-
-    Returns:
-    --------
-    bool : `True` if the file extension is a valid video format.
-    """
-    return video_filepath.suffix[1:] in C.VALID_VIDEO_FORMATS

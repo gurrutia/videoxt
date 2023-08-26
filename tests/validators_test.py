@@ -20,6 +20,7 @@ from videoxt.validators import valid_rotate_value
 from videoxt.validators import valid_start_time
 from videoxt.validators import valid_stop_time
 from videoxt.validators import valid_timestamp
+from videoxt.validators import valid_video_filepath
 from videoxt.validators import ValidationException
 
 
@@ -283,6 +284,112 @@ def test_valid_capture_rate_with_valid_capture_rates():
     assert valid_capture_rate(60, 0, 60) == 60
     assert valid_capture_rate(120, 0, 120) == 120
     assert valid_capture_rate(240, 0, 240) == 240
+
+
+def test_valid_video_filepath_with_supported_existing_filepath(
+    tmp_video_filepath: Path,
+):
+    """Test that a filepath is returned when an existing, supported pathlib video filepath is passed.
+
+    `tmp_video_filepath` is created by the fixture of the same name in `conftest.py`.
+    """
+    assert valid_video_filepath(tmp_video_filepath) == tmp_video_filepath
+
+
+def test_valid_video_filepath_with_supported_existing_filepath_string(
+    tmp_video_filepath: Path,
+):
+    """Test that a filepath is returned when an existing, supported pathlib video filepath string is passed.
+
+    `tmp_video_filepath` is created by the fixture of the same name in `conftest.py`.
+    """
+    assert valid_video_filepath(str(tmp_video_filepath)) == tmp_video_filepath
+
+
+def test_valid_video_filepath_with_supported_existing_filepath_lowercase_suffix(
+    tmp_video_filepath: Path,
+):
+    """Test that a filepath is returned when an existing, supported pathlib video filepath is passed with a lowercase suffix.
+
+    `tmp_video_filepath` is created by the fixture of the same name in `conftest.py`.
+    """
+    assert (
+        valid_video_filepath(tmp_video_filepath.with_suffix(".mp4"))
+        == tmp_video_filepath
+    )
+
+
+def test_valid_video_filepath_with_supported_existing_filepath_mixedcase_suffix(
+    tmp_video_filepath: Path,
+):
+    """Test that a filepath is returned when an existing, supported pathlib video filepath is passed with a mixedcase suffix.
+
+    `tmp_video_filepath` is created by the fixture of the same name in `conftest.py`.
+    """
+    assert (
+        valid_video_filepath(tmp_video_filepath.with_suffix(".Mp4"))
+        == tmp_video_filepath
+    )
+
+
+def test_valid_video_filepath_with_supported_existing_filepath_uppercase_suffix(
+    tmp_video_filepath: Path,
+):
+    """Test that a filepath is returned when an existing, supported pathlib video filepath is passed with an uppercase suffix.
+
+    `tmp_video_filepath` is created by the fixture of the same name in `conftest.py`.
+    """
+    assert (
+        valid_video_filepath(tmp_video_filepath.with_suffix(".MP4"))
+        == tmp_video_filepath
+    )
+
+
+def test_valid_video_filepath_with_supported_nonexistant_video_filepath(tmp_path: Path):
+    """Test that a ValidationException is raised when a nonexistant, supported pathlib video filepath is passed.
+
+    `tmp_path` is a built-in pytest fixture that creates a temporary directory.
+    """
+    with pytest.raises(ValidationException):
+        valid_video_filepath(tmp_path / "t.mp4")
+
+
+def test_valid_video_filepath_with_supported_nonexistant_video_filepath_string():
+    """Test that a ValidationException is raised when a nonexistant, supported pathlib video filepath string is passed.
+
+    `tmp_path` is a built-in pytest fixture that creates a temporary directory.
+    """
+    with pytest.raises(ValidationException):
+        valid_video_filepath("t.mp4")
+
+
+def test_valid_video_filepath_with_unsupported_existing_file_suffix(
+    tmp_text_filepath: Path,
+):
+    """Test that a ValidationException is raised when an existing, unsupported pathlib filepath is passed.
+
+    `tmp_text_filepath` is created by the fixture of the same name in `conftest.py`.
+    """
+    with pytest.raises(ValidationException):
+        valid_video_filepath(tmp_text_filepath)
+
+
+def test_valid_video_filepath_with_unsupported_nonexistant_file_suffix():
+    """Test that a ValidationException is raised when a nonexistant, unsupported string filepath is passed.
+
+    `tmp_text_filepath` is created by the fixture of the same name in `conftest.py`.
+    """
+    with pytest.raises(ValidationException):
+        valid_video_filepath("t.txt")
+
+
+def test_valid_video_filepath_with_directory_path(tmp_path: Path):
+    """Test that a ValidationException is raised when a pathlib directory path is passed.
+
+    `tmp_path` is a built-in pytest fixture that creates a temporary directory.
+    """
+    with pytest.raises(ValidationException):
+        valid_video_filepath(tmp_path)
 
 
 class TestNonCLI:

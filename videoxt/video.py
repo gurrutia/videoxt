@@ -14,31 +14,39 @@ import videoxt.validators as V
 def open_video_capture(video_filepath: Path) -> t.Iterator[cv2.VideoCapture]:
     """A context manager for `cv2.VideoCapture` objects.
 
+    Args:
+    -----
+    video_filepath : Path
+        Path to the video file with the extension.
+
     Yields:
     -------
-    `cv2.VideoCapture`
+    cv2.VideoCapture : The opened video capture object.
+
+    Raises:
+    ------
+    FileNotFoundError : If the video file is not found.
+    TypeError : If the video file cannot be opened.
 
     Example:
     --------
     >>> from videoxt import Video
-    >>> with open_video_capture('path/to/video.mp4') as opencap:
+    >>> with open_video_capture(Path('video.mp4')) as opencap:
     ...     # do something with opencap
     """
     if not video_filepath.exists():
         raise FileNotFoundError(f"Video file not found: {video_filepath}")
 
-    if not V.is_video_file(video_filepath):
-        raise TypeError(f"File is not a video file: {video_filepath}")
+    video_filepath = V.valid_video_filepath(video_filepath)
 
-    cap = cv2.VideoCapture(str(video_filepath))
-
-    if not cap.isOpened():
+    video_capture = cv2.VideoCapture(str(video_filepath))
+    if not video_capture.isOpened():
         raise TypeError(f"Could not open video file: {video_filepath}")
 
     try:
-        yield cap
+        yield video_capture
     finally:
-        cap.release()
+        video_capture.release()
 
 
 @dataclass

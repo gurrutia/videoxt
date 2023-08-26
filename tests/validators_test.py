@@ -1,4 +1,5 @@
 import os
+from argparse import ArgumentTypeError
 from pathlib import Path
 
 import pytest
@@ -293,7 +294,10 @@ def test_valid_video_filepath_with_supported_existing_filepath(
 
     `tmp_video_filepath` is created by the fixture of the same name in `conftest.py`.
     """
-    assert valid_video_filepath(tmp_video_filepath) == tmp_video_filepath
+    assert (
+        valid_video_filepath(tmp_video_filepath, from_cli=False) == tmp_video_filepath
+    )
+    assert valid_video_filepath(tmp_video_filepath, from_cli=True) == tmp_video_filepath
 
 
 def test_valid_video_filepath_with_supported_existing_filepath_string(
@@ -303,7 +307,9 @@ def test_valid_video_filepath_with_supported_existing_filepath_string(
 
     `tmp_video_filepath` is created by the fixture of the same name in `conftest.py`.
     """
-    assert valid_video_filepath(str(tmp_video_filepath)) == tmp_video_filepath
+    path_str = str(tmp_video_filepath)
+    assert valid_video_filepath(path_str, from_cli=False) == tmp_video_filepath
+    assert valid_video_filepath(path_str, from_cli=True) == tmp_video_filepath
 
 
 def test_valid_video_filepath_with_supported_existing_filepath_lowercase_suffix(
@@ -313,10 +319,9 @@ def test_valid_video_filepath_with_supported_existing_filepath_lowercase_suffix(
 
     `tmp_video_filepath` is created by the fixture of the same name in `conftest.py`.
     """
-    assert (
-        valid_video_filepath(tmp_video_filepath.with_suffix(".mp4"))
-        == tmp_video_filepath
-    )
+    path = tmp_video_filepath.with_suffix(".mp4")
+    assert valid_video_filepath(path, from_cli=False) == tmp_video_filepath
+    assert valid_video_filepath(path, from_cli=True) == tmp_video_filepath
 
 
 def test_valid_video_filepath_with_supported_existing_filepath_mixedcase_suffix(
@@ -326,10 +331,9 @@ def test_valid_video_filepath_with_supported_existing_filepath_mixedcase_suffix(
 
     `tmp_video_filepath` is created by the fixture of the same name in `conftest.py`.
     """
-    assert (
-        valid_video_filepath(tmp_video_filepath.with_suffix(".Mp4"))
-        == tmp_video_filepath
-    )
+    path = tmp_video_filepath.with_suffix(".Mp4")
+    assert valid_video_filepath(path, from_cli=False) == tmp_video_filepath
+    assert valid_video_filepath(path, from_cli=True) == tmp_video_filepath
 
 
 def test_valid_video_filepath_with_supported_existing_filepath_uppercase_suffix(
@@ -339,10 +343,9 @@ def test_valid_video_filepath_with_supported_existing_filepath_uppercase_suffix(
 
     `tmp_video_filepath` is created by the fixture of the same name in `conftest.py`.
     """
-    assert (
-        valid_video_filepath(tmp_video_filepath.with_suffix(".MP4"))
-        == tmp_video_filepath
-    )
+    path = tmp_video_filepath.with_suffix(".MP4")
+    assert valid_video_filepath(path, from_cli=False) == tmp_video_filepath
+    assert valid_video_filepath(path, from_cli=True) == tmp_video_filepath
 
 
 def test_valid_video_filepath_with_supported_nonexistant_video_filepath(tmp_path: Path):
@@ -350,8 +353,11 @@ def test_valid_video_filepath_with_supported_nonexistant_video_filepath(tmp_path
 
     `tmp_path` is a built-in pytest fixture that creates a temporary directory.
     """
+    path = tmp_path / "t.mp4"
     with pytest.raises(ValidationException):
-        valid_video_filepath(tmp_path / "t.mp4")
+        valid_video_filepath(path, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        valid_video_filepath(path, from_cli=True)
 
 
 def test_valid_video_filepath_with_supported_nonexistant_video_filepath_string():
@@ -360,7 +366,9 @@ def test_valid_video_filepath_with_supported_nonexistant_video_filepath_string()
     `tmp_path` is a built-in pytest fixture that creates a temporary directory.
     """
     with pytest.raises(ValidationException):
-        valid_video_filepath("t.mp4")
+        valid_video_filepath("t.mp4", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        valid_video_filepath("t.mp4", from_cli=True)
 
 
 def test_valid_video_filepath_with_unsupported_existing_file_suffix(
@@ -371,7 +379,9 @@ def test_valid_video_filepath_with_unsupported_existing_file_suffix(
     `tmp_text_filepath` is created by the fixture of the same name in `conftest.py`.
     """
     with pytest.raises(ValidationException):
-        valid_video_filepath(tmp_text_filepath)
+        valid_video_filepath(tmp_text_filepath, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        valid_video_filepath(tmp_text_filepath, from_cli=True)
 
 
 def test_valid_video_filepath_with_unsupported_nonexistant_file_suffix():
@@ -380,7 +390,9 @@ def test_valid_video_filepath_with_unsupported_nonexistant_file_suffix():
     `tmp_text_filepath` is created by the fixture of the same name in `conftest.py`.
     """
     with pytest.raises(ValidationException):
-        valid_video_filepath("t.txt")
+        valid_video_filepath("t.txt", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        valid_video_filepath("t.txt", from_cli=True)
 
 
 def test_valid_video_filepath_with_directory_path(tmp_path: Path):
@@ -389,7 +401,9 @@ def test_valid_video_filepath_with_directory_path(tmp_path: Path):
     `tmp_path` is a built-in pytest fixture that creates a temporary directory.
     """
     with pytest.raises(ValidationException):
-        valid_video_filepath(tmp_path)
+        valid_video_filepath(tmp_path, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        valid_video_filepath(tmp_path, from_cli=True)
 
 
 class TestNonCLI:

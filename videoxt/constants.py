@@ -1,5 +1,7 @@
 import importlib.metadata
 
+import cv2  # type: ignore
+
 
 VERSION = importlib.metadata.version("videoxt")
 
@@ -30,6 +32,13 @@ VALID_IMAGE_FORMATS = (
     "tif",
     "webp",
 )
+
+
+ROTATION_MAP = {
+    90: cv2.ROTATE_90_CLOCKWISE,
+    180: cv2.ROTATE_180,
+    270: cv2.ROTATE_90_COUNTERCLOCKWISE,
+}
 
 
 EMOJI_MAP = {

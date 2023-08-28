@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 
 import videoxt.constants as C
+from videoxt.validators import _raise_error
 from videoxt.validators import non_negative_float
 from videoxt.validators import non_negative_int
 from videoxt.validators import positive_float
@@ -404,6 +405,20 @@ def test_valid_video_filepath_with_directory_path(tmp_path: Path):
         valid_video_filepath(tmp_path, from_cli=False)
     with pytest.raises(ArgumentTypeError):
         valid_video_filepath(tmp_path, from_cli=True)
+
+
+def test__raise_error_from_cli_raising_arguement_type_error():
+    error_msg = "Argument type error"
+    with pytest.raises(ArgumentTypeError) as excinfo:
+        _raise_error(error_msg, from_cli=True)
+    assert error_msg in str(excinfo.value)
+
+
+def test__raise_error_from_non_cli_raising_validation_error():
+    error_msg = "Validation exception"
+    with pytest.raises(ValidationException) as excinfo:
+        _raise_error(error_msg, from_cli=False)
+    assert error_msg in str(excinfo.value)
 
 
 class TestNonCLI:

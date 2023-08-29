@@ -26,18 +26,73 @@ from videoxt.validators import valid_video_filepath
 from videoxt.validators import ValidationException
 
 
-def test_positive_int_with_positive_ints():
-    assert positive_int(1) == 1
-    assert positive_int("1") == 1
-    assert positive_int(100_000_000) == 100_000_000
-    assert positive_int("100_000_000") == 100_000_000
+def test_positive_int_valid_int():
+    assert positive_int(42, from_cli=False) == 42
+    assert positive_int(42, from_cli=True) == 42
 
 
-def test_positive_int_with_valid_floats():
-    assert positive_int(1.0) == 1
-    assert positive_int("1.0") == 1
-    assert positive_int(100_000_000.0) == 100_000_000
-    assert positive_int("100_000_000.0") == 100_000_000
+def test_positive_int_valid_string():
+    assert positive_int("42", from_cli=False) == 42
+    assert positive_int("42", from_cli=True) == 42
+
+
+def test_positive_int_valid_float():
+    assert positive_int(42.0, from_cli=False) == 42
+    assert positive_int(42.0, from_cli=True) == 42
+
+
+def test_positive_int_valid_float_string():
+    assert positive_int("42.0", from_cli=False) == 42
+    assert positive_int("42.0", from_cli=True) == 42
+
+
+def test_positive_int_negative_int():
+    with pytest.raises(ValidationException):
+        positive_int(-42, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_int(-42, from_cli=True)
+
+
+def test_positive_int_negative_int_string():
+    with pytest.raises(ValidationException):
+        positive_int("-42", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_int("-42", from_cli=True)
+
+
+def test_positive_int_negative_float():
+    with pytest.raises(ValidationException):
+        positive_int(-42.0, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_int(-42.0, from_cli=True)
+
+
+def test_positive_int_negative_float_string():
+    with pytest.raises(ValidationException):
+        positive_int("-42.0", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_int("-42.0", from_cli=True)
+
+
+def test_positive_int_invalid_float():
+    with pytest.raises(ValidationException):
+        positive_int(42.5, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_int(42.5, from_cli=True)
+
+
+def test_positive_int_invalid_float_string():
+    with pytest.raises(ValidationException):
+        positive_int("42.5", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_int("42.5", from_cli=True)
+
+
+def test_positive_int_invalid_string():
+    with pytest.raises(ValidationException):
+        positive_int("abc", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_int("abc", from_cli=True)
 
 
 def test_positive_float_with_positive_floats():
@@ -422,43 +477,6 @@ def test__raise_error_from_non_cli_raising_validation_error():
 
 
 class TestNonCLI:
-    # positive_int
-    def test_positive_int_with_zero_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            positive_int(0)
-
-    def test_positive_int_with_zero_string_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            positive_int("0")
-
-    def test_positive_int_with_negative_int_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            positive_int(-1)
-
-    def test_positive_int_with_negative_int_string_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            positive_int("-1")
-
-    def test_positive_int_with_invalid_float_from_non_cli_0_9(self):
-        with pytest.raises(ValidationException):
-            positive_int(0.9)
-
-    def test_positive_int_with_invalid_float_string_from_non_cli_0_9_string(self):
-        with pytest.raises(ValidationException):
-            positive_int("0.9")
-
-    def test_positive_int_with_invalid_float_from_non_cli_1_1(self):
-        with pytest.raises(ValidationException):
-            positive_int(1.1)
-
-    def test_positive_int_with_invalid_float_string_from_non_cli_1_1_string(self):
-        with pytest.raises(ValidationException):
-            positive_int("1.1")
-
-    def test_positive_int_with_non_int_string_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            positive_int("a")
-
     # positive_float
     def test_positive_float_with_zero_from_non_cli(self):
         with pytest.raises(ValidationException):

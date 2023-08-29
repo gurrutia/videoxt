@@ -46,6 +46,27 @@ def test_positive_int_valid_float_string():
     assert positive_int("42.0", from_cli=True) == 42
 
 
+def test_positive_int_zero_int():
+    with pytest.raises(ValidationException):
+        positive_int(0, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_int(0, from_cli=True)
+
+
+def test_positive_int_zero_int_string():
+    with pytest.raises(ValidationException):
+        positive_int("0", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_int("0", from_cli=True)
+
+
+def test_positive_int_zero_float():
+    with pytest.raises(ValidationException):
+        positive_int(0.0, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_int(0.0, from_cli=True)
+
+
 def test_positive_int_negative_int():
     with pytest.raises(ValidationException):
         positive_int(-42, from_cli=False)
@@ -95,20 +116,31 @@ def test_positive_int_invalid_string():
         positive_int("abc", from_cli=True)
 
 
-def test_positive_float_with_positive_floats():
-    assert positive_float(1.0) == 1.0
-    assert positive_float("1.0") == 1.0
-    assert positive_float(12.34) == 12.34
-    assert positive_float("12.34") == 12.34
-    assert positive_float(100_000_000.0) == 100_000_000.0
-    assert positive_float("100_000_000.0") == 100_000_000.0
+def test_positive_float_valid_float():
+    assert positive_float(3.14, from_cli=False) == 3.14
+    assert positive_float(3.14, from_cli=True) == 3.14
 
 
-def test_positive_float_with_positive_ints():
-    assert positive_float(1) == 1.0
-    assert positive_float("1") == 1.0
-    assert positive_float(100_000_000) == 100_000_000.0
-    assert positive_float("100_000_000") == 100_000_000.0
+def test_positive_float_valid_float_string():
+    assert positive_float("3.14", from_cli=False) == 3.14
+    assert positive_float("3.14", from_cli=True) == 3.14
+
+
+def test_positive_float_valid_int():
+    assert positive_float(42, from_cli=False) == 42.0
+    assert positive_float(42, from_cli=True) == 42.0
+
+
+def test_positive_float_valid_int_string():
+    assert positive_float("42", from_cli=False) == 42.0
+    assert positive_float("42", from_cli=True) == 42.0
+
+
+def test_positive_float_negative_float():
+    with pytest.raises(ValidationException):
+        positive_float(-3.14, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_float(-3.14, from_cli=True)
 
 
 def test_non_negative_int_with_non_negative_ints():

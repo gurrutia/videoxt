@@ -213,22 +213,102 @@ def test_positive_float_none():
         positive_float(None, from_cli=True)
 
 
-def test_non_negative_int_with_non_negative_ints():
-    assert non_negative_int(0) == 0
-    assert non_negative_int("0") == 0
-    assert non_negative_int(1) == 1
-    assert non_negative_int("1") == 1
-    assert non_negative_int(100_000_000) == 100_000_000
-    assert non_negative_int("100_000_000") == 100_000_000
+def test_non_negative_int_valid():
+    assert non_negative_int(42, from_cli=False) == 42
+    assert non_negative_int(42, from_cli=True) == 42
 
 
-def test_non_negative_int_with_non_negative_floats():
-    assert non_negative_int(0.0) == 0
-    assert non_negative_int("0.0") == 0
-    assert non_negative_int(1.0) == 1
-    assert non_negative_int("1.0") == 1
-    assert non_negative_int(100_000_000.0) == 100_000_000
-    assert non_negative_int("100_000_000.0") == 100_000_000
+def test_non_negative_int_valid_string():
+    assert non_negative_int("42", from_cli=False) == 42
+    assert non_negative_int("42", from_cli=True) == 42
+
+
+def test_non_negative_int_valid_float():
+    assert non_negative_int(42.0, from_cli=False) == 42
+    assert non_negative_int(42.0, from_cli=True) == 42
+
+
+def test_non_negative_int_valid_float_string():
+    assert non_negative_int("42.0", from_cli=False) == 42
+    assert non_negative_int("42.0", from_cli=True) == 42
+
+
+def test_non_negative_int_zero_int():
+    assert non_negative_int(0, from_cli=False) == 0
+    assert non_negative_int(0, from_cli=True) == 0
+
+
+def test_non_negative_int_zero_int_string():
+    assert non_negative_int("0", from_cli=False) == 0
+    assert non_negative_int("0", from_cli=True) == 0
+
+
+def test_non_negative_int_zero_float():
+    assert non_negative_int(0.0, from_cli=False) == 0
+    assert non_negative_int(0.0, from_cli=True) == 0
+
+
+def test_non_negative_int_negative_int():
+    with pytest.raises(ValidationException):
+        non_negative_int(-42, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        non_negative_int(-42, from_cli=True)
+
+
+def test_non_negative_int_negative_int_string():
+    with pytest.raises(ValidationException):
+        non_negative_int("-42", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        non_negative_int("-42", from_cli=True)
+
+
+def test_non_negative_int_negative_float():
+    with pytest.raises(ValidationException):
+        non_negative_int(-42.0, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        non_negative_int(-42.0, from_cli=True)
+
+
+def test_non_negative_int_negative_float_string():
+    with pytest.raises(ValidationException):
+        non_negative_int("-42.0", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        non_negative_int("-42.0", from_cli=True)
+
+
+def test_non_negative_int_invalid_float():
+    with pytest.raises(ValidationException):
+        non_negative_int(42.5, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        non_negative_int(42.5, from_cli=True)
+
+
+def test_non_negative_int_invalid_float_string():
+    with pytest.raises(ValidationException):
+        non_negative_int("42.5", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        non_negative_int("42.5", from_cli=True)
+
+
+def test_non_negative_int_invalid_string():
+    with pytest.raises(ValidationException):
+        non_negative_int("abc", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        non_negative_int("abc", from_cli=True)
+
+
+def test_non_negative_int_empty_string():
+    with pytest.raises(ValidationException):
+        non_negative_int("", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        non_negative_int("", from_cli=True)
+
+
+def test_non_negative_int_none():
+    with pytest.raises(ValidationException):
+        non_negative_int(None, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        non_negative_int(None, from_cli=True)
 
 
 def test_non_negative_float_with_non_negative_floats():
@@ -579,35 +659,6 @@ def test__raise_error_from_non_cli_raising_validation_error():
 
 
 class TestNonCLI:
-    # non_negative_int
-    def test_non_negative_int_with_negative_int_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            non_negative_int(-1)
-
-    def test_non_negative_int_with_negative_int_string_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            non_negative_int("-1")
-
-    def test_non_negative_int_with_invalid_float_from_non_cli_1_1(self):
-        with pytest.raises(ValidationException):
-            non_negative_int(1.1)
-
-    def test_non_negative_int_with_invalid_float_from_non_cli_0_9(self):
-        with pytest.raises(ValidationException):
-            non_negative_int(0.9)
-
-    def test_non_negative_int_with_invalid_float_from_non_cli_1_1_string(self):
-        with pytest.raises(ValidationException):
-            non_negative_int("1.1")
-
-    def test_non_negative_int_with_invalid_float_from_non_cli_0_9_string(self):
-        with pytest.raises(ValidationException):
-            non_negative_int("0.9")
-
-    def test_non_negative_int_with_non_int_string_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            non_negative_int("a")
-
     # non_negative_float
     def test_non_negative_float_with_negative_float_from_non_cli(self):
         with pytest.raises(ValidationException):

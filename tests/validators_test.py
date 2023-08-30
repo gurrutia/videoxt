@@ -116,6 +116,27 @@ def test_positive_int_invalid_string():
         positive_int("abc", from_cli=True)
 
 
+def test_positive_int_empty_string():
+    with pytest.raises(ValidationException):
+        positive_int("", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_int("", from_cli=True)
+
+
+def test_positive_int_none():
+    with pytest.raises(ValidationException):
+        positive_int(None, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_int(None, from_cli=True)
+
+
+def test_positive_int_invalid_string():
+    with pytest.raises(ValidationException):
+        positive_int("abc", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_int("abc", from_cli=True)
+
+
 def test_positive_float_valid_float():
     assert positive_float(3.14, from_cli=False) == 3.14
     assert positive_float(3.14, from_cli=True) == 3.14

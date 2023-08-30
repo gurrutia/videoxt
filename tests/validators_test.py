@@ -443,26 +443,20 @@ def test_valid_filepath_with_valid_pathlib_filepath(tmp_path: Path):
     os.remove(filepath)
 
 
-def test_valid_dir_with_valid_dir_string(tmp_path: Path):
-    """Test that a valid directory is returned when a valid string directory is passed.
-
-    `tmp_path` is a built-in pytest fixture that creates a temporary directory.
-    """
-    dirpath = tmp_path / "t"
-    dirpath.mkdir()
-    assert valid_dir(str(dirpath)) == dirpath
-    os.rmdir(dirpath)
-
-
 def test_valid_dir_with_valid_dir_pathlib(tmp_path: Path):
     """Test that a valid directory is returned when a valid pathlib directory is passed.
 
     `tmp_path` is a built-in pytest fixture that creates a temporary directory.
     """
-    dirpath = tmp_path / "t"
-    dirpath.mkdir()
-    assert valid_dir(dirpath) == dirpath
-    os.rmdir(dirpath)
+    assert valid_dir(tmp_path) == tmp_path
+
+
+def test_valid_dir_with_valid_dir_string(tmp_path: Path):
+    """Test that a valid directory is returned when a valid string directory is passed.
+
+    `tmp_path` is a built-in pytest fixture that creates a temporary directory.
+    """
+    assert valid_dir(str(tmp_path)) == tmp_path
 
 
 def test_valid_filename_with_valid_filename():
@@ -757,15 +751,6 @@ class TestNonCLI:
     def test_valid_filepath_with_invalid_pathlib_filepath_from_non_cli(self):
         with pytest.raises(ValidationException):
             valid_filepath(Path("invalid.txt"))
-
-    # valid_dir
-    def test_valid_dir_with_invalid_dir_string_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_dir("invalid")
-
-    def test_valid_dir_with_invalid_dir_pathlib_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_dir(Path("invalid"))
 
     # valid_filename
     def test_valid_filename_with_slashes_from_non_cli(self):

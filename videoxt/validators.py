@@ -24,7 +24,7 @@ def positive_int(num: t.Union[float, int, str], from_cli: bool = False) -> int:
     """
     try:
         value = float(num)
-    except ValueError:
+    except (ValueError, TypeError):
         _raise_error(f"expected integer, got {num!r}", from_cli)
 
     if not value.is_integer():

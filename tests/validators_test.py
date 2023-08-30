@@ -143,6 +143,76 @@ def test_positive_float_negative_float():
         positive_float(-3.14, from_cli=True)
 
 
+def test_positive_float_negative_float_string():
+    with pytest.raises(ValidationException):
+        positive_float("-3.14", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_float("-3.14", from_cli=True)
+
+
+def test_positive_float_negative_int():
+    with pytest.raises(ValidationException):
+        positive_float(-42, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_float(-42, from_cli=True)
+
+
+def test_positive_float_negative_int_string():
+    with pytest.raises(ValidationException):
+        positive_float("-42", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_float("-42", from_cli=True)
+
+
+def test_positive_float_zero_float():
+    with pytest.raises(ValidationException):
+        positive_float(0.0, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_float(0.0, from_cli=True)
+
+
+def test_positive_float_zero_float_string():
+    with pytest.raises(ValidationException):
+        positive_float("0.0", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_float("0.0", from_cli=True)
+
+
+def test_positive_float_zero_int():
+    with pytest.raises(ValidationException):
+        positive_float(0, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_float(0, from_cli=True)
+
+
+def test_positive_float_zero_int_string():
+    with pytest.raises(ValidationException):
+        positive_float("0", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_float("0", from_cli=True)
+
+
+def test_positive_float_invalid_string():
+    with pytest.raises(ValidationException):
+        positive_float("abc", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_float("abc", from_cli=True)
+
+
+def test_positive_float_empty_string():
+    with pytest.raises(ValidationException):
+        positive_float("", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_float("", from_cli=True)
+
+
+def test_positive_float_none():
+    with pytest.raises(ValidationException):
+        positive_float(None, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_float(None, from_cli=True)
+
+
 def test_non_negative_int_with_non_negative_ints():
     assert non_negative_int(0) == 0
     assert non_negative_int("0") == 0
@@ -509,27 +579,6 @@ def test__raise_error_from_non_cli_raising_validation_error():
 
 
 class TestNonCLI:
-    # positive_float
-    def test_positive_float_with_zero_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            positive_float(0)
-
-    def test_positive_float_with_zero_string_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            positive_float("0")
-
-    def test_positive_float_with_negative_float_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            positive_float(-1.0)
-
-    def test_positive_float_with_negative_float_string_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            positive_float("-1.0")
-
-    def test_positive_float_with_non_float_string_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            positive_float("a")
-
     # non_negative_int
     def test_non_negative_int_with_negative_int_from_non_cli(self):
         with pytest.raises(ValidationException):

@@ -110,6 +110,9 @@ def valid_filepath(filepath: t.Union[Path, str], from_cli: bool = False) -> Path
 
 def valid_filename(filename: str, from_cli: bool = False) -> str:
     """Validates filenames are valid and returns the input filename if valid."""
+    if filename is None:
+        _raise_error(f"invalid filename, got {filename!r}", from_cli)
+
     invalid_chars = r"[\\/:*?\"<>|]"
     if re.search(invalid_chars, filename):
         _raise_error(

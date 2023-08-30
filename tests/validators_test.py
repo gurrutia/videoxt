@@ -311,24 +311,93 @@ def test_non_negative_int_none():
         non_negative_int(None, from_cli=True)
 
 
-def test_non_negative_float_with_non_negative_floats():
-    assert non_negative_float(0.0) == 0.0
-    assert non_negative_float("0.0") == 0.0
-    assert non_negative_float(1.0) == 1.0
-    assert non_negative_float("1.0") == 1.0
-    assert non_negative_float(12.34) == 12.34
-    assert non_negative_float("12.34") == 12.34
-    assert non_negative_float(100_000_000.0) == 100_000_000.0
-    assert non_negative_float("100_000_000.0") == 100_000_000.0
+def test_non_negative_float_valid_float():
+    assert non_negative_float(3.14, from_cli=False) == 3.14
+    assert non_negative_float(3.14, from_cli=True) == 3.14
 
 
-def test_non_negative_float_with_non_negative_ints():
-    assert non_negative_float(0) == 0.0
-    assert non_negative_float("0") == 0.0
-    assert non_negative_float(1) == 1.0
-    assert non_negative_float("1") == 1.0
-    assert non_negative_float(100_000_000) == 100_000_000.0
-    assert non_negative_float("100_000_000") == 100_000_000.0
+def test_non_negative_float_valid_float_string():
+    assert non_negative_float("3.14", from_cli=False) == 3.14
+    assert non_negative_float("3.14", from_cli=True) == 3.14
+
+
+def test_non_negative_float_valid_int():
+    assert non_negative_float(42, from_cli=False) == 42.0
+    assert non_negative_float(42, from_cli=True) == 42.0
+
+
+def test_non_negative_float_valid_int_string():
+    assert non_negative_float("42", from_cli=False) == 42.0
+    assert non_negative_float("42", from_cli=True) == 42.0
+
+
+def test_non_negative_float_zero_float():
+    assert non_negative_float(0.0, from_cli=False) == 0.0
+    assert non_negative_float(0.0, from_cli=True) == 0.0
+
+
+def test_non_negative_float_zero_float_string():
+    assert non_negative_float("0.0", from_cli=False) == 0.0
+    assert non_negative_float("0.0", from_cli=True) == 0.0
+
+
+def test_non_negative_float_zero_int():
+    assert non_negative_float(0, from_cli=False) == 0.0
+    assert non_negative_float(0, from_cli=True) == 0.0
+
+
+def test_non_negative_float_zero_int_string():
+    assert non_negative_float("0", from_cli=False) == 0.0
+    assert non_negative_float("0", from_cli=True) == 0.0
+
+
+def test_non_negative_float_negative_float():
+    with pytest.raises(ValidationException):
+        non_negative_float(-3.14, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        non_negative_float(-3.14, from_cli=True)
+
+
+def test_non_negative_float_negative_float_string():
+    with pytest.raises(ValidationException):
+        non_negative_float("-3.14", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        non_negative_float("-3.14", from_cli=True)
+
+
+def test_non_negative_float_negative_int():
+    with pytest.raises(ValidationException):
+        non_negative_float(-42, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        non_negative_float(-42, from_cli=True)
+
+
+def test_non_negative_float_negative_int_string():
+    with pytest.raises(ValidationException):
+        non_negative_float("-42", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        non_negative_float("-42", from_cli=True)
+
+
+def test_non_negative_float_invalid_string():
+    with pytest.raises(ValidationException):
+        non_negative_float("abc", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        non_negative_float("abc", from_cli=True)
+
+
+def test_non_negative_float_empty_string():
+    with pytest.raises(ValidationException):
+        non_negative_float("", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        non_negative_float("", from_cli=True)
+
+
+def test_non_negative_float_none():
+    with pytest.raises(ValidationException):
+        non_negative_float(None, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        non_negative_float(None, from_cli=True)
 
 
 def test_valid_filepath_with_valid_string_filepath(tmp_path: Path):
@@ -659,19 +728,6 @@ def test__raise_error_from_non_cli_raising_validation_error():
 
 
 class TestNonCLI:
-    # non_negative_float
-    def test_non_negative_float_with_negative_float_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            non_negative_float(-1.0)
-
-    def test_non_negative_float_with_negative_float_string_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            non_negative_float("-1.0")
-
-    def test_non_negative_float_with_non_float_string_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            non_negative_float("a")
-
     # valid_filepath
     def test_valid_filepath_with_invalid_string_filepath_from_non_cli(self):
         with pytest.raises(ValidationException):

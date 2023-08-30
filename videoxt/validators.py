@@ -97,6 +97,9 @@ def valid_dir(dir: t.Union[Path, str], from_cli: bool = False) -> Path:
 
 def valid_filepath(filepath: t.Union[Path, str], from_cli: bool = False) -> Path:
     """Validates a file exists as a Path or str and returns a Path object if valid."""
+    if filepath is None:
+        _raise_error(f"invalid filepath, got {filepath!r}", from_cli)
+
     filepath_path = Path(filepath)
 
     if not filepath_path.is_file():

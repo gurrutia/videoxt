@@ -443,7 +443,7 @@ def test_valid_filepath_with_valid_pathlib_filepath(tmp_path: Path):
     os.remove(filepath)
 
 
-def test_valid_dir_with_valid_dir_pathlib(tmp_path: Path):
+def test_valid_dir_valid_path(tmp_path: Path):
     """Test that a valid directory is returned when a valid pathlib directory is passed.
 
     `tmp_path` is a built-in pytest fixture that creates a temporary directory.
@@ -451,12 +451,36 @@ def test_valid_dir_with_valid_dir_pathlib(tmp_path: Path):
     assert valid_dir(tmp_path) == tmp_path
 
 
-def test_valid_dir_with_valid_dir_string(tmp_path: Path):
+def test_valid_dir_valid_string(tmp_path: Path):
     """Test that a valid directory is returned when a valid string directory is passed.
 
     `tmp_path` is a built-in pytest fixture that creates a temporary directory.
     """
     assert valid_dir(str(tmp_path)) == tmp_path
+
+
+def test_valid_dir_invalid_path(tmp_path: Path):
+    """Test that a ValidationException is raised when an invalid pathlib directory is passed.
+
+    `tmp_path` is a built-in pytest fixture that creates a temporary directory.
+    """
+    with pytest.raises(ValidationException):
+        valid_dir(tmp_path / "invalid")
+
+
+def test_valid_dir_invalid_string(tmp_path: Path):
+    """Test that a ValidationException is raised when an invalid string directory is passed.
+
+    `tmp_path` is a built-in pytest fixture that creates a temporary directory.
+    """
+    with pytest.raises(ValidationException):
+        valid_dir(str(tmp_path / "invalid"))
+
+
+def test_valid_dir_none():
+    """Test that a ValidationException is raised when None is passed."""
+    with pytest.raises(ValidationException):
+        valid_dir(None)
 
 
 def test_valid_filename_with_valid_filename():

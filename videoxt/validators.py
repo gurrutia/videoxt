@@ -84,6 +84,9 @@ def non_negative_float(num: t.Union[float, int, str], from_cli: bool = False) ->
 
 def valid_dir(dir: t.Union[Path, str], from_cli: bool = False) -> Path:
     """Validates a directory as a Path or str exists and returns a Path object if valid."""
+    if dir is None:
+        _raise_error(f"invalid directory, got {dir!r}", from_cli)
+
     dir_path = Path(dir)
 
     if not dir_path.is_dir():

@@ -512,11 +512,56 @@ def test_valid_dir_none():
         valid_dir(None, from_cli=True)
 
 
-def test_valid_filename_with_valid_filename():
-    assert valid_filename("file.txt") == "file.txt"
-    assert valid_filename("file_with_underscores.txt") == "file_with_underscores.txt"
-    assert valid_filename("file-with-dashes.txt") == "file-with-dashes.txt"
-    assert valid_filename("file (1).txt") == "file (1).txt"
+@pytest.mark.parametrize(
+    ("filename", "expected_filename"),
+    [
+        ("filename", "filename"),
+        ("filename (1)", "filename (1)"),
+        ("filename-with-dashes", "filename-with-dashes"),
+        ("filename with spaces", "filename with spaces"),
+        ("filename_with_underscores", "filename_with_underscores"),
+        ("filenamewithsuffix.mp4", "filenamewithsuffix.mp4"),
+        ("filenameendswithdot.", "filenameendswithdot."),
+        (".filenamestartswithdot", ".filenamestartswithdot"),
+        (" filename starts with space", " filename starts with space"),
+        ("filename ends with space ", "filename ends with space "),
+        (
+            "filename_with_symbols!@#$%^&()_+{}[];'",
+            "filename_with_symbols!@#$%^&()_+{}[];'",
+        ),
+        (".mp4.", ".mp4."),
+        (".mp4", ".mp4"),
+        (".", "."),
+        (" ", " "),
+    ],
+)
+def test_valid_filename_valid_filenames(filename: str, expected_filename: str):
+    assert valid_filename(filename, from_cli=False) == expected_filename
+    assert valid_filename(filename, from_cli=True) == expected_filename
+
+
+@pytest.mark.parametrize(
+    ("filename"),
+    [
+        ("file|with|invalid|characters.mp4"),
+        ("file\\\\with\\\\backslashes.mp4"),
+        ("file/with/forward/slashes.mp4"),
+        ("file*with*asterisks.mp4"),
+        ("file?with?question?marks.mp4"),
+        ("file<with<less<than.mp4"),
+        ("file>with>greater>than.mp4"),
+        ("file:with:colons.mp4"),
+        ('file"with"quotes.mp4'),
+        ("file|with|pipes.mp4"),
+        (""),
+        (None),
+    ],
+)
+def test_valid_filename_invalid_filenames(filename: str):
+    with pytest.raises(ValidationException):
+        valid_filename(filename, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        valid_filename(filename, from_cli=True)
 
 
 def test_valid_image_format_with_valid_lowercase_image_formats():
@@ -796,43 +841,6 @@ def test__raise_error_from_non_cli_raising_validation_error():
 
 
 class TestNonCLI:
-    # valid_filename
-    def test_valid_filename_with_slashes_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_filename("file/with/slashes.txt")
-
-    def test_valid_filename_with_backslashes_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_filename("file\\with\\backslashes.txt")
-
-    def test_valid_filename_with_colons_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_filename("file:with:colons.txt")
-
-    def test_valid_filename_with_question_marks_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_filename("file?with?question?marks.txt")
-
-    def test_valid_filename_with_asterisks_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_filename("file*with*asterisks.txt")
-
-    def test_valid_filename_with_quotes_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_filename('file"with"quotes.txt')
-
-    def test_valid_filename_with_less_than_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_filename("file<with<less<than.txt")
-
-    def test_valid_filename_with_greater_than_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_filename("file>with>greater>than.txt")
-
-    def test_valid_filename_with_pipes_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_filename("file|with|pipes.txt")
-
     # valid_image_format
     def test_valid_image_format_with_invalid_format_from_non_cli(self):
         with pytest.raises(ValidationException):

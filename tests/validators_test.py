@@ -440,7 +440,7 @@ def test_valid_filepath_valid_string(tmp_video_filepath: Path):
 
 
 def test_valid_filepath_nonexistent_path():
-    path = Path("nonexistent" / "file.mp4")
+    path = Path("nonexistent") / "file.mp4"
     with pytest.raises(ValidationException):
         valid_filepath(path, from_cli=False)
     with pytest.raises(ArgumentTypeError):
@@ -467,7 +467,8 @@ def test_valid_dir_valid_path(tmp_path: Path):
 
     `tmp_path` is a built-in pytest fixture that creates a temporary directory.
     """
-    assert valid_dir(tmp_path) == tmp_path
+    assert valid_dir(tmp_path, from_cli=False) == tmp_path
+    assert valid_dir(tmp_path, from_cli=True) == tmp_path
 
 
 def test_valid_dir_valid_string(tmp_path: Path):
@@ -475,31 +476,40 @@ def test_valid_dir_valid_string(tmp_path: Path):
 
     `tmp_path` is a built-in pytest fixture that creates a temporary directory.
     """
-    assert valid_dir(str(tmp_path)) == tmp_path
+    assert valid_dir(str(tmp_path), from_cli=False) == tmp_path
+    assert valid_dir(str(tmp_path), from_cli=True) == tmp_path
 
 
 def test_valid_dir_invalid_path(tmp_path: Path):
-    """Test that a ValidationException is raised when an invalid pathlib directory is passed.
+    """When a nonexistent pathlib directory is passed, test that a ValidationException is raised
+    when from_cli is False and an ArgumentTypeError is raised when from_cli is True.
 
     `tmp_path` is a built-in pytest fixture that creates a temporary directory.
     """
     with pytest.raises(ValidationException):
-        valid_dir(tmp_path / "invalid")
+        valid_dir(tmp_path / "invalid", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        valid_dir(tmp_path / "invalid", from_cli=True)
 
 
 def test_valid_dir_invalid_string(tmp_path: Path):
-    """Test that a ValidationException is raised when an invalid string directory is passed.
+    """When a nonexistent string directory is passed, test that a ValidationException is raised
+    when from_cli is False and an ArgumentTypeError is raised when from_cli is True.
 
     `tmp_path` is a built-in pytest fixture that creates a temporary directory.
     """
     with pytest.raises(ValidationException):
-        valid_dir(str(tmp_path / "invalid"))
+        valid_dir(str(tmp_path / "invalid"), from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        valid_dir(str(tmp_path / "invalid"), from_cli=True)
 
 
 def test_valid_dir_none():
     """Test that a ValidationException is raised when None is passed."""
     with pytest.raises(ValidationException):
-        valid_dir(None)
+        valid_dir(None, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        valid_dir(None, from_cli=True)
 
 
 def test_valid_filename_with_valid_filename():

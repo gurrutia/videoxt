@@ -421,26 +421,45 @@ def test_non_negative_float_none():
         non_negative_float(None, from_cli=True)
 
 
-def test_valid_filepath_with_valid_string_filepath(tmp_path: Path):
+def test_valid_filepath_valid_path(tmp_video_filepath: Path):
+    """Test that a valid filepath is returned when a valid pathlib path is passed.
+
+    `tmp_video_filepath` is created by the fixture of the same name in `conftest.py`.
+    """
+    assert valid_filepath(tmp_video_filepath, from_cli=False) == tmp_video_filepath
+    assert valid_filepath(tmp_video_filepath, from_cli=True) == tmp_video_filepath
+
+
+def test_valid_filepath_valid_string(tmp_video_filepath: Path):
     """Test that a valid filepath is returned when a valid string filepath is passed.
 
-    `tmp_path` is a built-in pytest fixture that creates a temporary directory.
+    `tmp_video_filepath` is created by the fixture of the same name in `conftest.py`.
     """
-    filepath = tmp_path / "t.txt"
-    filepath.write_text("t")
-    assert valid_filepath(str(filepath)) == filepath
-    os.remove(filepath)
+    assert valid_filepath(str(tmp_video_filepath), from_cli=False) == tmp_video_filepath
+    assert valid_filepath(str(tmp_video_filepath), from_cli=True) == tmp_video_filepath
 
 
-def test_valid_filepath_with_valid_pathlib_filepath(tmp_path: Path):
-    """Test that a valid filepath is returned when a valid pathlib filepath is passed.
+def test_valid_filepath_nonexistent_path():
+    path = Path("nonexistent" / "file.mp4")
+    with pytest.raises(ValidationException):
+        valid_filepath(path, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        valid_filepath(path, from_cli=True)
 
-    `tmp_path` is a built-in pytest fixture that creates a temporary directory.
-    """
-    filepath = tmp_path / "t.txt"
-    filepath.write_text("t")
-    assert valid_filepath(filepath) == filepath
-    os.remove(filepath)
+
+def test_valid_filepath_nonexistent_string():
+    path = "nonexistent/file.mp4"
+    with pytest.raises(ValidationException):
+        valid_filepath(path, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        valid_filepath(path, from_cli=True)
+
+
+def test_valid_filepath_none():
+    with pytest.raises(ValidationException):
+        valid_filepath(None, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        valid_filepath(None, from_cli=True)
 
 
 def test_valid_dir_valid_path(tmp_path: Path):
@@ -767,15 +786,6 @@ def test__raise_error_from_non_cli_raising_validation_error():
 
 
 class TestNonCLI:
-    # valid_filepath
-    def test_valid_filepath_with_invalid_string_filepath_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_filepath("invalid.txt")
-
-    def test_valid_filepath_with_invalid_pathlib_filepath_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_filepath(Path("invalid.txt"))
-
     # valid_filename
     def test_valid_filename_with_slashes_from_non_cli(self):
         with pytest.raises(ValidationException):

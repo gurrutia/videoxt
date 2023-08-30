@@ -73,7 +73,7 @@ def non_negative_float(num: t.Union[float, int, str], from_cli: bool = False) ->
     """
     try:
         value = float(num)
-    except ValueError:
+    except (ValueError, TypeError):
         _raise_error(f"expected numeric value, got {num!r}", from_cli)
 
     if value < 0:

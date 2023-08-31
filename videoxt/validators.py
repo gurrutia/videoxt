@@ -290,10 +290,10 @@ def valid_audio_format(audio_format: str, from_cli: bool = False) -> str:
     Valid audio formats: `m4a`, `mp3`, `ogg`, `wav`
     """
     audio_format = audio_format.lower().strip(".")
-    if audio_format not in C.VALID_AUDIO_FORMATS:
+    if audio_format not in C.SUPPORTED_AUDIO_FORMATS:
         _raise_error(
             f"invalid audio format, got {audio_format!r}\n"
-            f"valid audio formats: {C.VALID_AUDIO_FORMATS}",
+            f"supported audio formats: {C.SUPPORTED_AUDIO_FORMATS}",
             from_cli,
         )
 

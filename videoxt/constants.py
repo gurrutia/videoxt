@@ -32,16 +32,17 @@ SUPPORTED_AUDIO_FORMATS = {
     "wav",
 }
 
-VALID_IMAGE_FORMATS = (
+SUPPORTED_IMAGE_FORMATS = {
     "bmp",
     "dib",
+    "jp2",
     "jpeg",
     "jpg",
     "png",
-    "tiff",
     "tif",
+    "tiff",
     "webp",
-)
+}
 
 VALID_ROTATE_VALUES = {0, 90, 180, 270}
 

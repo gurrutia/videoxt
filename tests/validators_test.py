@@ -145,22 +145,22 @@ def test_valid_filename_with_valid_filename():
 
 
 def test_valid_image_format_with_valid_lowercase_image_formats():
-    for image_format in C.VALID_IMAGE_FORMATS:
+    for image_format in C.SUPPORTED_IMAGE_FORMATS:
         assert valid_image_format(image_format) == image_format
 
 
 def test_valid_image_format_with_valid_uppercase_image_formats():
-    for image_format in C.VALID_IMAGE_FORMATS:
+    for image_format in C.SUPPORTED_IMAGE_FORMATS:
         assert valid_image_format(image_format.upper()) == image_format
 
 
 def test_valid_image_format_with_valid_lowercase_image_formats_with_dot():
-    for image_format in C.VALID_IMAGE_FORMATS:
+    for image_format in C.SUPPORTED_IMAGE_FORMATS:
         assert valid_image_format(f".{image_format}") == image_format
 
 
 def test_valid_image_format_with_valid_uppercase_image_formats_with_dot():
-    for image_format in C.VALID_IMAGE_FORMATS:
+    for image_format in C.SUPPORTED_IMAGE_FORMATS:
         assert valid_image_format(f".{image_format.upper()}") == image_format
 
 

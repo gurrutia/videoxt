@@ -305,13 +305,13 @@ def valid_image_format(image_format: str, from_cli: bool = False) -> str:
     image format is one that is not in the list of valid image formats located in
     `constants.py`.
 
-    Valid image formats: `bmp`, `dib`, `jpeg`, `jpg`, `png`, `tiff`, `tif`, `webp`
+    Supported formats: `bmp`, `dib`, `jp2`, `jpeg`, `jpg`, `png`, `tif`, `tiff`, `webp`
     """
     image_format = image_format.lower().strip(".")
-    if image_format not in C.VALID_IMAGE_FORMATS:
+    if image_format not in C.SUPPORTED_IMAGE_FORMATS:
         _raise_error(
             f"invalid image format, got {image_format!r}\n"
-            f"valid image formats: {C.VALID_IMAGE_FORMATS}",
+            f"supported image formats: {C.SUPPORTED_IMAGE_FORMATS}",
             from_cli,
         )
 

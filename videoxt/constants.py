@@ -9,13 +9,25 @@ VERSION = importlib.metadata.version("videoxt")
 VALID_ROTATE_VALUES = (0, 90, 180, 270)
 
 
-VALID_VIDEO_FORMATS = (
+VALID_VIDEO_FORMATS = {
     "mp4",
     "avi",
     "mkv",
     "mov",
     "wmv",
-)
+    "flv",
+    "webm",
+    "m4v",
+    "3gp",
+    "mpeg",
+    "ts",
+    "ogv",
+    "rm",
+    "vob",
+    "asf",
+    "mpg",
+    "divx",
+}
 
 VALID_AUDIO_FORMATS = (
     "m4a",

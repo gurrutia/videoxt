@@ -128,10 +128,15 @@ def valid_filename(filename: str, from_cli: bool = False) -> str:
 
 
 def valid_timestamp(timestamp: str, from_cli: bool = False) -> str:
-    """Validates timestamps are in the correct format. Microseconds are truncated.
+    """Verifies that a timestamp, typically used for video playback on
+    streaming services, adheres to accepted formats. Microseconds are truncated.
 
-    Correct formats: `HH:MM:SS`, `H:MM:SS`, `MM:SS`, `M:SS`
+    Accepted:  `M:SS`, `MM:SS`, `H:MM:SS`, `HH:MM:SS`
+    Unaccepted: `S`, `H:M:S`, values greater than 59
     """
+    if timestamp is None or not timestamp:
+        _raise_error(f"invalid timestamp, got {timestamp!r}", from_cli)
+
     timestamp = timestamp.split(".")[0]
 
     regex = r"^([0-9]|[0-5][0-9])(:[0-5][0-9]){1,2}$"

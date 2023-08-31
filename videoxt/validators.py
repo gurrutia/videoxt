@@ -341,10 +341,10 @@ def valid_video_filepath(video_filepath: Path, from_cli: bool = False) -> Path:
     video_filepath = valid_filepath(video_filepath, from_cli)
     video_format = video_filepath.name.split(".")[-1].lower()
 
-    if video_format not in C.VALID_VIDEO_FORMATS:
+    if video_format not in C.SUPPORTED_VIDEO_FORMATS:
         _raise_error(
             f"invalid video format, got {video_format!r}\n"
-            f"supported video formats: {C.VALID_VIDEO_FORMATS}",
+            f"supported video formats: {C.SUPPORTED_VIDEO_FORMATS}",
             from_cli,
         )
 

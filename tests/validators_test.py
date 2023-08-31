@@ -584,22 +584,67 @@ def test_valid_image_format_with_valid_uppercase_image_formats_with_dot():
         assert valid_image_format(f".{image_format.upper()}") == image_format
 
 
-def test_valid_timestamp_with_valid_start_timestamp_zero():
-    assert valid_timestamp(timestamp="0:00") == "0:00"
-    assert valid_timestamp(timestamp="0:00:00") == "0:00:00"
-    assert valid_timestamp(timestamp="0:00:00.0") == "0:00:00"
-    assert valid_timestamp(timestamp="0:00:00.9") == "0:00:00"
+@pytest.mark.parametrize(
+    ("timestamp", "expected"),
+    [
+        ("0:00", "0:00"),
+        ("00:00", "00:00"),
+        ("0:00:00", "0:00:00"),
+        ("00:00:00", "00:00:00"),
+        ("0:00:00.0", "0:00:00"),
+        ("0:00:00.01", "0:00:00"),
+        ("0:00:00.99", "0:00:00"),
+        ("12:34:56", "12:34:56"),
+        ("1:23:45", "1:23:45"),
+        ("12:34", "12:34"),
+        ("1:23", "1:23"),
+        ("59:59:59", "59:59:59"),
+    ],
+)
+def test_valid_timestamp_valid(timestamp: str, expected: str):
+    assert valid_timestamp(timestamp, from_cli=False) == expected
+    assert valid_timestamp(timestamp, from_cli=True) == expected
 
 
-def test_valid_timestamp_with_valid_start_timestamp_non_zero():
-    assert valid_timestamp("1:00") == "1:00"
-    assert valid_timestamp("1:00:00") == "1:00:00"
-    assert valid_timestamp("1:00:00.0") == "1:00:00"
-    assert valid_timestamp("1:00:00.1") == "1:00:00"
-    assert valid_timestamp("59:59") == "59:59"
-    assert valid_timestamp("59:59:59") == "59:59:59"
-    assert valid_timestamp("59:59:59.0") == "59:59:59"
-    assert valid_timestamp("59:59:59.9") == "59:59:59"
+@pytest.mark.parametrize(
+    ("timestamp"),
+    [
+        (""),
+        (" "),
+        (":"),
+        ("0"),
+        ("00"),
+        (":0"),
+        (":00"),
+        ("0:"),
+        ("00:"),
+        ("0:0"),
+        ("00:0"),
+        ("0:0:0"),
+        ("0:0:00"),
+        ("0:00:0"),
+        ("00:0:0"),
+        ("00:00:0"),
+        ("60:00:00"),
+        ("00:60:00"),
+        ("00:00:60"),
+        ("60:60:60"),
+        ("abc"),
+        ("ab:cd:ef"),
+        ("x0:00:00"),
+        ("0x:00:00"),
+        ("00:x0:00"),
+        ("00:0x:00"),
+        ("00:00:x0"),
+        ("00:00:0x"),
+        (None),
+    ],
+)
+def test_valid_timestamp_invalid(timestamp: str):
+    with pytest.raises(ValidationException):
+        valid_timestamp(timestamp, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        valid_timestamp(timestamp, from_cli=True)
 
 
 def test_valid_resize_value_with_valid_resize_values_strings():
@@ -845,41 +890,6 @@ class TestNonCLI:
     def test_valid_image_format_with_invalid_format_from_non_cli(self):
         with pytest.raises(ValidationException):
             valid_image_format("invalid")
-
-    # valid_timestamp
-    def test_valid_timestamp_containing_colon_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_timestamp("x0:00:00")
-        with pytest.raises(ValidationException):
-            valid_timestamp("0x:00:00")
-        with pytest.raises(ValidationException):
-            valid_timestamp("00:x0:00")
-        with pytest.raises(ValidationException):
-            valid_timestamp("00:0x:00")
-        with pytest.raises(ValidationException):
-            valid_timestamp("00:00:x0")
-        with pytest.raises(ValidationException):
-            valid_timestamp("00:00:0x")
-
-    def test_valid_timestamp_with_invalid_timestamp_60_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_timestamp("60:00:00")
-        with pytest.raises(ValidationException):
-            valid_timestamp("60:00")
-        with pytest.raises(ValidationException):
-            valid_timestamp("1:60")
-
-    def test_valid_timestamp_with_invalid_start_timestamp_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_timestamp("-1:")
-
-    def test_valid_timestamp_with_invalid_stop_timestamp_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_timestamp("-1:")
-        with pytest.raises(ValidationException):
-            valid_timestamp("0::")
-        with pytest.raises(ValidationException):
-            valid_timestamp(":0.9")
 
     # valid_resize_value
     def test_valid_resize_value_with_invalid_value_from_non_cli(self):

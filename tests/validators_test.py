@@ -1,4 +1,4 @@
-import os
+import typing as t
 from argparse import ArgumentTypeError
 from pathlib import Path
 
@@ -706,25 +706,40 @@ def test_valid_capture_rate_invalid_capture_rates_raises_validation_exception(
         valid_capture_rate(capture_rate, first_frame, last_frame)
 
 
-def test_valid_resize_value_with_valid_resize_values_strings():
-    assert valid_resize_value("0.01") == 0.01
-    assert valid_resize_value("0.1") == 0.1
-    assert valid_resize_value("1") == 1
-    assert valid_resize_value("1.0") == 1.0
-    assert valid_resize_value("50.0") == 50.0
+@pytest.mark.parametrize(
+    ("resize_value", "expected_value"),
+    [
+        (1.0, 1.0),
+        (1, 1.0),
+        ("0.01", 0.01),
+    ],
+)
+def test_valid_resize_value_valid_values(
+    resize_value: t.Union[float, str], expected_value: t.Union[float, str]
+):
+    assert valid_resize_value(resize_value, from_cli=False) == expected_value
+    assert valid_resize_value(resize_value, from_cli=True) == expected_value
 
 
-def test_valid_resize_value_with_valid_resize_values_floats():
-    assert valid_resize_value(0.01) == 0.01
-    assert valid_resize_value(0.1) == 0.1
-    assert valid_resize_value(1) == 1
-    assert valid_resize_value(1.0) == 1.0
-    assert valid_resize_value(50.0) == 50.0
-
-
-def test_valid_resize_value_with_valid_ints():
-    assert valid_resize_value(1) == 1
-    assert valid_resize_value(50) == 50
+@pytest.mark.parametrize(
+    ("resize_value"),
+    [
+        (-1),
+        ("-1"),
+        (0),
+        ("0"),
+        (0.0),
+        ("0.0"),
+        ("abc"),
+        (""),
+        (None),
+    ],
+)
+def test_valid_resize_value_invalid_values(resize_value):
+    with pytest.raises(ValidationException):
+        valid_resize_value(resize_value, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        valid_resize_value(resize_value, from_cli=True)
 
 
 def test_valid_dimensions_with_valid_dimensions():
@@ -939,37 +954,6 @@ class TestNonCLI:
     def test_valid_image_format_with_invalid_format_from_non_cli(self):
         with pytest.raises(ValidationException):
             valid_image_format("invalid")
-
-    # valid_resize_value
-    def test_valid_resize_value_with_invalid_value_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_resize_value("invalid")
-
-    def test_valid_resize_value_with_invalid_ints_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_resize_value(-1)
-        with pytest.raises(ValidationException):
-            valid_resize_value(0)
-
-    def test_valid_resize_value_with_invalid_floats_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_resize_value(-1.0)
-        with pytest.raises(ValidationException):
-            valid_resize_value(0.0)
-        with pytest.raises(ValidationException):
-            valid_resize_value(0.009)
-
-    def test_valid_resize_value_with_invalid_strings_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_resize_value("-1")
-        with pytest.raises(ValidationException):
-            valid_resize_value("0")
-        with pytest.raises(ValidationException):
-            valid_resize_value("-1.0")
-        with pytest.raises(ValidationException):
-            valid_resize_value("0.0")
-        with pytest.raises(ValidationException):
-            valid_resize_value("0.009")
 
     # valid_dimensions
     def test_valid_dimensions_with_invalid_ints_from_non_cli(self):

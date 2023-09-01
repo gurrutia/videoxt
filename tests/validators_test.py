@@ -1,10 +1,11 @@
-import os
+import typing as t
 from argparse import ArgumentTypeError
 from pathlib import Path
 
 import pytest
 
 import videoxt.constants as C
+from videoxt.validators import _raise_error
 from videoxt.validators import non_negative_float
 from videoxt.validators import non_negative_int
 from videoxt.validators import positive_float
@@ -25,123 +26,570 @@ from videoxt.validators import valid_video_filepath
 from videoxt.validators import ValidationException
 
 
-def test_positive_int_with_positive_ints():
-    assert positive_int(1) == 1
-    assert positive_int("1") == 1
-    assert positive_int(100_000_000) == 100_000_000
-    assert positive_int("100_000_000") == 100_000_000
+def test_positive_int_valid_int():
+    assert positive_int(42, from_cli=False) == 42
+    assert positive_int(42, from_cli=True) == 42
 
 
-def test_positive_int_with_valid_floats():
-    assert positive_int(1.0) == 1
-    assert positive_int("1.0") == 1
-    assert positive_int(100_000_000.0) == 100_000_000
-    assert positive_int("100_000_000.0") == 100_000_000
+def test_positive_int_valid_string():
+    assert positive_int("42", from_cli=False) == 42
+    assert positive_int("42", from_cli=True) == 42
 
 
-def test_positive_float_with_positive_floats():
-    assert positive_float(1.0) == 1.0
-    assert positive_float("1.0") == 1.0
-    assert positive_float(12.34) == 12.34
-    assert positive_float("12.34") == 12.34
-    assert positive_float(100_000_000.0) == 100_000_000.0
-    assert positive_float("100_000_000.0") == 100_000_000.0
+def test_positive_int_valid_float():
+    assert positive_int(42.0, from_cli=False) == 42
+    assert positive_int(42.0, from_cli=True) == 42
 
 
-def test_positive_float_with_positive_ints():
-    assert positive_float(1) == 1.0
-    assert positive_float("1") == 1.0
-    assert positive_float(100_000_000) == 100_000_000.0
-    assert positive_float("100_000_000") == 100_000_000.0
+def test_positive_int_valid_float_string():
+    assert positive_int("42.0", from_cli=False) == 42
+    assert positive_int("42.0", from_cli=True) == 42
 
 
-def test_non_negative_int_with_non_negative_ints():
-    assert non_negative_int(0) == 0
-    assert non_negative_int("0") == 0
-    assert non_negative_int(1) == 1
-    assert non_negative_int("1") == 1
-    assert non_negative_int(100_000_000) == 100_000_000
-    assert non_negative_int("100_000_000") == 100_000_000
+def test_positive_int_zero_int():
+    with pytest.raises(ValidationException):
+        positive_int(0, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_int(0, from_cli=True)
 
 
-def test_non_negative_int_with_non_negative_floats():
-    assert non_negative_int(0.0) == 0
-    assert non_negative_int("0.0") == 0
-    assert non_negative_int(1.0) == 1
-    assert non_negative_int("1.0") == 1
-    assert non_negative_int(100_000_000.0) == 100_000_000
-    assert non_negative_int("100_000_000.0") == 100_000_000
+def test_positive_int_zero_int_string():
+    with pytest.raises(ValidationException):
+        positive_int("0", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_int("0", from_cli=True)
 
 
-def test_non_negative_float_with_non_negative_floats():
-    assert non_negative_float(0.0) == 0.0
-    assert non_negative_float("0.0") == 0.0
-    assert non_negative_float(1.0) == 1.0
-    assert non_negative_float("1.0") == 1.0
-    assert non_negative_float(12.34) == 12.34
-    assert non_negative_float("12.34") == 12.34
-    assert non_negative_float(100_000_000.0) == 100_000_000.0
-    assert non_negative_float("100_000_000.0") == 100_000_000.0
+def test_positive_int_zero_float():
+    with pytest.raises(ValidationException):
+        positive_int(0.0, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_int(0.0, from_cli=True)
 
 
-def test_non_negative_float_with_non_negative_ints():
-    assert non_negative_float(0) == 0.0
-    assert non_negative_float("0") == 0.0
-    assert non_negative_float(1) == 1.0
-    assert non_negative_float("1") == 1.0
-    assert non_negative_float(100_000_000) == 100_000_000.0
-    assert non_negative_float("100_000_000") == 100_000_000.0
+def test_positive_int_negative_int():
+    with pytest.raises(ValidationException):
+        positive_int(-42, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_int(-42, from_cli=True)
 
 
-def test_valid_filepath_with_valid_string_filepath(tmp_path: Path):
+def test_positive_int_negative_int_string():
+    with pytest.raises(ValidationException):
+        positive_int("-42", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_int("-42", from_cli=True)
+
+
+def test_positive_int_negative_float():
+    with pytest.raises(ValidationException):
+        positive_int(-42.0, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_int(-42.0, from_cli=True)
+
+
+def test_positive_int_negative_float_string():
+    with pytest.raises(ValidationException):
+        positive_int("-42.0", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_int("-42.0", from_cli=True)
+
+
+def test_positive_int_invalid_float():
+    with pytest.raises(ValidationException):
+        positive_int(42.5, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_int(42.5, from_cli=True)
+
+
+def test_positive_int_invalid_float_string():
+    with pytest.raises(ValidationException):
+        positive_int("42.5", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_int("42.5", from_cli=True)
+
+
+def test_positive_int_invalid_string():
+    with pytest.raises(ValidationException):
+        positive_int("abc", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_int("abc", from_cli=True)
+
+
+def test_positive_int_empty_string():
+    with pytest.raises(ValidationException):
+        positive_int("", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_int("", from_cli=True)
+
+
+def test_positive_int_none():
+    with pytest.raises(ValidationException):
+        positive_int(None, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_int(None, from_cli=True)
+
+
+def test_positive_int_invalid_string():
+    with pytest.raises(ValidationException):
+        positive_int("abc", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_int("abc", from_cli=True)
+
+
+def test_positive_float_valid_float():
+    assert positive_float(3.14, from_cli=False) == 3.14
+    assert positive_float(3.14, from_cli=True) == 3.14
+
+
+def test_positive_float_valid_float_string():
+    assert positive_float("3.14", from_cli=False) == 3.14
+    assert positive_float("3.14", from_cli=True) == 3.14
+
+
+def test_positive_float_valid_int():
+    assert positive_float(42, from_cli=False) == 42.0
+    assert positive_float(42, from_cli=True) == 42.0
+
+
+def test_positive_float_valid_int_string():
+    assert positive_float("42", from_cli=False) == 42.0
+    assert positive_float("42", from_cli=True) == 42.0
+
+
+def test_positive_float_negative_float():
+    with pytest.raises(ValidationException):
+        positive_float(-3.14, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_float(-3.14, from_cli=True)
+
+
+def test_positive_float_negative_float_string():
+    with pytest.raises(ValidationException):
+        positive_float("-3.14", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_float("-3.14", from_cli=True)
+
+
+def test_positive_float_negative_int():
+    with pytest.raises(ValidationException):
+        positive_float(-42, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_float(-42, from_cli=True)
+
+
+def test_positive_float_negative_int_string():
+    with pytest.raises(ValidationException):
+        positive_float("-42", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_float("-42", from_cli=True)
+
+
+def test_positive_float_zero_float():
+    with pytest.raises(ValidationException):
+        positive_float(0.0, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_float(0.0, from_cli=True)
+
+
+def test_positive_float_zero_float_string():
+    with pytest.raises(ValidationException):
+        positive_float("0.0", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_float("0.0", from_cli=True)
+
+
+def test_positive_float_zero_int():
+    with pytest.raises(ValidationException):
+        positive_float(0, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_float(0, from_cli=True)
+
+
+def test_positive_float_zero_int_string():
+    with pytest.raises(ValidationException):
+        positive_float("0", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_float("0", from_cli=True)
+
+
+def test_positive_float_invalid_string():
+    with pytest.raises(ValidationException):
+        positive_float("abc", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_float("abc", from_cli=True)
+
+
+def test_positive_float_empty_string():
+    with pytest.raises(ValidationException):
+        positive_float("", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_float("", from_cli=True)
+
+
+def test_positive_float_none():
+    with pytest.raises(ValidationException):
+        positive_float(None, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        positive_float(None, from_cli=True)
+
+
+def test_non_negative_int_valid():
+    assert non_negative_int(42, from_cli=False) == 42
+    assert non_negative_int(42, from_cli=True) == 42
+
+
+def test_non_negative_int_valid_string():
+    assert non_negative_int("42", from_cli=False) == 42
+    assert non_negative_int("42", from_cli=True) == 42
+
+
+def test_non_negative_int_valid_float():
+    assert non_negative_int(42.0, from_cli=False) == 42
+    assert non_negative_int(42.0, from_cli=True) == 42
+
+
+def test_non_negative_int_valid_float_string():
+    assert non_negative_int("42.0", from_cli=False) == 42
+    assert non_negative_int("42.0", from_cli=True) == 42
+
+
+def test_non_negative_int_zero_int():
+    assert non_negative_int(0, from_cli=False) == 0
+    assert non_negative_int(0, from_cli=True) == 0
+
+
+def test_non_negative_int_zero_int_string():
+    assert non_negative_int("0", from_cli=False) == 0
+    assert non_negative_int("0", from_cli=True) == 0
+
+
+def test_non_negative_int_zero_float():
+    assert non_negative_int(0.0, from_cli=False) == 0
+    assert non_negative_int(0.0, from_cli=True) == 0
+
+
+def test_non_negative_int_negative_int():
+    with pytest.raises(ValidationException):
+        non_negative_int(-42, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        non_negative_int(-42, from_cli=True)
+
+
+def test_non_negative_int_negative_int_string():
+    with pytest.raises(ValidationException):
+        non_negative_int("-42", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        non_negative_int("-42", from_cli=True)
+
+
+def test_non_negative_int_negative_float():
+    with pytest.raises(ValidationException):
+        non_negative_int(-42.0, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        non_negative_int(-42.0, from_cli=True)
+
+
+def test_non_negative_int_negative_float_string():
+    with pytest.raises(ValidationException):
+        non_negative_int("-42.0", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        non_negative_int("-42.0", from_cli=True)
+
+
+def test_non_negative_int_invalid_float():
+    with pytest.raises(ValidationException):
+        non_negative_int(42.5, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        non_negative_int(42.5, from_cli=True)
+
+
+def test_non_negative_int_invalid_float_string():
+    with pytest.raises(ValidationException):
+        non_negative_int("42.5", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        non_negative_int("42.5", from_cli=True)
+
+
+def test_non_negative_int_invalid_string():
+    with pytest.raises(ValidationException):
+        non_negative_int("abc", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        non_negative_int("abc", from_cli=True)
+
+
+def test_non_negative_int_empty_string():
+    with pytest.raises(ValidationException):
+        non_negative_int("", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        non_negative_int("", from_cli=True)
+
+
+def test_non_negative_int_none():
+    with pytest.raises(ValidationException):
+        non_negative_int(None, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        non_negative_int(None, from_cli=True)
+
+
+def test_non_negative_float_valid_float():
+    assert non_negative_float(3.14, from_cli=False) == 3.14
+    assert non_negative_float(3.14, from_cli=True) == 3.14
+
+
+def test_non_negative_float_valid_float_string():
+    assert non_negative_float("3.14", from_cli=False) == 3.14
+    assert non_negative_float("3.14", from_cli=True) == 3.14
+
+
+def test_non_negative_float_valid_int():
+    assert non_negative_float(42, from_cli=False) == 42.0
+    assert non_negative_float(42, from_cli=True) == 42.0
+
+
+def test_non_negative_float_valid_int_string():
+    assert non_negative_float("42", from_cli=False) == 42.0
+    assert non_negative_float("42", from_cli=True) == 42.0
+
+
+def test_non_negative_float_zero_float():
+    assert non_negative_float(0.0, from_cli=False) == 0.0
+    assert non_negative_float(0.0, from_cli=True) == 0.0
+
+
+def test_non_negative_float_zero_float_string():
+    assert non_negative_float("0.0", from_cli=False) == 0.0
+    assert non_negative_float("0.0", from_cli=True) == 0.0
+
+
+def test_non_negative_float_zero_int():
+    assert non_negative_float(0, from_cli=False) == 0.0
+    assert non_negative_float(0, from_cli=True) == 0.0
+
+
+def test_non_negative_float_zero_int_string():
+    assert non_negative_float("0", from_cli=False) == 0.0
+    assert non_negative_float("0", from_cli=True) == 0.0
+
+
+def test_non_negative_float_negative_float():
+    with pytest.raises(ValidationException):
+        non_negative_float(-3.14, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        non_negative_float(-3.14, from_cli=True)
+
+
+def test_non_negative_float_negative_float_string():
+    with pytest.raises(ValidationException):
+        non_negative_float("-3.14", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        non_negative_float("-3.14", from_cli=True)
+
+
+def test_non_negative_float_negative_int():
+    with pytest.raises(ValidationException):
+        non_negative_float(-42, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        non_negative_float(-42, from_cli=True)
+
+
+def test_non_negative_float_negative_int_string():
+    with pytest.raises(ValidationException):
+        non_negative_float("-42", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        non_negative_float("-42", from_cli=True)
+
+
+def test_non_negative_float_invalid_string():
+    with pytest.raises(ValidationException):
+        non_negative_float("abc", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        non_negative_float("abc", from_cli=True)
+
+
+def test_non_negative_float_empty_string():
+    with pytest.raises(ValidationException):
+        non_negative_float("", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        non_negative_float("", from_cli=True)
+
+
+def test_non_negative_float_none():
+    with pytest.raises(ValidationException):
+        non_negative_float(None, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        non_negative_float(None, from_cli=True)
+
+
+def test_valid_filepath_valid_path(tmp_video_filepath: Path):
+    """Test that a valid filepath is returned when a valid pathlib path is passed.
+
+    `tmp_video_filepath` is created by the fixture of the same name in `conftest.py`.
+    """
+    assert valid_filepath(tmp_video_filepath, from_cli=False) == tmp_video_filepath
+    assert valid_filepath(tmp_video_filepath, from_cli=True) == tmp_video_filepath
+
+
+def test_valid_filepath_valid_string(tmp_video_filepath: Path):
     """Test that a valid filepath is returned when a valid string filepath is passed.
 
-    `tmp_path` is a built-in pytest fixture that creates a temporary directory.
+    `tmp_video_filepath` is created by the fixture of the same name in `conftest.py`.
     """
-    filepath = tmp_path / "t.txt"
-    filepath.write_text("t")
-    assert valid_filepath(str(filepath)) == filepath
-    os.remove(filepath)
+    assert valid_filepath(str(tmp_video_filepath), from_cli=False) == tmp_video_filepath
+    assert valid_filepath(str(tmp_video_filepath), from_cli=True) == tmp_video_filepath
 
 
-def test_valid_filepath_with_valid_pathlib_filepath(tmp_path: Path):
-    """Test that a valid filepath is returned when a valid pathlib filepath is passed.
-
-    `tmp_path` is a built-in pytest fixture that creates a temporary directory.
-    """
-    filepath = tmp_path / "t.txt"
-    filepath.write_text("t")
-    assert valid_filepath(filepath) == filepath
-    os.remove(filepath)
+def test_valid_filepath_nonexistent_path():
+    path = Path("nonexistent") / "file.mp4"
+    with pytest.raises(ValidationException):
+        valid_filepath(path, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        valid_filepath(path, from_cli=True)
 
 
-def test_valid_dir_with_valid_dir_string(tmp_path: Path):
-    """Test that a valid directory is returned when a valid string directory is passed.
-
-    `tmp_path` is a built-in pytest fixture that creates a temporary directory.
-    """
-    dirpath = tmp_path / "t"
-    dirpath.mkdir()
-    assert valid_dir(str(dirpath)) == dirpath
-    os.rmdir(dirpath)
+def test_valid_filepath_nonexistent_string():
+    path = "nonexistent/file.mp4"
+    with pytest.raises(ValidationException):
+        valid_filepath(path, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        valid_filepath(path, from_cli=True)
 
 
-def test_valid_dir_with_valid_dir_pathlib(tmp_path: Path):
+def test_valid_filepath_none():
+    with pytest.raises(ValidationException):
+        valid_filepath(None, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        valid_filepath(None, from_cli=True)
+
+
+def test_valid_dir_valid_path(tmp_path: Path):
     """Test that a valid directory is returned when a valid pathlib directory is passed.
 
     `tmp_path` is a built-in pytest fixture that creates a temporary directory.
     """
-    dirpath = tmp_path / "t"
-    dirpath.mkdir()
-    assert valid_dir(dirpath) == dirpath
-    os.rmdir(dirpath)
+    assert valid_dir(tmp_path, from_cli=False) == tmp_path
+    assert valid_dir(tmp_path, from_cli=True) == tmp_path
 
 
-def test_valid_filename_with_valid_filename():
-    assert valid_filename("file.txt") == "file.txt"
-    assert valid_filename("file_with_underscores.txt") == "file_with_underscores.txt"
-    assert valid_filename("file-with-dashes.txt") == "file-with-dashes.txt"
-    assert valid_filename("file (1).txt") == "file (1).txt"
+def test_valid_dir_valid_string(tmp_path: Path):
+    """Test that a valid directory is returned when a valid string directory is passed.
+
+    `tmp_path` is a built-in pytest fixture that creates a temporary directory.
+    """
+    assert valid_dir(str(tmp_path), from_cli=False) == tmp_path
+    assert valid_dir(str(tmp_path), from_cli=True) == tmp_path
+
+
+def test_valid_dir_invalid_path(tmp_path: Path):
+    """When a nonexistent pathlib directory is passed, test that a ValidationException is raised
+    when from_cli is False and an ArgumentTypeError is raised when from_cli is True.
+
+    `tmp_path` is a built-in pytest fixture that creates a temporary directory.
+    """
+    with pytest.raises(ValidationException):
+        valid_dir(tmp_path / "invalid", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        valid_dir(tmp_path / "invalid", from_cli=True)
+
+
+def test_valid_dir_invalid_string(tmp_path: Path):
+    """When a nonexistent string directory is passed, test that a ValidationException is raised
+    when from_cli is False and an ArgumentTypeError is raised when from_cli is True.
+
+    `tmp_path` is a built-in pytest fixture that creates a temporary directory.
+    """
+    with pytest.raises(ValidationException):
+        valid_dir(str(tmp_path / "invalid"), from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        valid_dir(str(tmp_path / "invalid"), from_cli=True)
+
+
+def test_valid_dir_none():
+    """Test that a ValidationException is raised when None is passed."""
+    with pytest.raises(ValidationException):
+        valid_dir(None, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        valid_dir(None, from_cli=True)
+
+
+@pytest.mark.parametrize(
+    ("start", "stop", "duration", "expected"),
+    [
+        (0, 1, 2, True),  # start < stop < duration
+        (1, 3, 3, True),  # stop < stop, stop == duration
+    ],
+)
+def test_valid_extraction_range_valid_range(
+    start: float, stop: float, duration: float, expected: bool
+):
+    assert valid_extraction_range(start, stop, duration) == expected
+
+
+@pytest.mark.parametrize(
+    ("start", "stop", "duration"),
+    [
+        (1, 0, 0),  # start > duration
+        (1, 1, 2),  # start == stop
+        (1, 0, 2),  # start > stop
+    ],
+)
+def test_valid_extraction_range_invalid_range(
+    start: float, stop: float, duration: float
+):
+    with pytest.raises(ValidationException):
+        valid_extraction_range(start, stop, duration)
+
+
+@pytest.mark.parametrize(
+    ("filename", "expected_filename"),
+    [
+        ("filename", "filename"),
+        ("filename (1)", "filename (1)"),
+        ("filename-with-dashes", "filename-with-dashes"),
+        ("filename with spaces", "filename with spaces"),
+        ("filename_with_underscores", "filename_with_underscores"),
+        ("filenamewithsuffix.mp4", "filenamewithsuffix.mp4"),
+        ("filenameendswithdot.", "filenameendswithdot."),
+        (".filenamestartswithdot", ".filenamestartswithdot"),
+        (" filename starts with space", " filename starts with space"),
+        ("filename ends with space ", "filename ends with space "),
+        (
+            "filename_with_symbols!@#$%^&()_+{}[];'",
+            "filename_with_symbols!@#$%^&()_+{}[];'",
+        ),
+        (".mp4.", ".mp4."),
+        (".mp4", ".mp4"),
+        (".", "."),
+        (" ", " "),
+    ],
+)
+def test_valid_filename_valid_filenames(filename: str, expected_filename: str):
+    assert valid_filename(filename, from_cli=False) == expected_filename
+    assert valid_filename(filename, from_cli=True) == expected_filename
+
+
+@pytest.mark.parametrize(
+    ("filename"),
+    [
+        ("file|with|invalid|characters.mp4"),
+        ("file\\\\with\\\\backslashes.mp4"),
+        ("file/with/forward/slashes.mp4"),
+        ("file*with*asterisks.mp4"),
+        ("file?with?question?marks.mp4"),
+        ("file<with<less<than.mp4"),
+        ("file>with>greater>than.mp4"),
+        ("file:with:colons.mp4"),
+        ('file"with"quotes.mp4'),
+        ("file|with|pipes.mp4"),
+        (""),
+        (None),
+    ],
+)
+def test_valid_filename_invalid_filenames(filename: str):
+    with pytest.raises(ValidationException):
+        valid_filename(filename, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        valid_filename(filename, from_cli=True)
 
 
 def test_valid_image_format_with_valid_lowercase_image_formats():
@@ -164,43 +612,134 @@ def test_valid_image_format_with_valid_uppercase_image_formats_with_dot():
         assert valid_image_format(f".{image_format.upper()}") == image_format
 
 
-def test_valid_timestamp_with_valid_start_timestamp_zero():
-    assert valid_timestamp(timestamp="0:00") == "0:00"
-    assert valid_timestamp(timestamp="0:00:00") == "0:00:00"
-    assert valid_timestamp(timestamp="0:00:00.0") == "0:00:00"
-    assert valid_timestamp(timestamp="0:00:00.9") == "0:00:00"
+@pytest.mark.parametrize(
+    ("timestamp", "expected"),
+    [
+        ("0:00", "0:00"),
+        ("00:00", "00:00"),
+        ("0:00:00", "0:00:00"),
+        ("00:00:00", "00:00:00"),
+        ("0:00:00.0", "0:00:00"),
+        ("0:00:00.01", "0:00:00"),
+        ("0:00:00.99", "0:00:00"),
+        ("12:34:56", "12:34:56"),
+        ("1:23:45", "1:23:45"),
+        ("12:34", "12:34"),
+        ("1:23", "1:23"),
+        ("59:59:59", "59:59:59"),
+    ],
+)
+def test_valid_timestamp_valid(timestamp: str, expected: str):
+    assert valid_timestamp(timestamp, from_cli=False) == expected
+    assert valid_timestamp(timestamp, from_cli=True) == expected
 
 
-def test_valid_timestamp_with_valid_start_timestamp_non_zero():
-    assert valid_timestamp("1:00") == "1:00"
-    assert valid_timestamp("1:00:00") == "1:00:00"
-    assert valid_timestamp("1:00:00.0") == "1:00:00"
-    assert valid_timestamp("1:00:00.1") == "1:00:00"
-    assert valid_timestamp("59:59") == "59:59"
-    assert valid_timestamp("59:59:59") == "59:59:59"
-    assert valid_timestamp("59:59:59.0") == "59:59:59"
-    assert valid_timestamp("59:59:59.9") == "59:59:59"
+@pytest.mark.parametrize(
+    ("timestamp"),
+    [
+        (""),
+        (" "),
+        (":"),
+        ("0"),
+        ("00"),
+        (":0"),
+        (":00"),
+        ("0:"),
+        ("00:"),
+        ("0:0"),
+        ("00:0"),
+        ("0:0:0"),
+        ("0:0:00"),
+        ("0:00:0"),
+        ("00:0:0"),
+        ("00:00:0"),
+        ("60:00:00"),
+        ("00:60:00"),
+        ("00:00:60"),
+        ("60:60:60"),
+        ("abc"),
+        ("ab:cd:ef"),
+        ("x0:00:00"),
+        ("0x:00:00"),
+        ("00:x0:00"),
+        ("00:0x:00"),
+        ("00:00:x0"),
+        ("00:00:0x"),
+        (None),
+    ],
+)
+def test_valid_timestamp_invalid(timestamp: str):
+    with pytest.raises(ValidationException):
+        valid_timestamp(timestamp, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        valid_timestamp(timestamp, from_cli=True)
 
 
-def test_valid_resize_value_with_valid_resize_values_strings():
-    assert valid_resize_value("0.01") == 0.01
-    assert valid_resize_value("0.1") == 0.1
-    assert valid_resize_value("1") == 1
-    assert valid_resize_value("1.0") == 1.0
-    assert valid_resize_value("50.0") == 50.0
+@pytest.mark.parametrize(
+    ("capture_rate", "first_frame", "last_frame", "expected"),
+    [
+        (1, 0, 2, 1),  # capture rate (1) < number of frames to capture (2)
+        (29, 0, 30, 29),  # capture rate (29) < number of frames to capture (30)
+        (50, 30, 90, 50),  # capture rate (50) < number of frames to capture (60)
+        (1, 0, 1, 1),  # capture rate (1) == number of frames to capture (1)
+        (50, 30, 80, 50),  # capture rate (50) == number of frames to capture (50)
+    ],
+)
+def test_valid_capture_rate_with_valid_capture_rates(
+    capture_rate: int, first_frame: int, last_frame: int, expected: int
+):
+    assert valid_capture_rate(capture_rate, first_frame, last_frame) == expected
 
 
-def test_valid_resize_value_with_valid_resize_values_floats():
-    assert valid_resize_value(0.01) == 0.01
-    assert valid_resize_value(0.1) == 0.1
-    assert valid_resize_value(1) == 1
-    assert valid_resize_value(1.0) == 1.0
-    assert valid_resize_value(50.0) == 50.0
+@pytest.mark.parametrize(
+    ("capture_rate", "first_frame", "last_frame"),
+    [
+        (-1, 0, 1),  # capture rate cannot be negative
+        (0, 0, 1),  # capture rate cannot be (0)
+        (2, 0, 1),  # capture rate (2) > number of frames to capture (1)
+    ],
+)
+def test_valid_capture_rate_invalid_capture_rates_raises_validation_exception(
+    capture_rate: int, first_frame: int, last_frame: int
+):
+    with pytest.raises(ValidationException):
+        valid_capture_rate(capture_rate, first_frame, last_frame)
 
 
-def test_valid_resize_value_with_valid_ints():
-    assert valid_resize_value(1) == 1
-    assert valid_resize_value(50) == 50
+@pytest.mark.parametrize(
+    ("resize_value", "expected_value"),
+    [
+        (1.0, 1.0),
+        (1, 1.0),
+        ("0.01", 0.01),
+    ],
+)
+def test_valid_resize_value_valid_values(
+    resize_value: t.Union[float, str], expected_value: t.Union[float, str]
+):
+    assert valid_resize_value(resize_value, from_cli=False) == expected_value
+    assert valid_resize_value(resize_value, from_cli=True) == expected_value
+
+
+@pytest.mark.parametrize(
+    ("resize_value"),
+    [
+        (-1),
+        ("-1"),
+        (0),
+        ("0"),
+        (0.0),
+        ("0.0"),
+        ("abc"),
+        (""),
+        (None),
+    ],
+)
+def test_valid_resize_value_invalid_values(resize_value):
+    with pytest.raises(ValidationException):
+        valid_resize_value(resize_value, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        valid_resize_value(resize_value, from_cli=True)
 
 
 def test_valid_dimensions_with_valid_dimensions():
@@ -275,16 +814,6 @@ def test_valid_stop_time_with_valid_stop_time_floats():
     assert valid_stop_time(60.9) == 60.9
     assert valid_stop_time(3600.0) == 3600.0
     assert valid_stop_time(3600.9) == 3600.9
-
-
-def test_valid_capture_rate_with_valid_capture_rates():
-    assert valid_capture_rate(1, 0, 1) == 1
-    assert valid_capture_rate(12, 0, 12) == 12
-    assert valid_capture_rate(24, 0, 24) == 24
-    assert valid_capture_rate(30, 0, 30) == 30
-    assert valid_capture_rate(60, 0, 60) == 60
-    assert valid_capture_rate(120, 0, 120) == 120
-    assert valid_capture_rate(240, 0, 240) == 240
 
 
 def test_valid_video_filepath_with_supported_existing_filepath(
@@ -406,232 +935,25 @@ def test_valid_video_filepath_with_directory_path(tmp_path: Path):
         valid_video_filepath(tmp_path, from_cli=True)
 
 
+def test__raise_error_from_cli_raising_arguement_type_error():
+    error_msg = "Argument type error"
+    with pytest.raises(ArgumentTypeError) as excinfo:
+        _raise_error(error_msg, from_cli=True)
+    assert error_msg in str(excinfo.value)
+
+
+def test__raise_error_from_non_cli_raising_validation_error():
+    error_msg = "Validation exception"
+    with pytest.raises(ValidationException) as excinfo:
+        _raise_error(error_msg, from_cli=False)
+    assert error_msg in str(excinfo.value)
+
+
 class TestNonCLI:
-    # positive_int
-    def test_positive_int_with_zero_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            positive_int(0)
-
-    def test_positive_int_with_zero_string_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            positive_int("0")
-
-    def test_positive_int_with_negative_int_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            positive_int(-1)
-
-    def test_positive_int_with_negative_int_string_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            positive_int("-1")
-
-    def test_positive_int_with_invalid_float_from_non_cli_0_9(self):
-        with pytest.raises(ValidationException):
-            positive_int(0.9)
-
-    def test_positive_int_with_invalid_float_string_from_non_cli_0_9_string(self):
-        with pytest.raises(ValidationException):
-            positive_int("0.9")
-
-    def test_positive_int_with_invalid_float_from_non_cli_1_1(self):
-        with pytest.raises(ValidationException):
-            positive_int(1.1)
-
-    def test_positive_int_with_invalid_float_string_from_non_cli_1_1_string(self):
-        with pytest.raises(ValidationException):
-            positive_int("1.1")
-
-    def test_positive_int_with_non_int_string_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            positive_int("a")
-
-    # positive_float
-    def test_positive_float_with_zero_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            positive_float(0)
-
-    def test_positive_float_with_zero_string_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            positive_float("0")
-
-    def test_positive_float_with_negative_float_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            positive_float(-1.0)
-
-    def test_positive_float_with_negative_float_string_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            positive_float("-1.0")
-
-    def test_positive_float_with_non_float_string_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            positive_float("a")
-
-    # non_negative_int
-    def test_non_negative_int_with_negative_int_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            non_negative_int(-1)
-
-    def test_non_negative_int_with_negative_int_string_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            non_negative_int("-1")
-
-    def test_non_negative_int_with_invalid_float_from_non_cli_1_1(self):
-        with pytest.raises(ValidationException):
-            non_negative_int(1.1)
-
-    def test_non_negative_int_with_invalid_float_from_non_cli_0_9(self):
-        with pytest.raises(ValidationException):
-            non_negative_int(0.9)
-
-    def test_non_negative_int_with_invalid_float_from_non_cli_1_1_string(self):
-        with pytest.raises(ValidationException):
-            non_negative_int("1.1")
-
-    def test_non_negative_int_with_invalid_float_from_non_cli_0_9_string(self):
-        with pytest.raises(ValidationException):
-            non_negative_int("0.9")
-
-    def test_non_negative_int_with_non_int_string_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            non_negative_int("a")
-
-    # non_negative_float
-    def test_non_negative_float_with_negative_float_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            non_negative_float(-1.0)
-
-    def test_non_negative_float_with_negative_float_string_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            non_negative_float("-1.0")
-
-    def test_non_negative_float_with_non_float_string_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            non_negative_float("a")
-
-    # valid_filepath
-    def test_valid_filepath_with_invalid_string_filepath_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_filepath("invalid.txt")
-
-    def test_valid_filepath_with_invalid_pathlib_filepath_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_filepath(Path("invalid.txt"))
-
-    # valid_dir
-    def test_valid_dir_with_invalid_dir_string_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_dir("invalid")
-
-    def test_valid_dir_with_invalid_dir_pathlib_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_dir(Path("invalid"))
-
-    # valid_filename
-    def test_valid_filename_with_slashes_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_filename("file/with/slashes.txt")
-
-    def test_valid_filename_with_backslashes_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_filename("file\\with\\backslashes.txt")
-
-    def test_valid_filename_with_colons_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_filename("file:with:colons.txt")
-
-    def test_valid_filename_with_question_marks_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_filename("file?with?question?marks.txt")
-
-    def test_valid_filename_with_asterisks_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_filename("file*with*asterisks.txt")
-
-    def test_valid_filename_with_quotes_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_filename('file"with"quotes.txt')
-
-    def test_valid_filename_with_less_than_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_filename("file<with<less<than.txt")
-
-    def test_valid_filename_with_greater_than_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_filename("file>with>greater>than.txt")
-
-    def test_valid_filename_with_pipes_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_filename("file|with|pipes.txt")
-
     # valid_image_format
     def test_valid_image_format_with_invalid_format_from_non_cli(self):
         with pytest.raises(ValidationException):
             valid_image_format("invalid")
-
-    # valid_timestamp
-    def test_valid_timestamp_containing_colon_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_timestamp("x0:00:00")
-        with pytest.raises(ValidationException):
-            valid_timestamp("0x:00:00")
-        with pytest.raises(ValidationException):
-            valid_timestamp("00:x0:00")
-        with pytest.raises(ValidationException):
-            valid_timestamp("00:0x:00")
-        with pytest.raises(ValidationException):
-            valid_timestamp("00:00:x0")
-        with pytest.raises(ValidationException):
-            valid_timestamp("00:00:0x")
-
-    def test_valid_timestamp_with_invalid_timestamp_60_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_timestamp("60:00:00")
-        with pytest.raises(ValidationException):
-            valid_timestamp("60:00")
-        with pytest.raises(ValidationException):
-            valid_timestamp("1:60")
-
-    def test_valid_timestamp_with_invalid_start_timestamp_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_timestamp("-1:")
-
-    def test_valid_timestamp_with_invalid_stop_timestamp_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_timestamp("-1:")
-        with pytest.raises(ValidationException):
-            valid_timestamp("0::")
-        with pytest.raises(ValidationException):
-            valid_timestamp(":0.9")
-
-    # valid_resize_value
-    def test_valid_resize_value_with_invalid_value_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_resize_value("invalid")
-
-    def test_valid_resize_value_with_invalid_ints_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_resize_value(-1)
-        with pytest.raises(ValidationException):
-            valid_resize_value(0)
-
-    def test_valid_resize_value_with_invalid_floats_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_resize_value(-1.0)
-        with pytest.raises(ValidationException):
-            valid_resize_value(0.0)
-        with pytest.raises(ValidationException):
-            valid_resize_value(0.009)
-
-    def test_valid_resize_value_with_invalid_strings_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_resize_value("-1")
-        with pytest.raises(ValidationException):
-            valid_resize_value("0")
-        with pytest.raises(ValidationException):
-            valid_resize_value("-1.0")
-        with pytest.raises(ValidationException):
-            valid_resize_value("0.0")
-        with pytest.raises(ValidationException):
-            valid_resize_value("0.009")
 
     # valid_dimensions
     def test_valid_dimensions_with_invalid_ints_from_non_cli(self):
@@ -726,29 +1048,3 @@ class TestNonCLI:
             valid_stop_time("-1")
         with pytest.raises(ValidationException):
             valid_stop_time("0")
-
-    # valid_extraction_range
-    def test_valid_extraction_range_where_start_second_greater_than_video_length_second_from_non_cli(
-        self,
-    ):
-        with pytest.raises(ValidationException):
-            valid_extraction_range(2.0, 1.0, 1.0)
-
-    def test_valid_extraction_range_where_start_second_greater_than_stop_second(
-        self,
-    ):
-        with pytest.raises(ValidationException):
-            valid_extraction_range(2.0, 1.0, 3.0)
-
-    # valid_capture_rate
-    def test_valid_capture_rate_where_capture_rate_greater_than_frame_range_from_non_cli(
-        self,
-    ):
-        with pytest.raises(ValidationException):
-            valid_capture_rate(1, 1, 1)
-
-    def test_valid_capture_rate_where_capture_rate_greater_than_frame_range_from_non_cli(
-        self,
-    ):
-        with pytest.raises(ValidationException):
-            valid_capture_rate(100_000_000, 0, 30)

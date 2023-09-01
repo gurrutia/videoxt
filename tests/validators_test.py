@@ -675,6 +675,37 @@ def test_valid_timestamp_invalid(timestamp: str):
         valid_timestamp(timestamp, from_cli=True)
 
 
+@pytest.mark.parametrize(
+    ("capture_rate", "first_frame", "last_frame", "expected"),
+    [
+        (1, 0, 2, 1),  # capture rate (1) < number of frames to capture (2)
+        (29, 0, 30, 29),  # capture rate (29) < number of frames to capture (30)
+        (50, 30, 90, 50),  # capture rate (50) < number of frames to capture (60)
+        (1, 0, 1, 1),  # capture rate (1) == number of frames to capture (1)
+        (50, 30, 80, 50),  # capture rate (50) == number of frames to capture (50)
+    ],
+)
+def test_valid_capture_rate_with_valid_capture_rates(
+    capture_rate: int, first_frame: int, last_frame: int, expected: int
+):
+    assert valid_capture_rate(capture_rate, first_frame, last_frame) == expected
+
+
+@pytest.mark.parametrize(
+    ("capture_rate", "first_frame", "last_frame"),
+    [
+        (-1, 0, 1),  # capture rate cannot be negative
+        (0, 0, 1),  # capture rate cannot be (0)
+        (2, 0, 1),  # capture rate (2) > number of frames to capture (1)
+    ],
+)
+def test_valid_capture_rate_invalid_capture_rates_raises_validation_exception(
+    capture_rate: int, first_frame: int, last_frame: int
+):
+    with pytest.raises(ValidationException):
+        valid_capture_rate(capture_rate, first_frame, last_frame)
+
+
 def test_valid_resize_value_with_valid_resize_values_strings():
     assert valid_resize_value("0.01") == 0.01
     assert valid_resize_value("0.1") == 0.1
@@ -768,16 +799,6 @@ def test_valid_stop_time_with_valid_stop_time_floats():
     assert valid_stop_time(60.9) == 60.9
     assert valid_stop_time(3600.0) == 3600.0
     assert valid_stop_time(3600.9) == 3600.9
-
-
-def test_valid_capture_rate_with_valid_capture_rates():
-    assert valid_capture_rate(1, 0, 1) == 1
-    assert valid_capture_rate(12, 0, 12) == 12
-    assert valid_capture_rate(24, 0, 24) == 24
-    assert valid_capture_rate(30, 0, 30) == 30
-    assert valid_capture_rate(60, 0, 60) == 60
-    assert valid_capture_rate(120, 0, 120) == 120
-    assert valid_capture_rate(240, 0, 240) == 240
 
 
 def test_valid_video_filepath_with_supported_existing_filepath(
@@ -1043,16 +1064,3 @@ class TestNonCLI:
             valid_stop_time("-1")
         with pytest.raises(ValidationException):
             valid_stop_time("0")
-
-    # valid_capture_rate
-    def test_valid_capture_rate_where_capture_rate_greater_than_frame_range_from_non_cli(
-        self,
-    ):
-        with pytest.raises(ValidationException):
-            valid_capture_rate(1, 1, 1)
-
-    def test_valid_capture_rate_where_capture_rate_greater_than_frame_range_from_non_cli(
-        self,
-    ):
-        with pytest.raises(ValidationException):
-            valid_capture_rate(100_000_000, 0, 30)

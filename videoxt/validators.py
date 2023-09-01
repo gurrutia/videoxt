@@ -232,16 +232,35 @@ def valid_extraction_range(start: float, stop: float, duration: float) -> bool:
     return True
 
 
-def valid_capture_rate(capture_rate: int, start_frame: int, stop_frame: int) -> int:
-    """Validates the capture rate is valid and returns the capture rate if valid. An
-    invalid capture rate is one that exceeds the range between the start and stop
-    frames. For example: if the start frame is 0 and the stop frame is 10, the
-    capture rate can't be greater than 10.
+def valid_capture_rate(capture_rate: int, first_frame: int, last_frame: int) -> int:
+    """Validates that the capture rate is a positive integer less than or equal to the
+    difference between the first and last frames. Returns the capture rate if valid,
+    otherwise raises an error.
+
+    Args:
+    -----
+        capture_rate (int): The capture rate to validate.
+        first_frame (int): The first frame of the extraction range.
+        last_frame (int): The last frame of the extraction range.
+
+    Returns:
+    --------
+        int: The capture rate if valid.
+
+    Raises:
+    -------
+        ValidationException: If the capture rate is not a positive integer or exceeds
+            the range between the first and last frames.
     """
-    if capture_rate > (stop_frame - start_frame):
-        _raise_error(
+    if capture_rate < 1:
+        raise ValidationException(
+            f"capture rate must be a positive integer: {capture_rate}"
+        )
+
+    if capture_rate > (last_frame - first_frame):
+        raise ValidationException(
             f"capture rate ({capture_rate}) exceeds range between "
-            f"start ({start_frame}) and stop ({stop_frame}) frames"
+            f"first frame ({first_frame}) and last frame ({last_frame})"
         )
 
     return capture_rate

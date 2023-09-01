@@ -203,25 +203,31 @@ def valid_stop_time(
         return positive_float(stop_time_float, from_cli)
 
 
-def valid_extraction_range(
-    start_second: float, stop_second: float, video_length_second: float
-) -> bool:
-    """Validates the extraction range is valid and returns True if valid."""
-    if start_second > video_length_second:
-        _raise_error(
-            f"start second ({start_second}) exceeds "
-            f"length of video in seconds ({video_length_second})"
-        )
+def valid_extraction_range(start: float, stop: float, duration: float) -> bool:
+    """Validates the extraction range and ensures it is within valid bounds.
 
-    if start_second == stop_second:
-        _raise_error(
-            f"start second ({start_second}) equals stop second ({stop_second})"
-        )
+    - start second must be less than the duration of the video
+    - start second must be less than the stop second
 
-    if start_second > stop_second:
-        _raise_error(
-            f"start second ({start_second}) exceeds stop second ({stop_second})"
-        )
+    Args:
+    -----
+        start (float): Start second of the extraction range.
+        stop (float): Stop second of the extraction range.
+        duration (float): Length of the video in seconds.
+
+    Returns:
+    --------
+        bool: True if the extraction range is valid.
+
+    Raises:
+    -------
+        ValidationException: If the extraction range is invalid.
+    """
+    if start > duration:
+        _raise_error(f"Start second ({start}) exceeds video length ({duration})")
+
+    if start >= stop:
+        _raise_error(f"Start second ({start}) must be before stop second ({stop})")
 
     return True
 

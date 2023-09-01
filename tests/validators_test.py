@@ -513,6 +513,34 @@ def test_valid_dir_none():
 
 
 @pytest.mark.parametrize(
+    ("start", "stop", "duration", "expected"),
+    [
+        (0, 1, 2, True),  # start < stop < duration
+        (1, 3, 3, True),  # stop < stop, stop == duration
+    ],
+)
+def test_valid_extraction_range_valid_range(
+    start: float, stop: float, duration: float, expected: bool
+):
+    assert valid_extraction_range(start, stop, duration) == expected
+
+
+@pytest.mark.parametrize(
+    ("start", "stop", "duration"),
+    [
+        (1, 0, 0),  # start > duration
+        (1, 1, 2),  # start == stop
+        (1, 0, 2),  # start > stop
+    ],
+)
+def test_valid_extraction_range_invalid_range(
+    start: float, stop: float, duration: float
+):
+    with pytest.raises(ValidationException):
+        valid_extraction_range(start, stop, duration)
+
+
+@pytest.mark.parametrize(
     ("filename", "expected_filename"),
     [
         ("filename", "filename"),
@@ -1015,19 +1043,6 @@ class TestNonCLI:
             valid_stop_time("-1")
         with pytest.raises(ValidationException):
             valid_stop_time("0")
-
-    # valid_extraction_range
-    def test_valid_extraction_range_where_start_second_greater_than_video_length_second_from_non_cli(
-        self,
-    ):
-        with pytest.raises(ValidationException):
-            valid_extraction_range(2.0, 1.0, 1.0)
-
-    def test_valid_extraction_range_where_start_second_greater_than_stop_second(
-        self,
-    ):
-        with pytest.raises(ValidationException):
-            valid_extraction_range(2.0, 1.0, 3.0)
 
     # valid_capture_rate
     def test_valid_capture_rate_where_capture_rate_greater_than_frame_range_from_non_cli(

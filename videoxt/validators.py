@@ -269,21 +269,40 @@ def valid_capture_rate(capture_rate: int, first_frame: int, last_frame: int) -> 
 def valid_resize_value(
     resize_value: t.Union[float, str], from_cli: bool = False
 ) -> float:
-    """Validates the resize value is valid and returns the value as a float if valid.
-    Resize has an arbitrary max value of 7680, which is used to prevent the user from
-    accidentally resizing output to abnormally large size.
+    """Validates that the resize value, a number, or a string representing a
+    number, is greater than 0. The resize value represents the percentage of
+    the original video dimensions to resize the output media to.
+
+    For example, a resize value of 0.5 will resize the media to 50% of its
+    original dimensions. A resize value of 2.0 will resize the media to 200%
+    of its original dimensions.
+
+    Args:
+    -----
+        resize_value (Union[float, str]): The resize value to validate.
+        from_cli (bool, optional): If True, raise an argparse error. Otherwise,
+            raise a ValidationException. Defaults to False.
+
+    Returns:
+    --------
+        float: The resize value if valid.
+
+    Raises:
+    -------
+        argparse.ArgumentTypeError: If from_cli is True and the resize value is invalid.
+        ValidationException: If from_cli is False and the resize value is invalid.
     """
     try:
-        val = float(resize_value)
-    except ValueError:
-        _raise_error(f"invalid resize value, got {resize_value!r}", from_cli)
+        value = float(resize_value)
+    except (TypeError, ValueError):
+        _raise_error(f"resize value must be a number, got {resize_value!r}", from_cli)
 
-    if not 0.01 <= val <= 7680:
+    if value <= 0:
         _raise_error(
-            f"resize value must be between 0.01 and 7680, got {resize_value}", from_cli
+            f"resize value must be greater that 0, got {resize_value}", from_cli
         )
 
-    return val
+    return value
 
 
 def valid_dimensions(dimensions: t.Tuple[int, int]) -> t.Tuple[int, int]:

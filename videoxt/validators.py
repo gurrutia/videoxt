@@ -375,13 +375,29 @@ def valid_audio_format(audio_format: str, from_cli: bool = False) -> str:
 
 
 def valid_image_format(image_format: str, from_cli: bool = False) -> str:
-    """Validates the image format is valid and returns the format if valid. An invalid
-    image format is one that is not in the list of valid image formats located in
-    `constants.py`.
+    """Validates image format is in a set of valid image formats in `constants.py`
+    and returns the image format if valid. The image format is converted to lowercase
+    and stripped of any leading periods. For example, `jpg` and `.JPG` are both valid
+    image formats.
 
     Supported formats: `bmp`, `dib`, `jp2`, `jpeg`, `jpg`, `png`, `tif`, `tiff`, `webp`
+
+    Args:
+    -----
+    image_format (str) : The image format to validate.
+    from_cli (bool) : If an error is raised, raise an argparse error if True, otherwise
+        raise a ValidationException.
+
+    Returns:
+    --------
+    str : The image format if valid.
+
+    Raises:
+    -------
+    argparse.ArgumentTypeError : If from_cli is True and the image format is invalid.
+    ValidationException : If from_cli is False and the image format is invalid.
     """
-    image_format = image_format.lower().strip(".")
+    image_format = image_format.lower().lstrip(".")
     if image_format not in C.SUPPORTED_IMAGE_FORMATS:
         _raise_error(
             f"invalid image format, got {image_format!r}\n"

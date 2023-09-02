@@ -306,8 +306,21 @@ def valid_resize_value(
 
 
 def valid_dimensions(dimensions: t.Tuple[int, int]) -> t.Tuple[int, int]:
-    """Validates the dimensions are valid and returns the dimensions as a tuple of
-    ints if valid.
+    """Validates that the dimensions are a tuple of two positive integers. Returns
+    the dimensions if valid, otherwise raises an error. The dimensions are converted
+    to integers. For example, `(800, 600)` and `('800', 600.0)` are both valid dimensions.
+
+    Args:
+    -----
+        dimensions (Tuple[int, int]): The dimensions to validate.
+
+    Returns:
+    --------
+        Tuple[int, int]: The dimensions if valid.
+
+    Raises:
+    -------
+        ValidationException: If the dimensions are invalid.
     """
     if len(dimensions) != 2:
         _raise_error(f"invalid dimensions, got {dimensions!r}")

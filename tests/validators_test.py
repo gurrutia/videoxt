@@ -810,19 +810,50 @@ def test_valid_dimensions_with_valid_dimensions():
     assert valid_dimensions((100_000_000, 100_000_000)) == (100_000_000, 100_000_000)
 
 
-def test_valid_rotate_value_with_valid_rotate_ints():
+def test_valid_rotate_value_valid_rotate_ints():
     for rotate_value in C.VALID_ROTATE_VALUES:
-        assert valid_rotate_value(rotate_value) == rotate_value
+        assert valid_rotate_value(rotate_value, from_cli=False) == rotate_value
+        assert valid_rotate_value(rotate_value, from_cli=True) == rotate_value
 
 
-def test_valid_rotate_value_with_valid_rotate_floats():
+def test_valid_rotate_value_valid_rotate_floats():
     for rotate_value in C.VALID_ROTATE_VALUES:
-        assert valid_rotate_value(float(rotate_value)) == rotate_value
+        assert valid_rotate_value(float(rotate_value), from_cli=False) == rotate_value
+        assert valid_rotate_value(float(rotate_value), from_cli=True) == rotate_value
 
 
-def test_valid_rotate_value_with_valid_rotate_int_strings():
+def test_valid_rotate_value_valid_rotate_int_strings():
     for rotate_value in C.VALID_ROTATE_VALUES:
-        assert valid_rotate_value(str(rotate_value)) == rotate_value
+        assert valid_rotate_value(str(rotate_value), from_cli=False) == rotate_value
+        assert valid_rotate_value(str(rotate_value), from_cli=True) == rotate_value
+
+
+@pytest.mark.parametrize(
+    ("rotate_value"),
+    [
+        ("0.0"),
+        ("90.0"),
+        ("180.0"),
+        ("270.0"),
+        (-1),
+        ("-1"),
+        (-1.0),
+        ("-1.0"),
+        (42),
+        ("42"),
+        (42.0),
+        ("42.0"),
+        ("abc"),
+        (""),
+    ],
+)
+def test_valid_rotate_value_invalid_rotate_values(
+    rotate_value: t.Union[int, float, str]
+):
+    with pytest.raises(ValidationException):
+        valid_rotate_value(rotate_value, from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        valid_rotate_value(rotate_value, from_cli=True)
 
 
 def test_valid_start_time_with_valid_start_time_strings():
@@ -1045,15 +1076,6 @@ class TestNonCLI:
     def test_test_valid_dimensions_with_less_than_two_values_from_non_cli(self):
         with pytest.raises(ValidationException):
             valid_dimensions((1,))
-
-    # valid_rotate_value
-    def test_valid_rotate_value_with_invalid_value_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_rotate_value("invalid")
-
-    def test_valid_rotate_value_with_invalid_float_string_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_rotate_value("0.1")
 
     # valid_start_time
     def test_valid_start_time_with_invalid_value_from_non_cli(self):

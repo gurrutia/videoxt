@@ -10,6 +10,7 @@ from videoxt.validators import non_negative_float
 from videoxt.validators import non_negative_int
 from videoxt.validators import positive_float
 from videoxt.validators import positive_int
+from videoxt.validators import valid_audio_format
 from videoxt.validators import valid_capture_rate
 from videoxt.validators import valid_dimensions
 from videoxt.validators import valid_dir
@@ -673,6 +674,46 @@ def test_valid_timestamp_invalid(timestamp: str):
         valid_timestamp(timestamp, from_cli=False)
     with pytest.raises(ArgumentTypeError):
         valid_timestamp(timestamp, from_cli=True)
+
+
+def test_valid_audio_format_valid_audio_formats():
+    for audio_format in C.SUPPORTED_AUDIO_FORMATS:
+        assert valid_audio_format(audio_format, from_cli=False) == audio_format
+        assert valid_audio_format(audio_format, from_cli=True) == audio_format
+
+
+def test_valid_audio_format_valid_audio_formats_uppercase():
+    for audio_format in C.SUPPORTED_AUDIO_FORMATS:
+        assert valid_audio_format(audio_format.upper(), from_cli=False) == audio_format
+        assert valid_audio_format(audio_format.upper(), from_cli=True) == audio_format
+
+
+def test_valid_audio_format_valid_audio_formats_start_with_dot():
+    for audio_format in C.SUPPORTED_AUDIO_FORMATS:
+        assert valid_audio_format(f".{audio_format}", from_cli=False) == audio_format
+        assert valid_audio_format(f".{audio_format}", from_cli=True) == audio_format
+
+
+def test_valid_audio_format_invalid_audio_formats_end_with_dot():
+    for audio_format in C.SUPPORTED_AUDIO_FORMATS:
+        with pytest.raises(ValidationException):
+            valid_audio_format(f"{audio_format}.", from_cli=False)
+        with pytest.raises(ArgumentTypeError):
+            valid_audio_format(f"{audio_format}.", from_cli=True)
+
+
+def test_valid_audio_format_invalid_audio_format():
+    with pytest.raises(ValidationException):
+        valid_audio_format("invalid", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        valid_audio_format("invalid", from_cli=True)
+
+
+def test_valid_audio_format_invalid_empty_string():
+    with pytest.raises(ValidationException):
+        valid_audio_format("", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        valid_audio_format("", from_cli=True)
 
 
 @pytest.mark.parametrize(

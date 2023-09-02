@@ -463,6 +463,46 @@ def test_valid_filepath_none():
         valid_filepath(None, from_cli=True)
 
 
+def test_valid_image_format_valid_image_formats():
+    for image_format in C.SUPPORTED_IMAGE_FORMATS:
+        assert valid_image_format(image_format, from_cli=False) == image_format
+        assert valid_image_format(image_format, from_cli=True) == image_format
+
+
+def test_valid_image_format_valid_image_formats_uppercase():
+    for image_format in C.SUPPORTED_IMAGE_FORMATS:
+        assert valid_image_format(image_format.upper(), from_cli=False) == image_format
+        assert valid_image_format(image_format.upper(), from_cli=True) == image_format
+
+
+def test_valid_image_format_valid_image_formats_start_with_dot():
+    for image_format in C.SUPPORTED_IMAGE_FORMATS:
+        assert valid_image_format(f".{image_format}", from_cli=False) == image_format
+        assert valid_image_format(f".{image_format}", from_cli=True) == image_format
+
+
+def test_valid_image_format_invalid_image_formats_end_with_dot():
+    for image_format in C.SUPPORTED_IMAGE_FORMATS:
+        with pytest.raises(ValidationException):
+            valid_image_format(f"{image_format}.", from_cli=False)
+        with pytest.raises(ArgumentTypeError):
+            valid_image_format(f"{image_format}.", from_cli=True)
+
+
+def test_valid_image_format_invalid_image_format():
+    with pytest.raises(ValidationException):
+        valid_image_format("invalid", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        valid_image_format("invalid", from_cli=True)
+
+
+def test_valid_image_format_invalid_empty_string():
+    with pytest.raises(ValidationException):
+        valid_image_format("", from_cli=False)
+    with pytest.raises(ArgumentTypeError):
+        valid_image_format("", from_cli=True)
+
+
 def test_valid_dir_valid_path(tmp_path: Path):
     """Test that a valid directory is returned when a valid pathlib directory is passed.
 
@@ -591,26 +631,6 @@ def test_valid_filename_invalid_filenames(filename: str):
         valid_filename(filename, from_cli=False)
     with pytest.raises(ArgumentTypeError):
         valid_filename(filename, from_cli=True)
-
-
-def test_valid_image_format_with_valid_lowercase_image_formats():
-    for image_format in C.SUPPORTED_IMAGE_FORMATS:
-        assert valid_image_format(image_format) == image_format
-
-
-def test_valid_image_format_with_valid_uppercase_image_formats():
-    for image_format in C.SUPPORTED_IMAGE_FORMATS:
-        assert valid_image_format(image_format.upper()) == image_format
-
-
-def test_valid_image_format_with_valid_lowercase_image_formats_with_dot():
-    for image_format in C.SUPPORTED_IMAGE_FORMATS:
-        assert valid_image_format(f".{image_format}") == image_format
-
-
-def test_valid_image_format_with_valid_uppercase_image_formats_with_dot():
-    for image_format in C.SUPPORTED_IMAGE_FORMATS:
-        assert valid_image_format(f".{image_format.upper()}") == image_format
 
 
 @pytest.mark.parametrize(
@@ -991,11 +1011,6 @@ def test__raise_error_from_non_cli_raising_validation_error():
 
 
 class TestNonCLI:
-    # valid_image_format
-    def test_valid_image_format_with_invalid_format_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_image_format("invalid")
-
     # valid_dimensions
     def test_valid_dimensions_with_invalid_ints_from_non_cli(self):
         with pytest.raises(ValidationException):

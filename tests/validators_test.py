@@ -768,6 +768,41 @@ def test_valid_capture_rate_invalid_capture_rates_raises_validation_exception(
 
 
 @pytest.mark.parametrize(
+    ("dimensions", "expected"),
+    [
+        ((1, 2), (1, 2)),  # width < height
+        ((2, 1), (2, 1)),  # width > height
+        ((1, 1), (1, 1)),  # width == height
+        ((1.0, 1.0), (1, 1)),  # whole float
+        (("1", "1"), (1, 1)),  # integer as string
+        (("1.0", "1.0"), (1, 1)),  # whole float as string
+    ],
+)
+def test_valid_dimensions_valid_dimensions(
+    dimensions: t.Tuple[int, int], expected: t.Tuple[int, int]
+):
+    assert valid_dimensions(dimensions) == expected
+
+
+@pytest.mark.parametrize(
+    ("dimensions"),
+    [
+        ((-1, -1)),  # width or height cannot be negative
+        ((0, 0)),  # width or height cannot be (0)
+        ((1, 2, 3)),  # dimensions cannot have more than two values
+        ((1,)),  # dimensions cannot have less than two values
+        (()),  # dimensions cannot be empty
+        ((1.5, 1.5)),  # dimensions cannot be floating point values
+        (("1.5", "1.5")),  # dimensions cannot be floating point values as strings
+        (("abc", "abc")),  # dimensions cannot be strings
+    ],
+)
+def test_valid_dimensions_invalid_dimensions(dimensions: t.Tuple[int, int]):
+    with pytest.raises(ValidationException):
+        valid_dimensions(dimensions)
+
+
+@pytest.mark.parametrize(
     ("resize_value", "expected_value"),
     [
         (1.0, 1.0),
@@ -801,13 +836,6 @@ def test_valid_resize_value_invalid_values(resize_value):
         valid_resize_value(resize_value, from_cli=False)
     with pytest.raises(ArgumentTypeError):
         valid_resize_value(resize_value, from_cli=True)
-
-
-def test_valid_dimensions_with_valid_dimensions():
-    assert valid_dimensions((1, 1)) == (1, 1)
-    assert valid_dimensions((1, 100_000_000)) == (1, 100_000_000)
-    assert valid_dimensions((100_000_000, 1)) == (100_000_000, 1)
-    assert valid_dimensions((100_000_000, 100_000_000)) == (100_000_000, 100_000_000)
 
 
 def test_valid_rotate_value_valid_rotate_ints():
@@ -1042,41 +1070,6 @@ def test__raise_error_from_non_cli_raising_validation_error():
 
 
 class TestNonCLI:
-    # valid_dimensions
-    def test_valid_dimensions_with_invalid_ints_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_dimensions((-1, -1))
-        with pytest.raises(ValidationException):
-            valid_dimensions((0, 0))
-
-    def test_valid_dimensions_with_invalid_floats_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_dimensions((-1.0, -1.0))
-        with pytest.raises(ValidationException):
-            valid_dimensions((0.0, 0.0))
-        with pytest.raises(ValidationException):
-            valid_dimensions((0.009, 0.009))
-
-    def test_valid_dimensions_with_invalid_strings_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_dimensions(("-1", "-1"))
-        with pytest.raises(ValidationException):
-            valid_dimensions(("0", "0"))
-        with pytest.raises(ValidationException):
-            valid_dimensions(("-1.0", "-1.0"))
-        with pytest.raises(ValidationException):
-            valid_dimensions(("0.0", "0.0"))
-        with pytest.raises(ValidationException):
-            valid_dimensions(("0.009", "0.009"))
-
-    def test_valid_dimensions_with_more_than_two_values_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_dimensions((1, 2, 3))
-
-    def test_test_valid_dimensions_with_less_than_two_values_from_non_cli(self):
-        with pytest.raises(ValidationException):
-            valid_dimensions((1,))
-
     # valid_start_time
     def test_valid_start_time_with_invalid_value_from_non_cli(self):
         with pytest.raises(ValidationException):

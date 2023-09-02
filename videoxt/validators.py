@@ -299,7 +299,7 @@ def valid_resize_value(
 
     if value <= 0:
         _raise_error(
-            f"resize value must be greater that 0, got {resize_value}", from_cli
+            f"resize value must be greater than 0, got {resize_value}", from_cli
         )
 
     return value
@@ -341,13 +341,29 @@ def valid_rotate_value(rotate_value: t.Union[int, str], from_cli: bool = False) 
 
 
 def valid_audio_format(audio_format: str, from_cli: bool = False) -> str:
-    """Validates the audio format is valid and returns the format if valid. An invalid
-    audio format is one that is not in the list of valid audio formats located in
-    `constants.py`.
+    """Validates audio format is in a set of valid audio formats in `constants.py`
+    and returns the audio format if valid. The audio format is converted to
+    lowercase and stripped of any leading periods. For example, `mp3` and `.MP3`
+    are both valid audio formats.
 
-    Valid audio formats: `m4a`, `mp3`, `ogg`, `wav`
+    Supported formats: `m4a`, `mp3`, `ogg`, `wav`
+
+    Args:
+    -----
+    audio_format (str) : The audio format to validate.
+    from_cli (bool) : If an error is raised, raise an argparse error if True, otherwise
+        raise a ValidationException.
+
+    Returns:
+    --------
+    str : The audio format if valid.
+
+    Raises:
+    -------
+    argparse.ArgumentTypeError : If from_cli is True and the audio format is invalid.
+    ValidationException : If from_cli is False and the audio format is invalid.
     """
-    audio_format = audio_format.lower().strip(".")
+    audio_format = audio_format.lower().lstrip(".")
     if audio_format not in C.SUPPORTED_AUDIO_FORMATS:
         _raise_error(
             f"invalid audio format, got {audio_format!r}\n"

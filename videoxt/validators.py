@@ -317,23 +317,41 @@ def valid_dimensions(dimensions: t.Tuple[int, int]) -> t.Tuple[int, int]:
 
 
 def valid_rotate_value(rotate_value: t.Union[int, str], from_cli: bool = False) -> int:
-    """Validates the rotate value is valid and returns the value as an int if valid.
+    """Validates a value used to rotate media clockwise by 0, 90, 180 or 270
+    degrees is a valid rotate value as defined in `constants.py` and returns
+    the rotate value if valid. The rotate value is converted to an integer.
+    For example, `90` and `'90'` are both valid rotate values.
 
-    Valid rotate values are `0`, `90`, `180`, `270`.
+    Accepted values: `0`, `90`, `180`, `270`
+
+    Args:
+    -----
+    rotate_value (Union[int, str]) : The rotate value to validate.
+    from_cli (bool) : If an error is raised, raise an argparse error if True, otherwise
+        raise a ValidationException.
+
+    Returns:
+    --------
+    int : The rotate value if valid.
+
+    Raises:
+    -------
+    argparse.ArgumentTypeError : If from_cli is True and the rotate value is invalid.
+    ValidationException : If from_cli is False and the rotate value is invalid.
     """
     try:
         val = int(rotate_value)
     except ValueError:
         _raise_error(
             f"invalid rotate value, got {rotate_value!r}\n"
-            f"valid rotate values: {C.VALID_ROTATE_VALUES}",
+            f"accepted rotate values: {C.VALID_ROTATE_VALUES}",
             from_cli,
         )
 
     if val not in C.VALID_ROTATE_VALUES:
         _raise_error(
             f"rotate value entered not a valid rotate value, got {rotate_value}\n"
-            f"valid rotate values: {C.VALID_ROTATE_VALUES}",
+            f"accepted rotate values: {C.VALID_ROTATE_VALUES}",
             from_cli,
         )
 

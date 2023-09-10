@@ -1,4 +1,5 @@
 import typing as t
+from dataclasses import asdict
 from pathlib import Path
 
 import videoxt.extractors as E
@@ -109,7 +110,7 @@ def extract_clip(filepath: Path, **kwargs: t.Dict[str, t.Any]) -> None:
     E.extraction_factory(filepath, R.ClipRequest, E.ClipExtractor, **kwargs)
 
 
-def extract_frames(filepath: Path, **kwargs: t.Dict[str, t.Any]) -> None:
+def extract_frames(filepath: Path, **kwargs: t.Dict[str, t.Any]) -> t.Dict[str, t.Any]:
     """Extract individual frames from a video and save them as images.
 
     Args:
@@ -158,7 +159,10 @@ def extract_frames(filepath: Path, **kwargs: t.Dict[str, t.Any]) -> None:
 
     Note: Unrecognized arguments are ignored.
     """
-    E.extraction_factory(filepath, R.FramesRequest, E.FramesExtractor, **kwargs)
+    results = E.extraction_factory(
+        filepath, R.FramesRequest, E.FramesExtractor, **kwargs
+    )
+    return asdict(results)
 
 
 def extract_gif(filepath: Path, **kwargs: t.Dict[str, t.Any]) -> None:

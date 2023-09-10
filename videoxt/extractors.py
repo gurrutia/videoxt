@@ -25,6 +25,7 @@ class Extractor(ABC):
     """Abstract class for all extractors. All extractors adhere to this interface."""
 
     request: R.BaseRequest
+    success: bool = False
 
     @abstractmethod
     def apply_edits(
@@ -79,6 +80,8 @@ class AudioExtractor(Extractor):
                 f"[green]AUDIO EXTRACTED: {str(self.request.filepath.resolve())}[/green]"
             )
 
+        self.success = True
+
 
 @dataclass
 class ClipExtractor(Extractor):
@@ -119,6 +122,8 @@ class ClipExtractor(Extractor):
             print(
                 f"[green]CLIP EXTRACTED: {str(self.request.filepath.resolve())}[/green]"
             )
+
+        self.success = True
 
 
 @dataclass
@@ -188,6 +193,10 @@ class FramesExtractor(Extractor):
 
         print(f"[green]FRAMES EXTRACTED: {self.request.destdir.resolve()}[/green]")
 
+        self.success = True
+
+        return self.request.destdir
+
 
 @dataclass
 class GifExtractor(Extractor):
@@ -228,6 +237,8 @@ class GifExtractor(Extractor):
             print(
                 f"[green]GIF EXTRACTED: {str(self.request.filepath.resolve())}[/green]"
             )
+
+        self.success = True
 
 
 def extraction_factory(

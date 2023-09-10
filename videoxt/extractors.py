@@ -35,8 +35,13 @@ class Extractor(ABC):
         pass
 
     @abstractmethod
-    def extract(self) -> None:
-        """Initiate the extraction process."""
+    def extract(self) -> Path:
+        """Initiate and perform the extraction process. Returns the path to
+        the extracted media.
+
+        Returns:
+            Path: The path to the extracted media.
+        """
         pass
 
 
@@ -47,7 +52,14 @@ class AudioExtractor(Extractor):
     request: R.AudioRequest
 
     def apply_edits(self, clip: VideoFileClip) -> VideoFileClip:
-        """Apply edits to the clip prior to audio extraction."""
+        """Apply edits to the clip prior to audio extraction.
+
+        Args:
+            clip (VideoFileClip): The clip to edit.
+
+        Returns:
+            VideoFileClip: The edited clip.
+        """
         clip = E.trim_clip(
             clip,
             self.request.time_range.start_second,
@@ -60,8 +72,12 @@ class AudioExtractor(Extractor):
 
         return clip
 
-    def extract(self) -> None:
-        """Extract audio from a video and save to a file."""
+    def extract(self) -> Path:
+        """Extract audio from a video and save to a file.
+
+        Returns:
+            Path: The path to the extracted audio file.
+        """
         with VideoFileClip(str(self.request.video.filepath)) as clip:
             subclip = self.apply_edits(clip)
 
@@ -81,6 +97,7 @@ class AudioExtractor(Extractor):
             )
 
         self.success = True
+        return self.request.filepath
 
 
 @dataclass
@@ -90,7 +107,14 @@ class ClipExtractor(Extractor):
     request: R.ClipRequest
 
     def apply_edits(self, clip: VideoFileClip) -> VideoFileClip:
-        """Apply edits to a VideoFileClip to create a subclip."""
+        """Apply edits to a VideoFileClip to create a subclip.
+
+        Args:
+            clip (VideoFileClip): The clip to edit.
+
+        Returns:
+            VideoFileClip: The edited clip.
+        """
         clip = E.trim_clip(
             clip,
             self.request.time_range.start_second,
@@ -103,10 +127,15 @@ class ClipExtractor(Extractor):
         clip = E.edit_clip_image(
             clip, self.request.dimensions, self.request.rotate, self.request.monochrome
         )
+
         return clip
 
-    def extract(self) -> None:
-        """Extract a clip from a video and save it to disk as a video."""
+    def extract(self) -> Path:
+        """Extract a subclip from a video and save it to disk.
+
+        Returns:
+            Path: The path to the extracted clip.
+        """
         with VideoFileClip(str(self.request.video.filepath)) as clip:
             subclip = self.apply_edits(clip)
 
@@ -124,6 +153,7 @@ class ClipExtractor(Extractor):
             )
 
         self.success = True
+        return self.request.filepath
 
 
 @dataclass
@@ -133,13 +163,24 @@ class FramesExtractor(Extractor):
     request: R.FramesRequest
 
     def apply_edits(self, image: np.ndarray) -> np.ndarray:
-        """Apply edits to an image `numpy.ndarray`."""
+        """Apply edits to an image `numpy.ndarray`.
+
+        Args:
+            image (np.ndarray): The image to edit.
+
+        Returns:
+            np.ndarray: The edited image.
+        """
         return E.edit_image(
             image, self.request.dimensions, self.request.rotate, self.request.monochrome
         )
 
-    def extract(self) -> None:
-        """Extract frames from a video and save them to a directory as images."""
+    def extract(self) -> Path:
+        """Extract frames from a video and save them to a directory as images.
+
+        Returns:
+            Path: The directory where the images were saved.
+        """
         if not self.request.destdir.exists():
             self.request.destdir.mkdir()
 
@@ -194,7 +235,6 @@ class FramesExtractor(Extractor):
         print(f"[green]FRAMES EXTRACTED: {self.request.destdir.resolve()}[/green]")
 
         self.success = True
-
         return self.request.destdir
 
 
@@ -205,7 +245,14 @@ class GifExtractor(Extractor):
     request: R.GifRequest
 
     def apply_edits(self, clip: VideoFileClip) -> VideoFileClip:
-        """Apply edits to a VideoFileClip and return the edited clip for gif extraction."""
+        """Apply edits to a clip and return the edited clip for gif extraction.
+
+        Args:
+            clip (VideoFileClip): The clip to edit.
+
+        Returns:
+            VideoFileClip: The edited clip.
+        """
         clip = E.trim_clip(
             clip,
             self.request.time_range.start_second,
@@ -220,8 +267,12 @@ class GifExtractor(Extractor):
 
         return clip
 
-    def extract(self) -> None:
-        """Extract a gif from a video and save it to disk."""
+    def extract(self) -> Path:
+        """Extract a gif from a video and save it to disk.
+
+        Returns:
+            Path: The path to the extracted gif.
+        """
         with VideoFileClip(str(self.request.video.filepath)) as clip:
             subclip = self.apply_edits(clip)
 
@@ -239,6 +290,7 @@ class GifExtractor(Extractor):
             )
 
         self.success = True
+        return self.request.filepath
 
 
 def extraction_factory(

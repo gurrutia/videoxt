@@ -79,6 +79,11 @@ class AudioExtractor(Extractor):
             Path: The path to the extracted audio file.
         """
         with VideoFileClip(str(self.request.video.filepath)) as clip:
+            if not clip.audio:
+                raise ValueError(
+                    f"Video {self.request.video.filepath.name!r} does not have audio."
+                )
+
             subclip = self.apply_edits(clip)
 
             if self.request.verbose:

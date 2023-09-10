@@ -116,3 +116,17 @@ def tmp_text_filepath(session_tmp_dir: Path) -> Path:
 
     if tmp_filepath.exists():
         os.remove(tmp_filepath)
+
+
+@pytest.fixture(scope="class")
+def extracted_frames(tmp_video_filepath: Path) -> t.Dict[str, t.Any]:
+    """Extract frames from a video and yield the directory where they were saved.
+
+    Yields:
+        Path: The directory where the frames were saved.
+    """
+    from videoxt.api import extract_frames
+
+    results = extract_frames(tmp_video_filepath)
+    yield results
+    shutil.rmtree(results["request"]["destdir"])

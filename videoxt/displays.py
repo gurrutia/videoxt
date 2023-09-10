@@ -8,16 +8,16 @@ from videoxt.video import Video
 
 def video_str(video: Video) -> str:
     """String representation of a Video that gets printed to the console."""
-    length_display = (
-        f"{video.properties.length_timestamp} | "
-        f"{video.properties.length_seconds} seconds"
+    duration_display = (
+        f"{video.properties.duration_timestamp} | "
+        f"{video.properties.duration_seconds} seconds"
     )
     return dedent(
         f"""
         {C.EMOJI_MAP['video']}
             filepath:           {video.filepath.resolve()}
             format:             {video.properties.suffix!r}
-            length:             {length_display}
+            duration:           {duration_display}
             fps:                {video.properties.fps}
             frame count:        {video.properties.frame_count}
             dimensions:         {video.properties.dimensions}"""

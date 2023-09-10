@@ -56,8 +56,8 @@ class VideoProperties:
     dimensions: t.Tuple[int, int]
     fps: float
     frame_count: int
-    length_seconds: float
-    length_timestamp: str
+    duration_seconds: float
+    duration_timestamp: str
     suffix: str
 
 
@@ -81,16 +81,16 @@ def get_video_properties(video_filepath: Path) -> VideoProperties:
             int(opencap.get(cv2.CAP_PROP_FRAME_HEIGHT)),
         )
 
-    length_seconds = round(frame_count / fps, 2)
-    length_timestamp = U.seconds_to_timestamp(length_seconds)
+    duration_seconds = round(frame_count / fps, 2)
+    duration_timestamp = U.seconds_to_timestamp(duration_seconds)
     suffix = video_filepath.suffix[1:]
 
     return VideoProperties(
         dimensions=dimensions,
         fps=fps,
         frame_count=frame_count,
-        length_seconds=length_seconds,
-        length_timestamp=length_timestamp,
+        duration_seconds=duration_seconds,
+        duration_timestamp=duration_timestamp,
         suffix=suffix,
     )
 
@@ -109,10 +109,10 @@ class Video:
     `properties` : VideoProperties
         `dimensions` : Tuple[int, int]
             The dimensions of the video as a tuple (width, height).
-        `length_timestamp` : str
-            The length of the video in the format `H:MM:SS`.
-        `length_seconds` : float
-            The length of the video in seconds.
+        `duration_timestamp` : str
+            The duration of the video in the format `H:MM:SS`.
+        `duration_seconds` : float
+            The duration of the video in seconds.
         `fps` : float
             The frame rate of the video.
         `frame_count` : int

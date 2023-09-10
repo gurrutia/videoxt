@@ -22,8 +22,8 @@ class TimeRange:
 def prepare_time_range(
     start_time_request: t.Union[float, str],
     stop_time_request: t.Optional[t.Union[float, str]],
-    video_length_timestamp: str,
-    video_length_seconds: float,
+    duration_timestamp: str,
+    duration_seconds: float,
     video_frame_count: int,
     fps: float,
 ) -> TimeRange:
@@ -43,7 +43,7 @@ def prepare_time_range(
         start_time = prepare_time_request_str(start_time_request, fps)
 
     if stop_time_request is None:
-        stop_time = video_length_timestamp, video_length_seconds, video_frame_count
+        stop_time = duration_timestamp, duration_seconds, video_frame_count
     elif isinstance(stop_time_request, float):
         stop_time = prepare_time_request_float(stop_time_request, fps)
     else:

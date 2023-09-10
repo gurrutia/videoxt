@@ -71,8 +71,8 @@ class BaseRequest(Request):
         self.time_range = P.prepare_time_range(
             self.start_time,
             self.stop_time,
-            self.video.properties.length_timestamp,
-            self.video.properties.length_seconds,
+            self.video.properties.duration_timestamp,
+            self.video.properties.duration_seconds,
             self.video.properties.frame_count,
             self.fps,
         )
@@ -80,7 +80,7 @@ class BaseRequest(Request):
         V.valid_extraction_range(
             self.time_range.start_second,
             self.time_range.stop_second,
-            self.video.properties.length_seconds,
+            self.video.properties.duration_seconds,
         )
 
     def __str__(self) -> str:

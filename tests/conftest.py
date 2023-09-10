@@ -1,132 +1,113 @@
-"""Pytest configuration file that contains fixtures and other configuration."""
+"""Configuration file containing pytest fixtures."""
 import os
-from dataclasses import dataclass
+import shutil
+import typing as t
 from pathlib import Path
 
 import cv2
 import numpy as np
 import pytest
+from moviepy.editor import AudioClip
+from moviepy.editor import VideoClip
 
 from videoxt.video import open_video_capture
-from videoxt.video import VideoProperties
 
 
-@dataclass
-class VideoSettings:
-    """A dataclass to hold the settings of a temporary video file."""
-
-    width: float
-    height: float
-    fps: float
-    frame_count: int
-    length_seconds: float
-    length_timestamp: str
-    suffix: str
-    codec: str
-
-
-@pytest.fixture
-def tmp_video_settings() -> VideoSettings:
-    """Create a temporary VideoSettings class and yield it.
+@pytest.fixture(scope="session")
+def session_tmp_dir() -> Path:
+    """Create a temporary directory for the session and yield its path.
 
     Yields:
-        VideoSettings: A temporary VideoSettings class.
+        Path: The path of the temporary directory.
     """
-    return VideoSettings(
-        width=640,
-        height=480,
-        fps=30.0,
-        frame_count=60,
-        length_seconds=2.0,
-        length_timestamp="0:00:02",
-        suffix="mp4",
-        codec="mp4v",
-    )
+    temp_dir = Path("tmp")
+    temp_dir.mkdir(exist_ok=True)
+    yield temp_dir
+    shutil.rmtree(temp_dir)
 
 
-@pytest.fixture
-def tmp_video_filepath(tmp_path: Path, tmp_video_settings: VideoSettings) -> Path:
-    """Create a temporary video file in the temporary directory and yield its path.
+@pytest.fixture(scope="session")
+def video_properties(session_tmp_dir: Path) -> t.Dict[str, t.Any]:
+    """Create a dictionary of properties for a temporary video.
 
-    `tmp_path` is a built-in pytest fixture that creates a temporary directory.
+    Args:
+        session_tmp_dir (Path): The path of the temporary directory for the session.
+
+    Yields:
+        t.Dict[str, t.Any]: A dictionary of properties for the temporary video.
+    """
+    return {
+        "video_file_path": session_tmp_dir / "tmp.video.mp4",
+        "frame_width": 640,
+        "frame_height": 480,
+        "dimensions": (640, 480),
+        "fps": 10.0,
+        "duration_seconds": 2.0,
+        "duration_timestamp": "0:00:02",
+        "frame_count": 20,
+        "suffix": "mp4",
+        "codec": "libx264",
+        "audio_codec": "aac",
+    }
+
+
+@pytest.fixture(scope="session")
+def tmp_video_filepath(video_properties: t.Dict[str, t.Any]) -> Path:
+    """Create a temporary video file and yield its path.
+
+    Args:
+        video_properties (t.Dict[str, t.Any]): A dictionary of properties for the temporary video.
 
     Yields:
         Path: Filepath of the temporary video file.
     """
-    tmp_filepath = tmp_path / "tmp.video.mp4"
-    fourcc = cv2.VideoWriter_fourcc(*tmp_video_settings.codec)
-    video_writer = cv2.VideoWriter(
-        str(tmp_filepath),
-        fourcc,
-        tmp_video_settings.fps,
-        (tmp_video_settings.width, tmp_video_settings.height),
-    )
 
-    # Write frames to a video file to simulate a real video file.
-    # The frames are just black images with the frame number written
-    # on them.
-    for i in range(
-        int(tmp_video_settings.length_seconds) * int(tmp_video_settings.fps)
-    ):
-        frame = cv2.putText(
-            np.zeros(
-                (tmp_video_settings.height, tmp_video_settings.width, 3), dtype=np.uint8
-            ),
-            f"Frame {i + 1}",
-            (240, 240),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            1,
-            (255, 255, 255),
-            2,
+    def make_frame(time: float) -> np.ndarray:
+        """Generate a single video frame."""
+        frame_num = int(time * video_properties["fps"]) + 1
+        frame = np.zeros(
+            (video_properties["frame_height"], video_properties["frame_width"], 3),
+            dtype=np.uint8,
         )
-        video_writer.write(frame)
-    video_writer.release()
+        text = f"Frame: {frame_num}"
+        cv2.putText(frame, text, (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        return frame
 
-    yield tmp_filepath
+    def make_audio(time: float) -> float:
+        """Generate synthetic audio for the length of the video."""
+        return np.sin(2 * np.pi * 440 * time)
 
-    if tmp_filepath.exists():
-        os.remove(tmp_filepath)
+    # Generate the video and set the audio
+    video = VideoClip(make_frame, duration=video_properties["duration_seconds"])
+    audio = AudioClip(make_audio, duration=video_properties["duration_seconds"])
+    video = video.set_audio(audio)
 
-
-@pytest.fixture
-def tmp_video_capture(tmp_video_filepath: Path) -> cv2.VideoCapture:
-    """Create a temporary `cv2.VideoCapture` object and yield it.
-
-    Yields:
-        cv2.VideoCapture: A temporary `cv2.VideoCapture` object.
-    """
-    with open_video_capture(tmp_video_filepath) as opencap:
-        yield opencap
-
-
-@pytest.fixture
-def tmp_video_properties_cls(tmp_video_settings: VideoSettings) -> VideoProperties:
-    """Create a temporary `VideoProperties` dataclass and yield it.
-
-    Yields:
-        VideoProperties: A temporary `VideoProperties` dataclass.
-    """
-    dimensions = (tmp_video_settings.width, tmp_video_settings.height)
-    return VideoProperties(
-        dimensions=dimensions,
-        fps=tmp_video_settings.fps,
-        frame_count=tmp_video_settings.frame_count,
-        length_seconds=tmp_video_settings.length_seconds,
-        length_timestamp=tmp_video_settings.length_timestamp,
-        suffix=tmp_video_settings.suffix,
+    # Write the video to disk
+    video.write_videofile(
+        str(video_properties["video_file_path"]),
+        codec=video_properties["codec"],
+        audio_codec=video_properties["audio_codec"],
+        fps=video_properties["fps"],
     )
 
+    # Yield the filepath of the temporary video file then delete it
+    yield video_properties["video_file_path"]
 
-@pytest.fixture
-def tmp_text_filepath(tmp_path: Path) -> Path:
+    # Delete the temporary video file
+    if video_properties["video_file_path"].exists():
+        os.remove(video_properties["video_file_path"])
+
+
+@pytest.fixture(scope="session")
+def tmp_text_filepath(session_tmp_dir: Path) -> Path:
     """Create a temporary text file in the temporary directory and yield its path.
 
-    `tmp_path` is a built-in pytest fixture that creates a temporary directory.
+    `session_tmp_dir` is a fixture that creates a temporary directory for the session.
 
     Yields:
         Path: Filepath of the temporary text file.
     """
-    tmp_filepath = tmp_path / "tmp_text.txt"
+    tmp_filepath = session_tmp_dir / "tmp.text.txt"
     content = "This is a temporary text file."
     with open(tmp_filepath, "w") as f:
         f.write(content)

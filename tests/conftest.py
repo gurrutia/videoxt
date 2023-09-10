@@ -26,7 +26,8 @@ def session_tmp_dir() -> Path:
 
 @pytest.fixture(scope="session")
 def video_properties(session_tmp_dir: Path) -> t.Dict[str, t.Any]:
-    """Create a dictionary of properties for a temporary video.
+    """Create a dictionary of properties for a temporary video. Only some properties are
+    used to create the video. The rest are used to test for equality.
 
     Args:
         session_tmp_dir (Path): The path of the temporary directory for the session.
@@ -36,6 +37,7 @@ def video_properties(session_tmp_dir: Path) -> t.Dict[str, t.Any]:
     """
     return {
         "video_file_path": session_tmp_dir / "tmp.video.mp4",
+        "filename": "tmp.video",
         "frame_width": 640,
         "frame_height": 480,
         "dimensions": (640, 480),

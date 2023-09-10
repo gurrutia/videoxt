@@ -10,8 +10,6 @@ import pytest
 from moviepy.editor import AudioClip
 from moviepy.editor import VideoClip
 
-from videoxt.video import open_video_capture
-
 
 @pytest.fixture(scope="session")
 def session_tmp_dir() -> Path:

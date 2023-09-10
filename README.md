@@ -49,7 +49,7 @@ videoxt.extract_frames(
   'C:/Users/gurrutia/Videos/video.avi',  # pathlib.Path also works
   capture_rate=30,
   image_format='png',  # default is 'jpg'
-  dimension=(800, 600),
+  dimensions=(800, 600),
   monochrome=True,
   verbose=True,
 )

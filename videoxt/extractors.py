@@ -303,19 +303,28 @@ def extraction_factory(
     request_cls: t.Type[R.BaseRequest],
     extractor_cls: t.Type[Extractor],
     **kwargs: t.Dict[str, t.Any],
-) -> None:
-    """
-    Factory function that creates instances of a `Video` class, a `Request` class, and
-    an `Extractor` class to extract data from a `Video`.
+) -> t.Type[Extractor]:
+    """Creates instances of a Video object, a Request object, and an Extractor
+    object to extract data from a Video object. The Request and Extractor
+    objects should be of the same type (e.g. `FramesRequest` and `FramesExtractor`)
 
     Args:
-        filepath: A `Path` object to the video file.
-        request_cls: A subclass of a `BaseRequest` class for creating an extraction request.
-        extractor_cls: A subclass of an `Extractor` class that performs the extraction.
-        **kwargs: Optional keyword arguments to use for creating the request.
+        `filepath` (Path, str) :
+            Path to the video file with extension.
+        `request_cls` (Type[Request]) :
+            The type of `Request` object to create.
+        `extractor_cls` (Type[Extractor]) :
+            The type of `Extractor` object to create.
+        `**kwargs` (Dict[str, Any]) :
+            Keyword arguments to pass to the `Request` object.
+
+    Returns:
+        Extractor: An instance of an `Extractor` object.
     """
     video = Video(filepath)
     request_kwargs = U.parse_kwargs(kwargs, request_cls) if kwargs else kwargs
     request = request_cls(video, **request_kwargs)
     extractor = extractor_cls(request)
     extractor.extract()
+
+    return extractor

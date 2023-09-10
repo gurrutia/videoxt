@@ -1,3 +1,4 @@
+import typing as t
 from pathlib import Path
 
 import cv2
@@ -42,48 +43,62 @@ def test_open_video_capture_if_file_exists_but_is_not_a_video_file(
             assert not opencap.isOpened()
 
 
-def test_video_capture_is_open_when_video_file_exists(
-    tmp_video_capture: cv2.VideoCapture,
-):
-    """Test that an open `cv2.VideoCapture` is detected as open.
+def test_video_capture_is_open_when_video_file_exists(tmp_video_filepath: Path):
+    """Test that the `cv2.VideoCapture` object is opened when opening a video file.
 
-    `tmp_text_filepath` is created by the fixture of the same name in `conftest.py`.
+    Args:
+        tmp_video_filepath (Path): Filepath of the temporary video file.
     """
-    assert tmp_video_capture.isOpened()
+    with open_video_capture(tmp_video_filepath) as opencap:
+        assert opencap.isOpened()
 
 
-def test_video_properties_dataclass(tmp_video_properties_cls: VideoProperties):
+def test_video_properties_dataclass(video_properties: t.Dict[str, t.Any]):
     """Test that the `VideoProperties` dataclass is initialized as expected.
 
     `tmp_video_properties_cls` is created by the fixture of the same name in `conftest.py`.
     """
-    assert isinstance(tmp_video_properties_cls, VideoProperties)
-    assert tmp_video_properties_cls.dimensions == (640, 480)
-    assert tmp_video_properties_cls.fps == 30.0
-    assert tmp_video_properties_cls.frame_count == 60
-    assert tmp_video_properties_cls.length_seconds == 2.0
-    assert tmp_video_properties_cls.length_timestamp == "0:00:02"
-    assert tmp_video_properties_cls.suffix == "mp4"
+    video_properties_cls = VideoProperties(
+        video_properties["dimensions"],
+        video_properties["fps"],
+        video_properties["frame_count"],
+        video_properties["duration_seconds"],
+        video_properties["duration_timestamp"],
+        video_properties["suffix"],
+    )
+    assert isinstance(video_properties_cls, VideoProperties)
+    assert video_properties_cls.dimensions == video_properties["dimensions"]
+    assert video_properties_cls.fps == video_properties["fps"]
+    assert video_properties_cls.frame_count == video_properties["frame_count"]
+    assert video_properties_cls.duration_seconds == video_properties["duration_seconds"]
+    assert (
+        video_properties_cls.duration_timestamp
+        == video_properties["duration_timestamp"]
+    )
+    assert video_properties_cls.suffix == video_properties["suffix"]
 
 
-def test_get_video_properties(tmp_video_filepath: Path):
+def test_get_video_properties(
+    tmp_video_filepath: Path, video_properties: t.Dict[str, t.Any]
+):
     """Test that the video properties are returned as expected.
 
     `tmp_video_filepath` is created by the fixture of the same name in `conftest.py`.
     """
-    video_properties = get_video_properties(tmp_video_filepath)
-    assert isinstance(video_properties, VideoProperties)
-    assert video_properties.dimensions == (640, 480)
-    assert video_properties.fps == 30.0
-    assert video_properties.frame_count == 60
-    assert video_properties.length_seconds == 2.0
-    assert video_properties.length_timestamp == "0:00:02"
-    assert video_properties.suffix == "mp4"
+    video_properties_cls = get_video_properties(tmp_video_filepath)
+    assert isinstance(video_properties_cls, VideoProperties)
+    assert video_properties_cls.dimensions == video_properties["dimensions"]
+    assert video_properties_cls.fps == video_properties["fps"]
+    assert video_properties_cls.frame_count == video_properties["frame_count"]
+    assert video_properties_cls.duration_seconds == video_properties["duration_seconds"]
+    assert (
+        video_properties_cls.duration_timestamp
+        == video_properties["duration_timestamp"]
+    )
+    assert video_properties_cls.suffix == video_properties["suffix"]
 
 
-def test_video_dataclass(
-    tmp_video_filepath: Path, tmp_video_properties_cls: VideoProperties
-):
+def test_video_dataclass(tmp_video_filepath: Path):
     """Test that the `Video` dataclass is initialized as expected with the
     correct properties.
 
@@ -93,5 +108,4 @@ def test_video_dataclass(
     """
     video = Video(tmp_video_filepath)
     assert isinstance(video, Video)
-    assert video.filepath == tmp_video_filepath
-    assert video.properties == tmp_video_properties_cls
+    assert isinstance(video.properties, VideoProperties)

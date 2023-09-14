@@ -6,7 +6,7 @@ import videoxt.extractors as E
 import videoxt.requestors as R
 
 
-def extract_audio(filepath: Path, **kwargs: t.Dict[str, t.Any]) -> None:
+def extract_audio(filepath: Path, **kwargs: t.Dict[str, t.Any]) -> t.Dict[str, t.Any]:
     """Extract audio from a video file.
 
     Args:
@@ -52,8 +52,14 @@ def extract_audio(filepath: Path, **kwargs: t.Dict[str, t.Any]) -> None:
             If `True`, normalizes the audio output to a maximum of 0dB.
 
     Note: Unrecognized arguments are ignored.
+
+    Returns:
+    ------------
+        `results` (Dict[str, Any]) :
+            A dictionary of the extraction results.
     """
-    E.extraction_factory(filepath, R.AudioRequest, E.AudioExtractor, **kwargs)
+    results = E.extraction_factory(filepath, R.AudioRequest, E.AudioExtractor, **kwargs)
+    return asdict(results)
 
 
 def extract_clip(filepath: Path, **kwargs: t.Dict[str, t.Any]) -> None:

@@ -8,7 +8,7 @@ from videoxt.utils import parse_kwargs
 from videoxt.video import VideoProperties
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="session")
 def extracted_frames(tmp_video_filepath: Path) -> t.Dict[str, t.Any]:
     """Extract frames from a video and yield the directory where they were saved.
 

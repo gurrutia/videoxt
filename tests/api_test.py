@@ -62,7 +62,7 @@ def test_extract_frames_valid_default_request_fps(
     assert extracted_frames["request"]["fps"] == video_properties["fps"]
 
 
-def test_extract_frames_valid_default_request_destdir(
+def test_extract_frames_valid_default_request_destdir_exists(
     extracted_frames: t.Dict[str, t.Any]
 ):
     assert extracted_frames["request"]["destdir"].exists()
@@ -212,7 +212,7 @@ def test_extract_audio_valid_default_request_fps(
     assert extracted_audio["request"]["fps"] == video_properties["fps"]
 
 
-def test_extract_audio_valid_default_request_destdir(
+def test_extract_audio_valid_default_request_destdir_exists(
     extracted_audio: t.Dict[str, t.Any]
 ):
     assert extracted_audio["request"]["destdir"].exists()
@@ -354,7 +354,9 @@ def test_extract_clip_valid_default_request_fps(
     assert extracted_clip["request"]["fps"] == video_properties["fps"]
 
 
-def test_extract_clip_valid_default_request_destdir(extracted_clip: t.Dict[str, t.Any]):
+def test_extract_clip_valid_default_request_destdir_exists(
+    extracted_clip: t.Dict[str, t.Any]
+):
     assert extracted_clip["request"]["destdir"].exists()
 
 
@@ -462,7 +464,9 @@ def test_extract_gif_valid_default_request_fps(
     assert extracted_gif["request"]["fps"] == video_properties["fps"]
 
 
-def test_extract_gif_valid_default_request_destdir(extracted_gif: t.Dict[str, t.Any]):
+def test_extract_gif_valid_default_request_destdir_exists(
+    extracted_gif: t.Dict[str, t.Any]
+):
     assert extracted_gif["request"]["destdir"].exists()
 
 
@@ -532,3 +536,9 @@ def test_extract_gif_valid_default_request_monochrome(
     extracted_gif: t.Dict[str, t.Any]
 ):
     assert extracted_gif["request"]["monochrome"] is False
+
+
+def test_extract_gif_valid_default_request_file_is_gif(
+    extracted_gif: t.Dict[str, t.Any]
+):
+    assert extracted_gif["request"]["filepath"].suffix == ".gif"

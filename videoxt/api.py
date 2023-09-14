@@ -158,6 +158,11 @@ def extract_frames(filepath: Path, **kwargs: t.Dict[str, t.Any]) -> t.Dict[str, 
             Resize the images to the specified dimensions `(width, height)`.
 
     Note: Unrecognized arguments are ignored.
+
+    Returns:
+    ------------
+        `results` (Dict[str, Any]) :
+            A dictionary of the extraction results.
     """
     results = E.extraction_factory(
         filepath, R.FramesRequest, E.FramesExtractor, **kwargs

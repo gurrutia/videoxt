@@ -408,3 +408,127 @@ def test_extract_clip_valid_default_request_normalize(
     extracted_clip: t.Dict[str, t.Any]
 ):
     assert extracted_clip["request"]["normalize"] is False
+
+
+@pytest.fixture(scope="session")
+def extracted_gif(tmp_video_filepath: Path) -> t.Dict[str, t.Any]:
+    """Extract a gif from a video and yield the filepath where it was saved.
+
+    Yields:
+        Path: The filepath where the gif was saved.
+    """
+    from videoxt.api import extract_gif
+
+    results = extract_gif(tmp_video_filepath)
+    yield results
+    results["request"]["filepath"].unlink()
+
+
+def test_extract_gif_valid_default_request_success_is_true(
+    extracted_gif: t.Dict[str, t.Any]
+):
+    assert extracted_gif["success"] is True
+
+
+def test_extract_gif_valid_default_request_video_filepath(
+    extracted_gif: t.Dict[str, t.Any], video_properties: t.Dict[str, t.Any]
+):
+    assert (
+        extracted_gif["request"]["video"]["filepath"]
+        == video_properties["video_file_path"]
+    )
+
+
+def test_extract_gif_valid_default_request_video_properties(
+    extracted_gif: t.Dict[str, t.Any], video_properties: t.Dict[str, t.Any]
+):
+    expected_properties = parse_kwargs(video_properties, VideoProperties)
+    assert extracted_gif["request"]["video"]["properties"] == expected_properties
+
+
+def test_extract_gif_valid_default_request_start_time(
+    extracted_gif: t.Dict[str, t.Any]
+):
+    assert extracted_gif["request"]["start_time"] == "0:00:00"
+
+
+def test_extract_gif_valid_default_request_stop_time(extracted_gif: t.Dict[str, t.Any]):
+    assert extracted_gif["request"]["stop_time"] is None
+
+
+def test_extract_gif_valid_default_request_fps(
+    extracted_gif: t.Dict[str, t.Any], video_properties: t.Dict[str, t.Any]
+):
+    assert extracted_gif["request"]["fps"] == video_properties["fps"]
+
+
+def test_extract_gif_valid_default_request_destdir(extracted_gif: t.Dict[str, t.Any]):
+    assert extracted_gif["request"]["destdir"].exists()
+
+
+def test_extract_gif_valid_default_request_filename(extracted_gif: t.Dict[str, t.Any]):
+    assert extracted_gif["request"]["filename"] is None
+
+
+def test_extract_gif_valid_default_request_verbose(extracted_gif: t.Dict[str, t.Any]):
+    assert extracted_gif["request"]["verbose"] is False
+
+
+def test_extract_gif_valid_default_request_resize(extracted_gif: t.Dict[str, t.Any]):
+    assert extracted_gif["request"]["resize"] == 1.0
+
+
+def test_extract_gif_valid_default_request_rotate(extracted_gif: t.Dict[str, t.Any]):
+    assert extracted_gif["request"]["rotate"] == 0
+
+
+def test_extract_gif_valid_default_request_speed(extracted_gif: t.Dict[str, t.Any]):
+    assert extracted_gif["request"]["speed"] == 1.0
+
+
+def test_extract_gif_valid_default_request_time_range_start_timestamp(
+    extracted_gif: t.Dict[str, t.Any]
+):
+    assert extracted_gif["request"]["time_range"]["start_timestamp"] == "0:00:00"
+
+
+def test_extract_gif_valid_default_request_time_range_start_frame(
+    extracted_gif: t.Dict[str, t.Any]
+):
+    assert extracted_gif["request"]["time_range"]["start_frame"] == 0
+
+
+def test_extract_gif_valid_default_request_time_range_start_second(
+    extracted_gif: t.Dict[str, t.Any]
+):
+    assert extracted_gif["request"]["time_range"]["start_second"] == 0.0
+
+
+def test_extract_gif_valid_default_request_time_range_stop_timestamp(
+    extracted_gif: t.Dict[str, t.Any]
+):
+    assert extracted_gif["request"]["time_range"]["stop_timestamp"] == "0:00:02"
+
+
+def test_extract_gif_valid_default_request_time_range_stop_frame(
+    extracted_gif: t.Dict[str, t.Any]
+):
+    assert extracted_gif["request"]["time_range"]["stop_frame"] == 20
+
+
+def test_extract_gif_valid_default_request_time_range_stop_second(
+    extracted_gif: t.Dict[str, t.Any]
+):
+    assert extracted_gif["request"]["time_range"]["stop_second"] == 2.0
+
+
+def test_extract_gif_valid_default_request_dimensions(
+    extracted_gif: t.Dict[str, t.Any], video_properties: t.Dict[str, t.Any]
+):
+    assert extracted_gif["request"]["dimensions"] == video_properties["dimensions"]
+
+
+def test_extract_gif_valid_default_request_monochrome(
+    extracted_gif: t.Dict[str, t.Any]
+):
+    assert extracted_gif["request"]["monochrome"] is False

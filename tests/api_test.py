@@ -298,3 +298,113 @@ def test_extract_audio_valid_default_request_normalize(
     extracted_audio: t.Dict[str, t.Any]
 ):
     assert extracted_audio["request"]["normalize"] is False
+
+
+@pytest.fixture(scope="session")
+def extracted_clip(tmp_video_filepath: Path) -> t.Dict[str, t.Any]:
+    """Extract a clip from a video and yield the filepath where it was saved.
+
+    Yields:
+        Path: The filepath where the clip was saved.
+    """
+    from videoxt.api import extract_clip
+
+    results = extract_clip(tmp_video_filepath)
+    yield results
+    results["request"]["filepath"].unlink()
+
+
+def test_extract_clip_valid_default_request_success_is_true(
+    extracted_clip: t.Dict[str, t.Any]
+):
+    assert extracted_clip["success"] is True
+
+
+def test_extract_clip_valid_default_request_video_filepath(
+    extracted_clip: t.Dict[str, t.Any], video_properties: t.Dict[str, t.Any]
+):
+    assert (
+        extracted_clip["request"]["video"]["filepath"]
+        == video_properties["video_file_path"]
+    )
+
+
+def test_extract_clip_valid_default_request_video_properties(
+    extracted_clip: t.Dict[str, t.Any], video_properties: t.Dict[str, t.Any]
+):
+    expected_properties = parse_kwargs(video_properties, VideoProperties)
+    assert extracted_clip["request"]["video"]["properties"] == expected_properties
+
+
+def test_extract_clip_valid_default_request_start_time(
+    extracted_clip: t.Dict[str, t.Any]
+):
+    assert extracted_clip["request"]["start_time"] == "0:00:00"
+
+
+def test_extract_clip_valid_default_request_stop_time(
+    extracted_clip: t.Dict[str, t.Any]
+):
+    assert extracted_clip["request"]["stop_time"] is None
+
+
+def test_extract_clip_valid_default_request_fps(
+    extracted_clip: t.Dict[str, t.Any], video_properties: t.Dict[str, t.Any]
+):
+    assert extracted_clip["request"]["fps"] == video_properties["fps"]
+
+
+def test_extract_clip_valid_default_request_destdir(extracted_clip: t.Dict[str, t.Any]):
+    assert extracted_clip["request"]["destdir"].exists()
+
+
+def test_extract_clip_valid_default_request_filename(
+    extracted_clip: t.Dict[str, t.Any]
+):
+    assert extracted_clip["request"]["filename"] is None
+
+
+def test_extract_clip_valid_default_request_verbose(extracted_clip: t.Dict[str, t.Any]):
+    assert extracted_clip["request"]["verbose"] is False
+
+
+def test_extract_clip_valid_default_request_resize(extracted_clip: t.Dict[str, t.Any]):
+    assert extracted_clip["request"]["resize"] == 1.0
+
+
+def test_extract_clip_valid_default_request_rotate(extracted_clip: t.Dict[str, t.Any]):
+    assert extracted_clip["request"]["rotate"] == 0
+
+
+def test_extract_clip_valid_default_request_monochrome(
+    extracted_clip: t.Dict[str, t.Any]
+):
+    assert extracted_clip["request"]["monochrome"] is False
+
+
+def test_extract_clip_valid_default_request_dimensions(
+    extracted_clip: t.Dict[str, t.Any], video_properties: t.Dict[str, t.Any]
+):
+    assert extracted_clip["request"]["dimensions"] == video_properties["dimensions"]
+
+
+def test_extract_clip_valid_default_request_speed(extracted_clip: t.Dict[str, t.Any]):
+    assert extracted_clip["request"]["speed"] == 1.0
+
+
+def test_extract_clip_valid_default_request_volume(extracted_clip: t.Dict[str, t.Any]):
+    assert extracted_clip["request"]["volume"] == 1.0
+
+
+def test_extract_clip_valid_default_request_bounce(extracted_clip: t.Dict[str, t.Any]):
+    assert extracted_clip["request"]["bounce"] is False
+
+
+def test_extract_clip_valid_default_request_reverse(extracted_clip: t.Dict[str, t.Any]):
+    assert extracted_clip["request"]["reverse"] is False
+
+
+def test_extract_clip_valid_default_request_normalize(
+    extracted_clip: t.Dict[str, t.Any]
+):
+    assert extracted_clip["request"]["normalize"] is False

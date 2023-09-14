@@ -182,7 +182,7 @@ def extract_frames(filepath: Path, **kwargs: t.Dict[str, t.Any]) -> t.Dict[str, 
     return asdict(results)
 
 
-def extract_gif(filepath: Path, **kwargs: t.Dict[str, t.Any]) -> None:
+def extract_gif(filepath: Path, **kwargs: t.Dict[str, t.Any]) -> t.Dict[str, t.Any]:
     """Create a GIF between two points in a video.
 
     Args:
@@ -228,5 +228,11 @@ def extract_gif(filepath: Path, **kwargs: t.Dict[str, t.Any]) -> None:
             Resize the gif to the specified dimensions `(width, height)`.
 
     Note: Unrecognized arguments are ignored.
+
+    Returns:
+    ------------
+        `results` (Dict[str, Any]) :
+            A dictionary of the extraction results.
     """
-    E.extraction_factory(filepath, R.GifRequest, E.GifExtractor, **kwargs)
+    results = E.extraction_factory(filepath, R.GifRequest, E.GifExtractor, **kwargs)
+    return asdict(results)

@@ -1,8 +1,32 @@
 import importlib.metadata
+from enum import Enum
 
 import cv2  # type: ignore
 
 VERSION = importlib.metadata.version("videoxt")
+
+
+class ExtractionMethod(Enum):
+    """
+    Enumeration of the supported extraction methods: audio, clip, frames, gif.
+
+    Attributes:
+    -----
+        `AUDIO` (str):
+            Extract the audio from a video file.
+        `CLIP` (str):
+            Extract a clip from a video file.
+        `FRAMES` (str):
+            Extract frames from a video file.
+        `GIF` (str):
+            Create a GIF from a video file.
+    """
+
+    AUDIO = "audio"
+    CLIP = "clip"
+    FRAMES = "frames"
+    GIF = "gif"
+
 
 SUPPORTED_VIDEO_FORMATS = {
     "3gp",

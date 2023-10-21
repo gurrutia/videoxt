@@ -2,7 +2,6 @@ import importlib.metadata
 
 import cv2  # type: ignore
 
-
 VERSION = importlib.metadata.version("videoxt")
 
 SUPPORTED_VIDEO_FORMATS = {
@@ -50,13 +49,4 @@ ROTATION_MAP = {
     90: cv2.ROTATE_90_CLOCKWISE,
     180: cv2.ROTATE_180,
     270: cv2.ROTATE_90_COUNTERCLOCKWISE,
-}
-
-EMOJI_MAP = {
-    "video": "VIDEO \N{FILM PROJECTOR}",
-    "extraction": "EXTRACTION \N{TOOTH}",
-    "audio": "AUDIO \N{SPEAKER WITH THREE SOUND WAVES}",
-    "clip": "CLIP \N{FILM PROJECTOR}",
-    "frames": "FRAMES \N{CAMERA WITH FLASH}",
-    "gif": "GIF \N{FILM FRAMES}",
 }

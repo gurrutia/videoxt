@@ -1,17 +1,31 @@
+import json
 from dataclasses import dataclass
+from datetime import timedelta
 from pathlib import Path
 
 import pytest
 
-from videoxt.utils import enumerate_dir
-from videoxt.utils import enumerate_filepath
-from videoxt.utils import parse_kwargs
-from videoxt.utils import seconds_to_timestamp
-from videoxt.utils import timestamp_to_seconds
+from videoxt.constants import ExtractionMethod
+from videoxt.exceptions import ValidationError
+from videoxt.utils import (
+    CustomJSONEncoder,
+    ToJsonMixin,
+    calculate_duration,
+    convert_bytes,
+    enumerate_dir,
+    enumerate_filepath,
+    enumerated_pattern,
+    parse_kwargs,
+    seconds_to_timestamp,
+    timedelta_to_timestamp,
+    timestamp_to_seconds,
+)
 
 
 def test_timestamp_to_seconds_valid_input():
-    """Test that the function returns a valid number of seconds for a given timestamp."""
+    """
+    Test that the function returns a valid number of seconds for a given timestamp.
+    """
     assert timestamp_to_seconds("0:00") == 0
     assert timestamp_to_seconds("0:01") == 1
     assert timestamp_to_seconds("0:59") == 59
@@ -30,10 +44,11 @@ def test_timestamp_to_seconds_valid_input():
 
 
 def test_timestamp_to_seconds_abnormal_but_valid_input():
-    """Test that the function returns a valid number of seconds for an abnormal timestamp.
+    """
+    Test that the function returns a valid number of seconds for an abnormal timestamp.
 
-    The following timestamps are not valid according to the function's docstring, but they should
-    be treated be handled by the function.
+    The following timestamps are not valid according to the function's docstring, but
+    they should be treated be handled by the function.
     """
     assert timestamp_to_seconds("0") == 0
     assert timestamp_to_seconds("1") == 1
@@ -57,7 +72,9 @@ def test_timestamp_to_seconds_abnormal_but_valid_input():
 
 
 def test_timestamp_to_seconds_invalid_input():
-    """Test that the function raises a ValueError if the input is not a valid timestamp."""
+    """
+    Test that the function raises a ValueError if the input is not a valid timestamp.
+    """
     with pytest.raises(ValueError):
         timestamp_to_seconds("invalid")
 
@@ -69,7 +86,10 @@ def test_timestamp_to_seconds_empty_string():
 
 
 def test_seconds_to_timestamp_valid_input():
-    """Test that the function returns a valid timestamp string for a given number of seconds."""
+    """
+    Test that the function returns a valid timestamp string for a given number of
+    seconds.
+    """
     assert seconds_to_timestamp(-1) == "0:00:00"
     assert seconds_to_timestamp(0) == "0:00:00"
     assert seconds_to_timestamp(0.0) == "0:00:00"
@@ -126,8 +146,8 @@ def test_enumerate_dir_existing_dir(tmp_path: Path):
 
     `tmp_path` is a built-in pytest fixture that creates a temporary directory.
     """
-    expected_path = tmp_path.with_name(f"{tmp_path.name} (2)")
-    assert enumerate_dir(tmp_path) == expected_path
+    expected_path = tmp_path.with_name(f"{tmp_path.name}_vxt")
+    assert enumerate_dir(tmp_path, label="_vxt") == expected_path
 
 
 def test_enumerate_dir_new_dir(tmp_path: Path):
@@ -139,23 +159,17 @@ def test_enumerate_dir_new_dir(tmp_path: Path):
     assert enumerate_dir(expected_path) == expected_path
 
 
-def test_enumerate_filepath_existing_file(tmp_text_filepath: Path):
-    """Test that the filepath is enumerated if the file already exists.
-
-    `tmp_text_filepath` is created by the fixture of the same name in `conftest.py`.
-    """
-    expected_path = tmp_text_filepath.with_name(
-        f"{tmp_text_filepath.stem} (2){tmp_text_filepath.suffix}"
-    )
-    assert enumerate_filepath(tmp_text_filepath) == expected_path
+def test_enumerate_filepath_existing_file(fixture_tmp_text_filepath: Path):
+    """Test that the filepath is enumerated if the file already exists."""
+    stem = fixture_tmp_text_filepath.stem
+    suffix = fixture_tmp_text_filepath.suffix
+    expected_path = fixture_tmp_text_filepath.with_name(f"{stem}_vxt{suffix}")
+    assert enumerate_filepath(fixture_tmp_text_filepath, label="_vxt") == expected_path
 
 
-def test_enumerate_filepath_new_file(tmp_text_filepath: Path):
-    """Test that the same filepath is returned if the file does not exist.
-
-    `tmp_text_filepath` is created by the fixture of the same name in `conftest.py`.
-    """
-    expected_path = tmp_text_filepath.with_name("new_file.txt")
+def test_enumerate_filepath_new_file(fixture_tmp_text_filepath: Path):
+    """Test that the same filepath is returned if the file does not exist."""
+    expected_path = fixture_tmp_text_filepath.with_name("new_file.txt")
     assert enumerate_filepath(expected_path) == expected_path
 
 
@@ -180,7 +194,8 @@ class Image:
             },
             {"filename": "image.jpg", "width": 1920, "height": 1080},
         ),
-        # Test case 2: all kwargs are defined as fields in the `Image` dataclass except `extra_field`.
+        # Test case 2: all kwargs are defined as fields in the `Image` dataclass except
+        # `extra_field`.
         (
             {
                 "filename": "image.jpg",
@@ -210,7 +225,8 @@ class Image:
             {"extra_field": "", "another_extra_field": ""},
             {},
         ),
-        # Test case 7: one of one kwarg is not defined as a field in the `Image` dataclass.
+        # Test case 7: one of one kwarg is not defined as a field in the `Image`
+        # dataclass.
         (
             {"extra_field": ""},
             {},
@@ -220,7 +236,8 @@ class Image:
             {},
             {},
         ),
-        # Test case 9: all kwargs are defined as fields in the `Image` dataclass, but one is None.
+        # Test case 9: all kwargs are defined as fields in the `Image` dataclass, but
+        # one is None.
         (
             {
                 "filename": "image.jpg",
@@ -235,3 +252,141 @@ def test_parse_kwargs(kwargs: dict, expected: dict):
     """Test that the `parse_kwargs` function returns a dictonary containing only the
     keyword arguments that match the fields in a given dataclass."""
     assert parse_kwargs(kwargs, Image) == expected
+
+
+def test_enumerated_pattern_when_only_index_is_entered():
+    assert enumerated_pattern(1) == " (1)"
+    assert enumerated_pattern(2) == " (2)"
+    assert enumerated_pattern(3) == " (3)"
+
+
+def test_enumerated_pattern_when_index_and_label_are_entered():
+    assert enumerated_pattern(1, label="_vxt") == "_vxt"
+    assert enumerated_pattern(2, label="_vxt") == "_vxt (2)"
+    assert enumerated_pattern(3, label="_vxt") == "_vxt (3)"
+
+
+def test_enumerated_pattern_when_index_is_0():
+    with pytest.raises(ValueError):
+        enumerated_pattern(0)
+
+
+def test_calculate_duration_with_valid_inputs():
+    frame_count = 120
+    fps = 30.0
+    expected_duration = timedelta(seconds=frame_count / fps)
+    result = calculate_duration(frame_count, fps)
+    assert result == expected_duration
+
+
+def test_calculate_duration_with_negative_frame_count_should_raise_value_error():
+    with pytest.raises(ValueError) as exc_info:
+        calculate_duration(-120, 30.0)
+    assert "Could not calculate duration, frame_count must be greater than 0" in str(
+        exc_info.value
+    )
+
+
+def test_calculate_duration_with_frame_count_zero_should_raise_value_error():
+    with pytest.raises(ValueError) as exc_info:
+        calculate_duration(0, 30.0)
+    assert "Could not calculate duration, frame_count must be greater than 0" in str(
+        exc_info.value
+    )
+
+
+def test_timedelta_to_timestamp_with_zero_seconds():
+    duration = timedelta(seconds=0)
+    result = timedelta_to_timestamp(duration)
+    assert result == "00:00:00"
+
+
+def test_timedelta_to_timestamp_with_59_seconds():
+    duration = timedelta(seconds=59)
+    result = timedelta_to_timestamp(duration)
+    assert result == "00:00:59"
+
+
+def test_timedelta_to_timestamp_with_61_seconds():
+    duration = timedelta(seconds=61)
+    result = timedelta_to_timestamp(duration)
+    assert result == "00:01:01"
+
+
+def test_timedelta_to_timestamp_with_microseconds_should_truncate():
+    duration = timedelta(seconds=61.123456)
+    result = timedelta_to_timestamp(duration)
+    assert result == "00:01:01"
+
+
+def test_timedelta_to_timestamp_with_negative_duration_should_raise_value_error():
+    with pytest.raises(ValueError) as exc_info:
+        duration = timedelta(seconds=-1)
+        timedelta_to_timestamp(duration)
+    assert "Invalid duration: timedelta must be non-negative" in str(exc_info.value)
+
+
+def test_convert_bytes_with_bytes():
+    bytes_ = 1024
+    result = convert_bytes(bytes_)
+    assert result == "1.00 KB"
+
+
+def test_convert_bytes_with_kilobytes():
+    kilobytes = 1024**2
+    result = convert_bytes(kilobytes)
+    assert result == "1.00 MB"
+
+
+def test_convert_bytes_with_megabytes():
+    megabytes = 1024**3
+    result = convert_bytes(megabytes)
+    assert result == "1.00 GB"
+
+
+def test_convert_bytes_with_gigabytes():
+    gigabytes = 1024**4
+    result = convert_bytes(gigabytes)
+    assert result == "1.00 TB"
+
+
+def test_convert_bytes_with_terabytes():
+    terabytes = 1024**5
+    result = convert_bytes(terabytes)
+    assert result == "1.00 PB"
+
+
+def test_convert_bytes_with_negative_bytes_should_raise_value_error():
+    with pytest.raises(ValidationError) as exc_info:
+        bytes_ = -1024
+        convert_bytes(bytes_)
+    assert "Expected positive integer" in str(exc_info.value)
+
+
+def test_custom_json_encoder_encode_path():
+    path = Path("/path/to/file")
+    encoded_path = json.dumps(path, cls=CustomJSONEncoder)
+    assert encoded_path == '"\\\\path\\\\to\\\\file"'
+
+
+def test_custom_json_encoder_encode_timedelta():
+    duration = timedelta(hours=1, minutes=11)
+    encoded_duration = json.dumps(duration, cls=CustomJSONEncoder)
+    assert encoded_duration == '"1:11:00"'
+
+
+def test_custom_json_encoder_encode_custom_object():
+    custom_obj = ExtractionMethod.AUDIO
+    encoded_custom_obj = json.dumps(custom_obj, cls=CustomJSONEncoder)
+    assert encoded_custom_obj == '"audio"'
+
+
+def test_to_json_mixin_to_json():
+    @dataclass
+    class TestClass(ToJsonMixin):
+        a: str
+        b: int
+
+    test_obj = TestClass("c", 4)
+    expected_json = '{\n  "a": "c",\n  "b": 4\n}'
+    assert test_obj.json() == expected_json

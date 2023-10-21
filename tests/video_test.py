@@ -1,111 +1,115 @@
-import typing as t
-from pathlib import Path
-
-import cv2
+import cv2  # type: ignore
 import pytest
 
-from videoxt.exceptions import ValidationException
-from videoxt.video import get_video_properties
-from videoxt.video import open_video_capture
-from videoxt.video import Video
-from videoxt.video import VideoProperties
+from videoxt.exceptions import ClosedVideoCaptureError
+from videoxt.video import Video, fetch_video_properties, open_video_capture
 
 
-def test_open_video_capture_when_file_exists(tmp_video_filepath: Path):
-    """Test that the `cv2.VideoCapture` object is returned when opening a video file.
-
-    `tmp_video_filepath` is created by the fixture of the same name in `conftest.py`.
-    """
-    with open_video_capture(tmp_video_filepath) as opencap:
+def test_open_video_capture_if_filepath_as_path_and_is_valid_video_file(
+    fixture_tmp_video_filepath,
+):
+    with open_video_capture(fixture_tmp_video_filepath) as opencap:
+        assert opencap.isOpened()
         assert isinstance(opencap, cv2.VideoCapture)
 
 
-def test_open_video_capture_if_file_not_found(tmp_video_filepath: Path):
-    """Test that FileNotFoundError is raised if the video file does not exist.
+def test_open_video_capture_if_filepath_as_str_and_is_valid_video_file(
+    fixture_tmp_video_filepath,
+):
+    with open_video_capture(str(fixture_tmp_video_filepath)) as opencap:
+        assert opencap.isOpened()
+        assert isinstance(opencap, cv2.VideoCapture)
 
-    `tmp_video_filepath` is created by the fixture of the same name in `conftest.py`.
-    """
-    non_existing_file = tmp_video_filepath / "non_existing.mp4"
-    with pytest.raises(FileNotFoundError):
+
+def test_open_video_capture_if_filepath_is_none():
+    with pytest.raises(ClosedVideoCaptureError):
+        with open_video_capture(None) as opencap:
+            assert not opencap.isOpened()
+
+
+def test_open_video_capture_if_filepath_is_int():
+    with pytest.raises(ClosedVideoCaptureError):
+        with open_video_capture(1) as opencap:
+            assert not opencap.isOpened()
+
+
+def test_open_video_capture_if_filepath_doesnt_exist(fixture_tmp_dir):
+    non_existing_file = fixture_tmp_dir / "non_existing.mp4"
+    with pytest.raises(ClosedVideoCaptureError):
         with open_video_capture(non_existing_file) as opencap:
             assert not opencap.isOpened()
 
 
-def test_open_video_capture_if_file_exists_but_is_not_a_video_file(
-    tmp_text_filepath: Path,
-):
-    """Test that a TypeError is raised if an existing file is not a video file.
-
-    `tmp_text_filepath` is created by the fixture of the same name in `conftest.py`.
-    """
-    with pytest.raises(ValidationException):
-        with open_video_capture(tmp_text_filepath) as opencap:
+def test_open_video_capture_if_filepath_is_a_directory(fixture_tmp_dir):
+    with pytest.raises(ClosedVideoCaptureError):
+        with open_video_capture(fixture_tmp_dir) as opencap:
             assert not opencap.isOpened()
 
 
-def test_video_capture_is_open_when_video_file_exists(tmp_video_filepath: Path):
-    """Test that the `cv2.VideoCapture` object is opened when opening a video file.
-
-    Args:
-        tmp_video_filepath (Path): Filepath of the temporary video file.
-    """
-    with open_video_capture(tmp_video_filepath) as opencap:
-        assert opencap.isOpened()
-
-
-def test_video_properties_dataclass(video_properties: t.Dict[str, t.Any]):
-    """Test that the `VideoProperties` dataclass is initialized as expected.
-
-    `tmp_video_properties_cls` is created by the fixture of the same name in `conftest.py`.
-    """
-    video_properties_cls = VideoProperties(
-        video_properties["dimensions"],
-        video_properties["fps"],
-        video_properties["frame_count"],
-        video_properties["duration_seconds"],
-        video_properties["duration_timestamp"],
-        video_properties["suffix"],
-    )
-    assert isinstance(video_properties_cls, VideoProperties)
-    assert video_properties_cls.dimensions == video_properties["dimensions"]
-    assert video_properties_cls.fps == video_properties["fps"]
-    assert video_properties_cls.frame_count == video_properties["frame_count"]
-    assert video_properties_cls.duration_seconds == video_properties["duration_seconds"]
-    assert (
-        video_properties_cls.duration_timestamp
-        == video_properties["duration_timestamp"]
-    )
-    assert video_properties_cls.suffix == video_properties["suffix"]
-
-
-def test_get_video_properties(
-    tmp_video_filepath: Path, video_properties: t.Dict[str, t.Any]
+def test_open_video_capture_if_filepath_is_an_existing_text_file(
+    fixture_tmp_text_filepath,
 ):
-    """Test that the video properties are returned as expected.
+    with pytest.raises(ClosedVideoCaptureError):
+        with open_video_capture(fixture_tmp_text_filepath) as opencap:
+            assert not opencap.isOpened()
 
-    `tmp_video_filepath` is created by the fixture of the same name in `conftest.py`.
-    """
-    video_properties_cls = get_video_properties(tmp_video_filepath)
-    assert isinstance(video_properties_cls, VideoProperties)
-    assert video_properties_cls.dimensions == video_properties["dimensions"]
-    assert video_properties_cls.fps == video_properties["fps"]
-    assert video_properties_cls.frame_count == video_properties["frame_count"]
-    assert video_properties_cls.duration_seconds == video_properties["duration_seconds"]
+
+def test_open_video_capture_if_filepath_is_a_video_file_with_zero_second_duration(
+    fixture_tmp_video_filepath_zero_seconds,
+):
+    with pytest.raises(ClosedVideoCaptureError):
+        with open_video_capture(fixture_tmp_video_filepath_zero_seconds) as opencap:
+            assert not opencap.isOpened()
+
+
+def test_fetch_video_properties_if_filepath_is_valid_video_file(
+    fixture_tmp_video_filepath, fixture_tmp_video_properties
+):
+    fetched_properties = fetch_video_properties(fixture_tmp_video_filepath)
+    assert isinstance(fetched_properties, dict)
     assert (
-        video_properties_cls.duration_timestamp
-        == video_properties["duration_timestamp"]
+        fetched_properties["dimensions"] == fixture_tmp_video_properties["dimensions"]
     )
-    assert video_properties_cls.suffix == video_properties["suffix"]
+    assert fetched_properties["fps"] == fixture_tmp_video_properties["fps"]
+    assert (
+        fetched_properties["frame_count"] == fixture_tmp_video_properties["frame_count"]
+    )
 
 
-def test_video_dataclass(tmp_video_filepath: Path):
-    """Test that the `Video` dataclass is initialized as expected with the
-    correct properties.
-
-    `tmp_video_filepath` is created by the fixture of the same name in `conftest.py`.
-
-    `tmp_video_properties_cls` is created by the fixture of the same name in `conftest.py`.
-    """
-    video = Video(tmp_video_filepath)
+def test_video_object_is_instance_of_video_dataclass(fixture_tmp_video_filepath):
+    video = Video(fixture_tmp_video_filepath)
     assert isinstance(video, Video)
-    assert isinstance(video.properties, VideoProperties)
+
+
+def test_video_object_attributes_match_expected_values(
+    fixture_tmp_video_filepath, fixture_tmp_video_properties
+):
+    video = Video(fixture_tmp_video_filepath)
+    assert video.filepath == fixture_tmp_video_filepath
+    assert video.dimensions == fixture_tmp_video_properties["dimensions"]
+    assert video.fps == fixture_tmp_video_properties["fps"]
+    assert video.frame_count == fixture_tmp_video_properties["frame_count"]
+    assert video.duration == fixture_tmp_video_properties["duration"]
+    assert video.duration_seconds == fixture_tmp_video_properties["duration_seconds"]
+    assert (
+        video.duration_timestamp == fixture_tmp_video_properties["duration_timestamp"]
+    )
+    assert video.has_audio == fixture_tmp_video_properties["has_audio"]
+    assert (
+        video.filesize_bytes
+        == fixture_tmp_video_properties["video_file_path"].stat().st_size
+    )
+
+
+def test_video_object_with_invalid_filepath_raises_cv2_error(
+    fixture_tmp_video_filepath_zero_seconds,
+):
+    with pytest.raises(ClosedVideoCaptureError):
+        Video(fixture_tmp_video_filepath_zero_seconds)
+
+
+def test_fetch_video_properties_with_invalid_filepath_raises_cv2_error(
+    fixture_tmp_video_filepath_zero_seconds,
+):
+    with pytest.raises(ClosedVideoCaptureError):
+        fetch_video_properties(fixture_tmp_video_filepath_zero_seconds)

@@ -1,7 +1,10 @@
 black
 flake8
+isort
 mypy
 pre-commit
+pycln
+pydocstyle
 pytest
 pytest-cov
 pyupgrade

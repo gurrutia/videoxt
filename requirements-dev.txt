@@ -5,6 +5,5 @@ pre-commit
 pytest
 pytest-cov
 pyupgrade
-reorder-python-imports
 setup-cfg-fmt
 tox

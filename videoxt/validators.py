@@ -1,532 +1,587 @@
-"""User input validators called from Request objects and command line."""
-import argparse
+"""Contains functions to validate user input and other data."""
 import re
-import typing as t
 from pathlib import Path
+from typing import cast
 
 import videoxt.constants as C
 import videoxt.utils as U
-from videoxt.exceptions import ValidationException
+from videoxt.exceptions import ValidationError
 
 
-def _raise_error(error_msg: str, from_cli: bool = False) -> None:
-    """Raise an error message. If `from_cli` is `True`, raise an argparse error.
-    Otherwise, raise a ValidationException.
+def positive_int(n: float | int | str) -> int:
     """
-    if from_cli:
-        raise argparse.ArgumentTypeError(error_msg)
-    raise ValidationException(error_msg)
+    Return a positive integer from a float, integer or string.
 
+    Args:
+    -----
+        `n` (float | int | str): The number to validate.
 
-def positive_int(num: t.Union[float, int, str], from_cli: bool = False) -> int:
-    """Validates floats, integers or strings are positive integers and returns
-    an integer if valid.
+    Returns:
+    -----
+        `int`: The number as an integer if positive.
+
+    Raises:
+    -----
+        `ValidationError`: If the number is not a positive integer.
     """
     try:
-        value = float(num)
+        value = float(n)
     except (ValueError, TypeError):
-        _raise_error(f"expected integer, got {num!r}", from_cli)
+        raise ValidationError(f"Expected integer, got {n!r}")
 
     if not value.is_integer():
-        _raise_error(f"expected integer, got {num}", from_cli)
+        raise ValidationError(f"Expected integer, got {n}")
 
     if value <= 0:
-        _raise_error(f"expected positive integer, got {num}", from_cli)
+        raise ValidationError(f"Expected positive integer, got {n}")
 
     return int(value)
 
 
-def positive_float(num: t.Union[float, int, str], from_cli: bool = False) -> float:
-    """Validates floats, integers or strings are positive floats and returns a float if valid."""
+def positive_float(n: float | int | str) -> float:
+    """
+    Return a positive float from a float, integer or string.
+
+    Args:
+    -----
+        `n` (float | int | str): The number to validate.
+
+    Returns:
+    -----
+        `float`: The number as a float if positive.
+
+    Raises:
+    -----
+        `ValidationError`: If the number is not a positive float.
+    """
     try:
-        value = float(num)
+        value = float(n)
     except (ValueError, TypeError):
-        _raise_error(f"expected numeric value, got {num!r}", from_cli)
+        raise ValidationError(f"Expected numeric value, got {n!r}")
 
     if value <= 0:
-        _raise_error(f"expected positive number, got {num}", from_cli)
+        raise ValidationError(f"Expected positive number, got {n}")
 
     return value
 
 
-def non_negative_int(num: t.Union[float, int, str], from_cli: bool = False) -> int:
-    """Validates floats, integers or strings are non-negative integers and returns
-    an integer if valid.
+def non_negative_int(n: float | int | str) -> int:
+    """
+    Return a non-negative integer from a float, integer or string.
+
+    Args:
+    -----
+        `n` (float | int | str): The number to validate.
+
+    Returns:
+    -----
+        `int`: The number as an integer if non-negative.
+
+    Raises:
+    -----
+        `ValidationError`: If the number is not a non-negative integer.
     """
     try:
-        value = float(num)
+        value = float(n)
     except (ValueError, TypeError):
-        _raise_error(f"expected integer, got {num!r}", from_cli)
+        raise ValidationError(f"Expected integer, got {n!r}")
 
     if not value.is_integer():
-        _raise_error(f"expected integer, got {num!r}", from_cli)
+        raise ValidationError(f"Expected integer, got {n!r}")
 
     if value < 0:
-        _raise_error(f"expected non-negative integer, got {num}", from_cli)
+        raise ValidationError(f"Expected non-negative integer, got {n}")
 
     return int(value)
 
 
-def non_negative_float(num: t.Union[float, int, str], from_cli: bool = False) -> float:
-    """Validates floats, integers or strings are non-negative floats and returns a float
-    if valid.
+def non_negative_float(n: float | int | str) -> float:
+    """
+    Return a non-negative float from a float, integer or string.
+
+    Args:
+    -----
+        `n` (float | int | str): The number to validate.
+
+    Returns:
+    -----
+        `float`: The number as a float if non-negative.
+
+    Raises:
+    -----
+        `ValidationError`: If the number is not a non-negative float.
     """
     try:
-        value = float(num)
+        value = float(n)
     except (ValueError, TypeError):
-        _raise_error(f"expected numeric value, got {num!r}", from_cli)
+        raise ValidationError(f"Expected numeric value, got {n!r}")
 
     if value < 0:
-        _raise_error(f"expected non-negative number, got {num}", from_cli)
+        raise ValidationError(f"Expected non-negative number, got {n}")
 
     return value
 
 
-def valid_dir(dir: t.Union[Path, str], from_cli: bool = False) -> Path:
-    """Validates a directory as a Path or str exists and returns a Path object if valid."""
+def valid_dir(dir: Path | str) -> Path:
+    """
+    Validate a path is a directory and exists and return it.
+
+    Args:
+    -----
+        `dir` (pathlib.Path | str): The directory to validate.
+
+    Returns:
+    -----
+        `pathlib.Path`: The directory as a Path object if valid.
+
+    Raises:
+    -----
+        `ValidationError`: If the path is not a directory or does not exist.
+    """
     if dir is None:
-        _raise_error(f"invalid directory, got {dir!r}", from_cli)
+        raise ValidationError(f"Directory cannot be None, got {dir!r}")
 
     dir_path = Path(dir)
 
     if not dir_path.is_dir():
-        _raise_error(f"directory not found, got {dir_path!r}", from_cli)
+        raise ValidationError(f"Directory not found, got {dir_path!r}")
 
     return dir_path
 
 
-def valid_filepath(filepath: t.Union[Path, str], from_cli: bool = False) -> Path:
-    """Validates a file exists as a Path or str and returns a Path object if valid."""
+def valid_filepath(filepath: Path | str, is_video: bool = False) -> Path:
+    """
+    Validate a path is a file and exists and return it.
+
+    Args:
+    -----
+        `filepath` (pathlib.Path | str):
+            The filepath to validate.
+        `is_video` (bool) :
+            If True, the filepath is checked against a set of supported video file
+            suffixes.
+
+    Returns:
+    -----
+        `pathlib.Path`: The filepath as a Path object if it is a file and exists.
+
+    Raises:
+    -----
+        `ValidationError`: If the path is not a file or does not exist.
+    """
     if filepath is None:
-        _raise_error(f"invalid filepath, got {filepath!r}", from_cli)
+        raise ValidationError(f"Filepath cannot be None, got {filepath!r}")
 
-    filepath_path = Path(filepath)
+    try:
+        fp = Path(filepath)
+    except TypeError:
+        raise ValidationError(f"Invalid filepath, got {filepath!r}")
 
-    if not filepath_path.is_file():
-        _raise_error(f"file not found, got {filepath_path}", from_cli)
+    if not fp.exists():
+        raise ValidationError(f"File not found, got {filepath}")
 
-    return filepath_path
+    if not fp.is_file():
+        raise ValidationError(f"Filepath provided is not a file, got {filepath}")
+
+    if is_video:
+        valid_video_file_suffix(fp.suffix)
+
+    return fp
 
 
-def valid_filename(filename: str, from_cli: bool = False) -> str:
-    """Validates filenames are valid and returns the input filename if valid."""
+def valid_filename(filename: str) -> str:
+    """
+    Validate a filename does not contain invalid characters and return it.
+
+    In the context of `videoxt`, a filename refers to a pathlib.Path().stem.
+
+    Args:
+    -----
+        `filename` (str): The filename to validate.
+
+    Returns:
+    -----
+        `str`: The filename if it does not contain invalid characters.
+
+    Raises:
+    -----
+        `ValidationError`: If the filename is None, empty or contains invalid chars.
+    """
     if filename is None:
-        _raise_error(f"invalid filename, got {filename!r}", from_cli)
+        raise ValidationError(f"Invalid filename, got {filename!r}")
+
+    if not filename:
+        raise ValidationError(f"Invalid filename, got {filename!r}")
 
     invalid_chars = r"[\\/:*?\"<>|]"
     if re.search(invalid_chars, filename):
-        _raise_error(
-            f"invalid filename, got {filename!r}\n"
-            f"filename can't contain any of the following characters: \\/:*?\"<>|",
-            from_cli,
+        raise ValidationError(
+            f"Invalid filename, got {filename!r}\n"
+            f"filename can't contain any of the following characters: \\/:*?\"<>|"
         )
-
-    if not filename:
-        _raise_error(f"invalid filename, got {filename!r}", from_cli)
 
     return filename
 
 
-def valid_timestamp(timestamp: str, from_cli: bool = False) -> str:
-    """Verifies that a timestamp, typically used for video playback on
-    streaming services, adheres to accepted formats. Microseconds are truncated.
+def valid_timestamp(timestamp: str) -> str:
+    """
+    Validate a timestamp is in the correct format and return it if valid.
 
-    Accepted:  `M:SS`, `MM:SS`, `H:MM:SS`, `HH:MM:SS`
-    Unaccepted: `S`, `H:M:S`, values greater than 59
+    In the context of `videoxt` a timestamp is one typically seen during playback on
+    video sharing or streaming platforms. Microseconds are truncated.
+
+    Valid:  `M:SS`, `MM:SS`, `H:MM:SS`, `HH:MM:SS`.
+    Invalid: `S`, `SS`, `H:M:S`, values greater than 59 for hours, minutes or seconds.
+
+    Args:
+    -----
+        `timestamp` (str): The timestamp to validate.
+
+    Returns:
+    -----
+        `str`: The timestamp if valid.
+
+    Raises:
+    -----
+        `ValidationError`:
+            If the timestamp is None, empty, or does not match the regex pattern.
     """
     if timestamp is None or not timestamp:
-        _raise_error(f"invalid timestamp, got {timestamp!r}", from_cli)
+        raise ValidationError(f"Timestamp string is empty or None, got {timestamp!r}")
 
     timestamp = timestamp.split(".")[0]
 
     regex = r"^([0-9]|[0-5][0-9])(:[0-5][0-9]){1,2}$"
     if not bool(re.match(regex, timestamp)):
-        _raise_error(f"invalid timestamp, got {timestamp!r}", from_cli)
+        raise ValidationError(
+            f"Invalid timestamp format, got {timestamp!r}\n"
+            f"Allowed: 'M:SS', 'MM:SS', 'H:MM:SS', 'HH:MM:SS'"
+        )
 
     return timestamp
 
 
-def valid_start_timestamp(start_time: str, from_cli: bool = False) -> str:
-    """Validates start timestamps are in the correct format, if so, converts to seconds
-    and validates the timestamp is non-negative and returns the timestamp string if valid
+def valid_start_timestamp(start_timestamp: str) -> str:
     """
-    timestamp = valid_timestamp(start_time, from_cli)
+    Validate a start timestamp is in the correct format and return it if valid.
+
+    Valid:  `M:SS`, `MM:SS`, `H:MM:SS`, `HH:MM:SS`.
+    Invalid: `S`, `SS`, `H:M:S`, values greater than 59 for hours, minutes or seconds.
+
+    See `valid_timestamp` for more information on how timestamps are validated.
+
+    Args:
+    -----
+        `start_timestamp` (str) : The timestamp to validate (Ex: '12:34').
+
+    Returns:
+    -----
+        `str`: The timestamp as a string if valid.
+    """
+    timestamp = valid_timestamp(start_timestamp)
     timestamp_as_seconds = U.timestamp_to_seconds(timestamp)
     timestamp_as_seconds = (
-        non_negative_float(timestamp, from_cli)
+        non_negative_float(timestamp)
         if timestamp_as_seconds is None
-        else non_negative_float(timestamp_as_seconds, from_cli)
+        else non_negative_float(timestamp_as_seconds)
     )
 
     return timestamp
 
 
-def valid_stop_timestamp(stop_time: str, from_cli: bool = False) -> str:
-    """Validates stop timestamps are in the correct format, if so, converts to seconds
-    and validates the timestamp is positive and returns the timestamp string if valid
+def valid_stop_timestamp(stop_timestamp: str) -> str:
     """
-    timestamp = valid_timestamp(stop_time, from_cli)
+    Validate a stop timestamp is in the correct format and return it if valid.
+
+    Valid:  `M:SS`, `MM:SS`, `H:MM:SS`, `HH:MM:SS`.
+    Invalid: `S`, `SS`, `H:M:S`, values greater than 59 for hours, minutes or seconds.
+
+    See `valid_timestamp` for more information on how timestamps are validated.
+
+    Args:
+    -----
+        `stop_timestamp` (str): The timestamp to validate (Ex: '12:34').
+
+    Returns:
+    -----
+        `str`: The timestamp as a string if valid.
+    """
+    timestamp = valid_timestamp(stop_timestamp)
     timestamp_as_seconds = U.timestamp_to_seconds(timestamp)
     timestamp_as_seconds = (
-        positive_float(timestamp, from_cli)
+        positive_float(timestamp)
         if timestamp_as_seconds is None
-        else positive_float(timestamp_as_seconds, from_cli)
+        else positive_float(timestamp_as_seconds)
     )
 
     return timestamp
 
 
-def valid_start_time(
-    start_time: t.Union[float, str], from_cli: bool = False
-) -> t.Union[float, str]:
-    """Validates start times are in the correct format and not negative. Returns the
-    start time as a float if valid or a string if the start time is a timestamp.
+def valid_start_time(start_time: float | int | str) -> float | str:
+    """
+    Validate any start time provided is in the correct format and not negative.
+
+    Args:
+    -----
+        `start_time` (float | int | str): The start time to validate.
+
+    Returns:
+    -----
+        `float | str`: The start time as a float or string if valid.
+
+    Raises:
+    -----
+        `ValidationError`:
+            If start time is not a non-negative float or a properly formatted timestamp.
     """
     try:
         start_time_float = float(start_time)
     except ValueError:
-        return valid_start_timestamp(str(start_time), from_cli)
+        return valid_start_timestamp(str(start_time))
     else:
-        return non_negative_float(start_time_float, from_cli)
+        return non_negative_float(start_time_float)
 
 
-def valid_stop_time(
-    stop_time: t.Union[float, str], from_cli: bool = False
-) -> t.Union[float, str]:
-    """Validates stop times are in the correct format and not negative. Returns the
-    stop time as a float if valid or a string if the stop time is a timestamp."""
+def valid_stop_time(stop_time: float | int | str) -> float | str:
+    """
+    Validate any stop time provided is in the correct format and not negative.
+
+    Args:
+    -----
+        `stop_time` (float | int | str): The stop time to validate.
+
+    Returns:
+    -----
+        `float | str`: The stop time as a float or string if valid.
+
+    Raises:
+    -----
+        `ValidationError`:
+            If stop time is not a positive float or a properly formatted timestamp.
+    """
     try:
         stop_time_float = float(stop_time)
     except ValueError:
-        return valid_stop_timestamp(str(stop_time), from_cli)
+        return valid_stop_timestamp(str(stop_time))
     else:
-        return positive_float(stop_time_float, from_cli)
+        return positive_float(stop_time_float)
 
 
-def valid_extraction_range(start: float, stop: float, duration: float) -> bool:
-    """Validates the extraction range and ensures it is within valid bounds.
-
-    - start second must be less than the duration of the video
-    - start second must be less than the stop second
+def valid_extraction_range(
+    start: float, stop: float, duration: float
+) -> tuple[float, float, float]:
+    """
+    Validate the extraction range is within bounds and return it.
 
     Args:
     -----
-        start (float): Start second of the extraction range.
-        stop (float): Stop second of the extraction range.
-        duration (float): Length of the video in seconds.
+        `start` (float):
+            Extraction start second.
+        `stop` (float):
+            Extraction stop second.
+        `duration` (float):
+            Duration of the video in seconds.
 
     Returns:
-    --------
-        bool: True if the extraction range is valid.
-
-    Raises:
-    -------
-        ValidationException: If the extraction range is invalid.
-    """
-    if start > duration:
-        _raise_error(f"Start second ({start}) exceeds video length ({duration})")
-
-    if start >= stop:
-        _raise_error(f"Start second ({start}) must be before stop second ({stop})")
-
-    return True
-
-
-def valid_capture_rate(capture_rate: int, first_frame: int, last_frame: int) -> int:
-    """Validates that the capture rate is a positive integer less than or equal to the
-    difference between the first and last frames. Returns the capture rate if valid,
-    otherwise raises an error.
-
-    Args:
     -----
-        capture_rate (int): The capture rate to validate.
-        first_frame (int): The first frame of the extraction range.
-        last_frame (int): The last frame of the extraction range.
-
-    Returns:
-    --------
-        int: The capture rate if valid.
+        `Tuple[float, float, float]`:
+            The start, stop and duration if valid (start, stop, duration).
 
     Raises:
-    -------
-        ValidationException: If the capture rate is not a positive integer or exceeds
-            the range between the first and last frames.
+    -----
+        `ValidationError`:
+        - If the start second is greater than or equal to the duration.
+        - If the stop second is less than or equal to the start second.
     """
-    if capture_rate < 1:
-        raise ValidationException(
-            f"capture rate must be a positive integer: {capture_rate}"
+    if stop > duration:
+        stop = duration
+
+    if start < 0:
+        start = 0
+
+    if start >= duration:
+        raise ValidationError(
+            f"Start second ({start}) is >= video duration ({duration})"
         )
 
-    if capture_rate > (last_frame - first_frame):
-        raise ValidationException(
-            f"capture rate ({capture_rate}) exceeds range between "
-            f"first frame ({first_frame}) and last frame ({last_frame})"
+    if stop <= start:
+        raise ValidationError(
+            f"Stop second ({stop}) must be greater than start second ({start})"
         )
 
-    return capture_rate
+    return start, stop, duration
 
 
-def valid_resize_value(
-    resize_value: t.Union[float, str], from_cli: bool = False
-) -> float:
-    """Validates that the resize value, a number, or a string representing a
-    number, is greater than 0. The resize value represents the percentage of
-    the original video dimensions to resize the output media to.
-
-    For example, a resize value of 0.5 will resize the media to 50% of its
-    original dimensions. A resize value of 2.0 will resize the media to 200%
-    of its original dimensions.
-
-    Args:
-    -----
-        resize_value (Union[float, str]): The resize value to validate.
-        from_cli (bool, optional): If True, raise an argparse error. Otherwise,
-            raise a ValidationException. Defaults to False.
-
-    Returns:
-    --------
-        float: The resize value if valid.
-
-    Raises:
-    -------
-        argparse.ArgumentTypeError: If from_cli is True and the resize value is invalid.
-        ValidationException: If from_cli is False and the resize value is invalid.
+def valid_dimensions(dimensions: tuple[int, int]) -> tuple[int, int]:
     """
-    try:
-        value = float(resize_value)
-    except (TypeError, ValueError):
-        _raise_error(f"resize value must be a number, got {resize_value!r}", from_cli)
-
-    if value <= 0:
-        _raise_error(
-            f"resize value must be greater than 0, got {resize_value}", from_cli
-        )
-
-    return value
-
-
-def valid_dimensions(dimensions: t.Tuple[int, int]) -> t.Tuple[int, int]:
-    """Validates that the dimensions are a tuple of two positive integers. Returns
-    the dimensions if valid, otherwise raises an error. The dimensions are converted
-    to integers. For example, `(800, 600)` and `('800', 600.0)` are both valid dimensions.
+    Validate values in a dimensions tuple are positive integers and return it.
 
     Args:
     -----
-        dimensions (Tuple[int, int]): The dimensions to validate.
+        `dimensions` (tuple[int, int]): The dimensions to validate.
 
     Returns:
-    --------
-        Tuple[int, int]: The dimensions if valid.
+    -----
+        `tuple[int, int]`: The dimensions if both integers are positive.
 
     Raises:
-    -------
-        ValidationException: If the dimensions are invalid.
+    -----
+        `ValidationError`:
+            If the length of the tuple isn't 2 or one or more of the values are not
+            positive integers
     """
     if len(dimensions) != 2:
-        _raise_error(f"invalid dimensions, got {dimensions!r}")
+        raise ValidationError(f"Invalid dimensions, got {dimensions!r}")
 
     dims = tuple([positive_int(dim) for dim in list(dimensions)])
-    return t.cast(t.Tuple[int, int], dims)
+
+    return cast(tuple[int, int], dims)
 
 
-def valid_rotate_value(rotate_value: t.Union[int, str], from_cli: bool = False) -> int:
-    """Validates a value used to rotate media clockwise by 0, 90, 180 or 270
-    degrees is a valid rotate value as defined in `constants.py` and returns
-    the rotate value if valid. The rotate value is converted to an integer.
-    For example, `90` and `'90'` are both valid rotate values.
-
-    Accepted values: `0`, `90`, `180`, `270`
+def valid_rotate_value(n: float | int | str) -> int:
+    """
+    Validate a rotate value is either 0, 90, 180 or 270.
 
     Args:
     -----
-    rotate_value (Union[int, str]) : The rotate value to validate.
-    from_cli (bool) : If an error is raised, raise an argparse error if True, otherwise
-        raise a ValidationException.
+        `n` (float | int | str): The rotate value to validate.
 
     Returns:
-    --------
-    int : The rotate value if valid.
+    -----
+        `int`: The rotate value if 0, 90, 180, or 270.
 
     Raises:
-    -------
-    argparse.ArgumentTypeError : If from_cli is True and the rotate value is invalid.
-    ValidationException : If from_cli is False and the rotate value is invalid.
+    -----
+        `ValidationError`: If the rotate value is invalid.
     """
     try:
-        val = int(rotate_value)
+        val = int(n)
     except ValueError:
-        _raise_error(
-            f"invalid rotate value, got {rotate_value!r}\n"
-            f"accepted rotate values: {C.VALID_ROTATE_VALUES}",
-            from_cli,
+        raise ValidationError(
+            f"Invalid rotate value, got {n!r}\n"
+            f"Allowed values: {C.VALID_ROTATE_VALUES}"
         )
 
     if val not in C.VALID_ROTATE_VALUES:
-        _raise_error(
-            f"rotate value entered not a valid rotate value, got {rotate_value}\n"
-            f"accepted rotate values: {C.VALID_ROTATE_VALUES}",
-            from_cli,
+        raise ValidationError(
+            f"Invalid rotate value, got {n}\n"
+            f"Allowed values: {C.VALID_ROTATE_VALUES}"
         )
 
     return val
 
 
-def valid_audio_format(audio_format: str, from_cli: bool = False) -> str:
-    """Validates audio format is in a set of valid audio formats in `constants.py`
-    and returns the audio format if valid. The audio format is converted to
-    lowercase and stripped of any leading periods. For example, `mp3` and `.MP3`
-    are both valid audio formats.
+def valid_audio_format(audio_format: str) -> str:
+    """
+    Validate audio format is supported by `videoxt` and return it if so.
 
-    Supported formats: `m4a`, `mp3`, `ogg`, `wav`
+    Input is converted to lowercase and stripped of any leading periods. `Mp3` and
+    `.MP3` would both be considered valid and returned as `mp3`.
+
+    See supported formats here: `videoxt.constants.SUPPORTED_AUDIO_FORMATS`.
 
     Args:
     -----
-    audio_format (str) : The audio format to validate.
-    from_cli (bool) : If an error is raised, raise an argparse error if True, otherwise
-        raise a ValidationException.
+        `audio_format` (str): The audio format to validate.
 
     Returns:
-    --------
-    str : The audio format if valid.
+    -----
+        `str`: The audio format if supported.
 
     Raises:
-    -------
-    argparse.ArgumentTypeError : If from_cli is True and the audio format is invalid.
-    ValidationException : If from_cli is False and the audio format is invalid.
+    -----
+        `ValidationError`: If the audio format is not supported.
     """
-    audio_format = audio_format.lower().lstrip(".")
-    if audio_format not in C.SUPPORTED_AUDIO_FORMATS:
-        _raise_error(
-            f"invalid audio format, got {audio_format!r}\n"
-            f"supported audio formats: {C.SUPPORTED_AUDIO_FORMATS}",
-            from_cli,
+    fmt = audio_format.lower().lstrip(".")
+    if fmt not in C.SUPPORTED_AUDIO_FORMATS:
+        raise ValidationError(
+            f"Unsupported audio format, got {audio_format!r}\n"
+            f"Supported formats: {C.SUPPORTED_AUDIO_FORMATS}"
         )
 
-    return audio_format
+    return fmt
 
 
-def valid_image_format(image_format: str, from_cli: bool = False) -> str:
-    """Validates image format is in a set of valid image formats in `constants.py`
-    and returns the image format if valid. The image format is converted to lowercase
-    and stripped of any leading periods. For example, `jpg` and `.JPG` are both valid
-    image formats.
+def valid_image_format(image_format: str) -> str:
+    """
+    Validate image format is supported by `videoxt` and return it if so.
 
-    Supported formats: `bmp`, `dib`, `jp2`, `jpeg`, `jpg`, `png`, `tif`, `tiff`, `webp`
+    Input is converted to lowercase and stripped of any leading periods. `jpG` and
+    `.JPG` would both be considered valid and returned as `jpg`.
+
+    See supported formats here: `videoxt.constants.SUPPORTED_IMAGE_FORMATS`.
 
     Args:
     -----
-    image_format (str) : The image format to validate.
-    from_cli (bool) : If an error is raised, raise an argparse error if True, otherwise
-        raise a ValidationException.
+        `image_format` (str): The image format to validate.
 
     Returns:
-    --------
-    str : The image format if valid.
+    -----
+        `str`: The image format if valid.
 
     Raises:
-    -------
-    argparse.ArgumentTypeError : If from_cli is True and the image format is invalid.
-    ValidationException : If from_cli is False and the image format is invalid.
+    -----
+        `ValidationError`: If the image format is not supported.
     """
-    image_format = image_format.lower().lstrip(".")
-    if image_format not in C.SUPPORTED_IMAGE_FORMATS:
-        _raise_error(
-            f"invalid image format, got {image_format!r}\n"
-            f"supported image formats: {C.SUPPORTED_IMAGE_FORMATS}",
-            from_cli,
+    fmt = image_format.lower().lstrip(".")
+    if fmt not in C.SUPPORTED_IMAGE_FORMATS:
+        raise ValidationError(
+            f"Invalid image format, got {image_format!r}\n"
+            f"Supported image formats: {C.SUPPORTED_IMAGE_FORMATS}"
         )
 
-    return image_format
+    return fmt
 
 
-def valid_video_filepath(video_filepath: Path, from_cli: bool = False) -> Path:
-    """Returns the filepath to the video file if the file extension is a valid
-    video format as defined in `constants.py`.
+def validate_volume(volume: float | int | str) -> float:
+    """
+    Validate and return non-negative float audio volume. If input is negative, set to 0.
 
     Args:
     -----
-    video_filepath : Path
-        Filepath to the presumed video file.
-    from_cli : bool
-        If True, raise an argparse error. Otherwise, raise a ValidationException.
+        `volume` (float | int | str): The volume to validate.
 
     Returns:
-    --------
-    Path : The filepath to the video file if valid.
+    -----
+        `float`: The volume as a float if valid.
 
     Raises:
-    -------
-    argparse.ArgumentTypeError : If from_cli is True and the video format is invalid.
-    ValidationException : If from_cli is False and the video format is invalid.
+    -----
+        `ValidationError`: If the volume is None.
     """
-    video_filepath = valid_filepath(video_filepath, from_cli)
-    video_format = video_filepath.name.split(".")[-1].lower()
+    if volume is None:
+        raise ValidationError("Volume cannot be None")
 
-    if video_format not in C.SUPPORTED_VIDEO_FORMATS:
-        _raise_error(
-            f"invalid video format, got {video_format!r}\n"
-            f"supported video formats: {C.SUPPORTED_VIDEO_FORMATS}",
-            from_cli,
+    if isinstance(volume, (float, int)):
+        return 0 if volume <= 0 else volume
+    else:
+        return non_negative_float(volume)
+
+
+def valid_video_file_suffix(suffix: str) -> str:
+    """
+    Validate suffix provided is supported by `videoxt` and return it.
+
+    Input is converted to lowercase and stripped of any leading periods. `Mp4` and
+    `.MP4` would both be considered valid and returned as `mp4`.
+
+    Args:
+    -----
+        `suffix` (str): The suffix to validate.
+
+    Returns:
+    -----
+        `str`: The suffix if valid.
+
+    Raises:
+    -----
+        `ValidationError`: If the video format is not supported.
+    """
+    suffix = suffix.lower().lstrip(".")
+    if suffix not in C.SUPPORTED_VIDEO_FORMATS:
+        raise ValidationError(
+            f"Invalid file suffix, got {suffix!r}\n"
+            f"Supported: {C.SUPPORTED_VIDEO_FORMATS}"
         )
 
-    return video_filepath
-
-
-def positive_int_cli(num: str) -> int:
-    """cli version of `positive_int`"""
-    return positive_int(num, from_cli=True)
-
-
-def positive_float_cli(num: str) -> float:
-    """cli version of `positive_float`"""
-    return positive_float(num, from_cli=True)
-
-
-def non_negative_float_cli(num: str) -> float:
-    """cli version of `non_negative_float`"""
-    return non_negative_float(num, from_cli=True)
-
-
-def valid_dir_cli(dir: str) -> Path:
-    """cli version of `valid_dir`"""
-    return valid_dir(dir, from_cli=True)
-
-
-def valid_filepath_cli(filepath: str) -> Path:
-    """cli version of `valid_filepath`"""
-    return valid_filepath(filepath, from_cli=True)
-
-
-def valid_filename_cli(filename: str) -> str:
-    """cli version of `valid_filename`"""
-    return valid_filename(filename, from_cli=True)
-
-
-def valid_audio_format_cli(audio_format: str) -> str:
-    """cli version of `valid_audio_format`"""
-    return valid_audio_format(audio_format, from_cli=True)
-
-
-def valid_image_format_cli(image_format: str) -> str:
-    """cli version of `valid_image_format`"""
-    return valid_image_format(image_format, from_cli=True)
-
-
-def valid_resize_value_cli(resize_value: str) -> float:
-    """cli version of `valid_resize_value`"""
-    return valid_resize_value(resize_value, from_cli=True)
-
-
-def valid_rotate_value_cli(rotate_value: str) -> int:
-    """cli version of `valid_rotate_value`"""
-    return valid_rotate_value(rotate_value, from_cli=True)
-
-
-def valid_start_time_cli(start_time: str) -> t.Union[float, str]:
-    """cli version of `valid_start_time`"""
-    return valid_start_time(start_time, from_cli=True)
-
-
-def valid_stop_time_cli(stop_time: str) -> t.Union[float, str]:
-    """cli version of `valid_stop_time`"""
-    return valid_stop_time(stop_time, from_cli=True)
+    return suffix

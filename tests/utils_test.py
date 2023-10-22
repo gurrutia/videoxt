@@ -395,6 +395,7 @@ def test_to_json_mixin_to_json():
     class TestClass(ToJsonMixin):
         a: str
         b: int
+        _private: bool = True
 
     test_obj = TestClass("c", 4)
     expected_json = '{\n  "a": "c",\n  "b": 4\n}'

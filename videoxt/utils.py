@@ -324,8 +324,17 @@ class ToJsonMixin:
     """A mixin for dataclasses that can be represented as JSON."""
 
     def json(self) -> str:
-        """Return a JSON string representation of the dataclass."""
-        return json.dumps(asdict(self), indent=2, cls=CustomJSONEncoder)
+        """
+        Return a JSON string representation of the dataclass.
+
+        Private attributes are excluded from the JSON string.
+
+        Returns:
+        -----
+            `str`: JSON string representation of the dataclass.
+        """
+        public_keys = {k: v for k, v in asdict(self).items() if not k.startswith("_")}
+        return json.dumps(public_keys, indent=2, cls=CustomJSONEncoder)
 
 
 class DataclassType(Protocol):

@@ -1,127 +1,345 @@
-import datetime
-import typing as t
+"""Utility functions and classes used throughout the library."""
+import json
+from dataclasses import asdict, dataclass
+from datetime import timedelta
 from pathlib import Path
+from typing import Any, ClassVar, Optional, Protocol
+
+from videoxt.constants import ExtractionMethod
+from videoxt.validators import positive_float, positive_int, valid_filename
 
 
 def timestamp_to_seconds(timestamp: str) -> float:
-    """Converts a timestamp string to seconds. Microseconds are truncated.
+    """
+    Convert a timestamp string to the total number of seconds (float) it represents.
 
-    Examples:
-        >>> timestamp_to_seconds("0:00")
-        0.0
-        >>> timestamp_to_seconds("0:59")
-        59.0
+    Accepts the formats "HH:MM:SS", "H:MM:SS", "MM:SS", "M:SS", "SS" or "S".
+    Microseconds are truncated.
+
+    Usage:
+    -----
+
         >>> timestamp_to_seconds("1:01")
         61.0
-        >>> timestamp_to_seconds("1:01.123456")
+        >>> timestamp_to_seconds("1:01.987654321")
         61.0
+        >>> timestamp_to_seconds("10:00")
+        600.0
+        >>> timestamp_to_seconds("1:00:00")
+        3600.0
 
     Args:
-        timestamp: A timestamp string in the format "HH:MM:SS" or "SS".
+    -----
+        `timestamp` (str):
+            A timestamp string in the format "HH:MM:SS", "H:MM:SS", "MM:SS", "M:SS",
+            "SS" or "S"
 
     Returns:
-        float: The number of seconds represented by the timestamp.
+    -----
+        `float`: The number of seconds converted from the timestamp string.
     """
     timestamp = timestamp.split(".")[0]
     time_parts = timestamp.split(":")
     total_seconds = sum(
-        float(part) * 60**pwr for pwr, part in enumerate(reversed(time_parts))
+        float(part) * 60**exponent
+        for exponent, part in enumerate(reversed(time_parts))
     )
 
     return total_seconds
 
 
 def seconds_to_timestamp(seconds: float) -> str:
-    """Converts seconds to a timestamp string. Microseconds are truncated.
+    """
+    Convert seconds to a time duration string in the format "HH:MM:SS" or "H:MM:SS".
 
-    Examples:
-        >>> seconds_to_timestamp(0)
-        '0:00:00'
-        >>> seconds_to_timestamp(59)
-        '0:00:59'
-        >>> seconds_to_timestamp(61)
-        '0:01:01'
-        >>> seconds_to_timestamp(61.123456)
-        '0:01:01'
+    Microseconds are truncated.
+
+    Usage:
+    -----
+        >>> seconds_to_timestamp(60)
+        '0:01:00'
+        >>> seconds_to_timestamp(60.987654321)
+        '0:01:00'
+        >>> seconds_to_timestamp(600)
+        '0:10:00'
+        >>> seconds_to_timestamp(3600)
+        '1:00:00'
 
     Args:
-        seconds: The number of seconds to convert represented by a float.
+    -----
+        `seconds` (float): The number of seconds to convert to a timestamp.
 
     Returns:
-        str: A timestamp string in the format "HH:MM:SS".
+    -----
+        `str`: A timestamp string in the format "HH:MM:SS" or "H:MM:SS".
     """
     if seconds <= 0:
         return "0:00:00"
 
-    return str(datetime.timedelta(seconds=int(seconds)))
+    return str(timedelta(seconds=int(seconds)))
 
 
-def enumerate_dir(dir_path: Path) -> Path:
-    """Returns a Path object with an enumerated name if a directory with the same
-    name already exists. If the directory does not exist, the original path is returned.
+def timedelta_to_timestamp(duration: timedelta) -> str:
+    """
+    Convert a timedelta to a time duration string in the format "HH:MM:SS".
 
-    Examples:
-        >>> enumerate_dir(Path("test_dir"))
-        Path('test_dir')
-        >>> enumerate_dir(Path("test_dir"))
-        Path('test_dir (2)')
-        >>> enumerate_dir(Path("test_dir (2)"))
-        Path('test_dir (3)')
+    Microseconds are truncated.
+
+    Usage:
+    -----
+        >>> timedelta_to_timestamp(timedelta(seconds=59))
+        '00:00:59'
+        >>> timedelta_to_timestamp(timedelta(seconds=61.987654321))
+        '00:01:01'
+        >>> timedelta_to_timestamp(timedelta(seconds=600))
+        '00:10:00'
 
     Args:
-        dir_path: The path to the directory to enumerate.
+    -----
+        `duration` (datetime.timedelta): The duration to convert to a timestamp.
 
     Returns:
-        Path: A Path object with an enumerated name if a directory with the same
-            name already exists. If the directory does not exist, the original path is
-            returned.
+    -----
+        `str`: A timestamp string in the format "HH:MM:SS".
     """
-    if not dir_path.exists():
-        return dir_path
+    total_seconds = duration.total_seconds()
 
-    index = 2
+    if total_seconds < 0:
+        raise ValueError(
+            f"Invalid duration: timedelta must be non-negative: {duration}"
+        )
+
+    hours, remainder = divmod(total_seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+
+    return f"{int(hours):02}:{int(minutes):02}:{int(seconds):02}"
+
+
+def append_enumeration(index: int, label: Optional[str] = None) -> str:
+    """
+    Return an enumerated file name with the given index and optional label.
+
+    The returned string is intended to be appended to a file name or directory name.
+    If the label is None, only the index is used to enumerate the file name starting
+    from 1. If a label is provided, the label is appended to the file name before the
+    index. Mimics the behavior of Windows when creating a file or directory with the
+    same name as an existing file or directory.
+
+    Usage:
+    -----
+        >>> append_enumeration(1)
+        ' (1)'
+        >>> append_enumeration(2)
+        ' (2)'
+        >>> append_enumeration(1, label="_vxt")
+        '_vxt'
+        >>> append_enumeration(2, label="_vxt")
+        '_vxt (2)'
+
+    Args:
+    -----
+        `index` (int):
+            The enumeration index. Must be greater than 0.
+        `label` (Optional[str]):
+            The label to enumerate. If None, only the index is used.
+
+    Returns:
+    -----
+        `str`: The enumerated string to append to a file name or directory name.
+    """
+    if index < 1:
+        raise ValueError(f"Enumeration index must be greater than 0, got {index}.")
+
+    if label is None:
+        return f" ({index})"
+
+    # Ensure the label doesn't contain invalid characters.
+    label = valid_filename(label)
+
+    return f"{label} ({index})" if index > 1 else label
+
+
+def enumerate_dir(dir: Path, label: Optional[str] = None) -> Path:
+    """
+    Return a non-existent, potentially enumerated directory path.
+
+    See `videoxt.utils.append_enumeration` for more information on how the directory
+    name is enumerated with or without a label.
+
+    Usage:
+    -----
+        >>> from pathlib import Path
+        >>> path = Path("test_dir")  # Assume 'test_dir' doesn't exist.
+        >>> enumerate_dir(path, label="_frames")
+        Path('test_dir')
+        >>> enumerate_dir(path, label="_frames")
+        Path('test_dir_frames')
+        >>> enumerate_dir(path, label="_frames")
+        Path('test_dir_frames (2)')
+
+    Args:
+    -----
+        `dir`:
+            The path to the directory to potentially enumerate.
+        `label` (Optional[str]):
+            The label to enumerate. If None, only the index is used.
+
+    Returns:
+    ------
+        `pathlib.Path`: The path to a non-existent directory.
+    """
+    if not dir.exists():
+        return dir
+
+    index = 1
     while True:
-        new_dir_path = dir_path.with_name(f"{dir_path.name} ({index})")
-        if not new_dir_path.exists():
-            return new_dir_path
+        append_str = append_enumeration(index, label=label)
+        new_dir = dir.with_name(f"{dir.name}{append_str}")
+        if not new_dir.exists():
+            return new_dir
         index += 1
 
 
-def enumerate_filepath(filepath: Path) -> Path:
-    """Returns new Path object with an enumerated name if a file with the same name
-    already exists. If the file does not exist, the original path is returned.
+def enumerate_filepath(filepath: Path, label: Optional[str] = None) -> Path:
+    """
+    Return a non-existent, potentially enumerated file path.
 
-    Examples:
-        >>> enumerate_filepath(Path("test.txt"))
-        Path('test.txt')
-        >>> enumerate_filepath(Path("test.txt"))
-        Path('test (2).txt')
-        >>> enumerate_filepath(Path("test (2).txt"))
-        Path('test (3).txt')
+    See `videoxt.utils.append_enumeration` for more information on how the file name
+    is enumerated with or without a label.
+
+    Usage:
+    -----
+        >>> from pathlib import Path
+        >>> filepath = Path('test.mp4')  # Assume 'test.mp4' doesn't exist.
+        >>> enumerate_filepath(filepath, label="_vxt")
+        Path('test.mp4')
+        >>> enumerate_filepath(filepath, label="_vxt")
+        Path('test_vxt.mp4')
+        >>> enumerate_filepath(filepath, label="_vxt")
+        Path('test_vxt (2).mp4')
 
     Args:
-        filepath: The path to the file to enumerate.
+    -----
+        `filepath` (pathlib.Path): The path to the file to potentially enumerate.
 
     Returns:
-        Path: A Path object with an enumerated name if a file with the same name
-            already exists. If the file does not exist, the original path is returned.
+    -----
+        `pathlib.Path`: The path to a non-existent file.
     """
     if not filepath.exists():
         return filepath
 
-    index = 2
+    index = 1
     while True:
-        new_filepath = filepath.with_name(f"{filepath.stem} ({index}){filepath.suffix}")
+        append_str = append_enumeration(index, label)
+        new_filename = f"{filepath.stem}{append_str}{filepath.suffix}"
+        new_filepath = filepath.with_name(new_filename)
+
         if not new_filepath.exists():
             return new_filepath
+
         index += 1
 
 
-def parse_kwargs(kwargs: t.Dict[str, t.Any], cls: t.Type[t.Any]) -> t.Dict[str, t.Any]:
-    """Parses a dictionary of keyword arguments and returns only those that match a
-    given dataclass.
+def calculate_duration(frame_count: int, fps: float) -> timedelta:
+    """
+    Return a timedelta representing the duration of a video using frame count and fps.
 
-    Example:
+    Args:
+    -----
+        `frame_count` (int):
+            The total number of frames in the video.
+        `fps` (float):
+            The frames per second of the video.
+
+    Returns:
+    -----
+        `datetime.timedelta`: The duration of the video.
+
+    Raises:
+    -----
+        `ZeroDivisionError`: If the fps is 0.
+    """
+    frame_count = positive_int(frame_count)
+    fps = positive_float(fps)
+
+    try:
+        td = timedelta(seconds=frame_count / fps)
+    except ZeroDivisionError:
+        raise ZeroDivisionError("FPS cannot be 0.")
+    else:
+        return td
+
+
+def convert_bytes(n: int) -> str:
+    """
+    Convert n bytes (int) to a human readable string.
+
+    Usage:
+    -----
+        >>> convert_bytes(1)
+        '1.00 bytes'
+        >>> convert_bytes(1024)
+        '1.00 KB'
+        >>> convert_bytes(1024**2)
+        '1.00 MB'
+        >>> convert_bytes(1024**3)
+        '1.00 GB'
+        >>> convert_bytes(1024**4)
+        '1.00 TB'
+        >>> convert_bytes(1024**5)
+        '1.00 PB'
+
+    Args:
+    -----
+        `n` (int): The number of bytes to convert.
+
+    Returns:
+    -----
+        `str`: A human readable string representing the number of bytes.
+    """
+    n = positive_int(n)
+    for size in ["bytes", "KB", "MB", "GB", "TB"]:
+        if n < 1024.0:
+            return f"{n:.2f} {size}"
+        n /= 1024.0
+
+    return f"{n:.2f} PB"
+
+
+class CustomJSONEncoder(json.JSONEncoder):
+    """A custom JSON encoder for types that are not JSON serializable."""
+
+    def default(self, obj) -> Any:
+        """Return a JSON serializable representation of the object."""
+        if isinstance(obj, (Path, timedelta)):
+            return str(obj)
+        if isinstance(obj, ExtractionMethod):
+            return obj.value
+        return json.JSONEncoder.default(self, obj)
+
+
+@dataclass
+class ToJsonMixin:
+    """A mixin for dataclasses that can be represented as JSON."""
+
+    def json(self) -> str:
+        """Return a JSON string representation of the dataclass."""
+        return json.dumps(asdict(self), indent=2, cls=CustomJSONEncoder)
+
+
+class DataclassType(Protocol):
+    """Protocol representing dataclass attributes for type-hinting purposes."""
+
+    __dataclass_fields__: ClassVar[dict]
+
+
+def parse_kwargs(kwargs: dict[str, Any], obj: DataclassType) -> dict[str, Any]:
+    """
+    Return the keys and values in `kwargs` present in the `obj` dataclass attributes.
+
+    Usage:
+    -----
         >>> from dataclasses import dataclass
         >>> @dataclass
         ... class Test:
@@ -131,10 +349,14 @@ def parse_kwargs(kwargs: t.Dict[str, t.Any], cls: t.Type[t.Any]) -> t.Dict[str, 
         {'a': 1, 'b': 2}
 
     Args:
-        kwargs: A dictionary of keyword arguments you want to parse.
-        cls: The dataclass to match the keyword arguments against.
+    -----
+        `kwargs` (dict[str, Any]):
+            A dictionary to filter down to keys present in the `obj` attributes.
+        `obj` (dataclasses.dataclass):
+            A dataclass to filter the `kwargs` dictionary with.
 
     Returns:
-        dict: A dictionary of keyword arguments that match the given dataclass.
+    -----
+        `dict`: A dictionary of keyword arguments present in the `obj` attributes.
     """
-    return {k: v for k, v in kwargs.items() if k in cls.__dataclass_fields__}
+    return {k: v for k, v in kwargs.items() if k in obj.__dataclass_fields__}

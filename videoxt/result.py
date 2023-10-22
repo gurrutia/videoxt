@@ -1,3 +1,4 @@
+"""Containers for extraction results."""
 from dataclasses import dataclass
 from typing import Optional
 
@@ -34,4 +35,5 @@ class Result(ToJsonMixin):
     elapsed_time: Optional[float] = None
 
     def __str__(self) -> str:
+        """Return a string representation of the Result."""
         return f"[yellow]<Result>[/yellow]\n{self.json()}"

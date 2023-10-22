@@ -10,11 +10,11 @@ from videoxt.exceptions import ValidationError
 from videoxt.utils import (
     CustomJSONEncoder,
     ToJsonMixin,
+    append_enumeration,
     calculate_duration,
     convert_bytes,
     enumerate_dir,
     enumerate_filepath,
-    enumerated_pattern,
     parse_kwargs,
     seconds_to_timestamp,
     timedelta_to_timestamp,
@@ -254,21 +254,21 @@ def test_parse_kwargs(kwargs: dict, expected: dict):
     assert parse_kwargs(kwargs, Image) == expected
 
 
-def test_enumerated_pattern_when_only_index_is_entered():
-    assert enumerated_pattern(1) == " (1)"
-    assert enumerated_pattern(2) == " (2)"
-    assert enumerated_pattern(3) == " (3)"
+def test_append_enumeration_when_only_index_is_entered():
+    assert append_enumeration(1) == " (1)"
+    assert append_enumeration(2) == " (2)"
+    assert append_enumeration(3) == " (3)"
 
 
-def test_enumerated_pattern_when_index_and_label_are_entered():
-    assert enumerated_pattern(1, label="_vxt") == "_vxt"
-    assert enumerated_pattern(2, label="_vxt") == "_vxt (2)"
-    assert enumerated_pattern(3, label="_vxt") == "_vxt (3)"
+def test_append_enumeration_when_index_and_label_are_entered():
+    assert append_enumeration(1, label="_vxt") == "_vxt"
+    assert append_enumeration(2, label="_vxt") == "_vxt (2)"
+    assert append_enumeration(3, label="_vxt") == "_vxt (3)"
 
 
-def test_enumerated_pattern_when_index_is_0():
+def test_append_enumeration_when_index_is_0():
     with pytest.raises(ValueError):
-        enumerated_pattern(0)
+        append_enumeration(0)
 
 
 def test_calculate_duration_with_valid_inputs():

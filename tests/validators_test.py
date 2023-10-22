@@ -16,7 +16,6 @@ from videoxt.validators import (
     valid_filename,
     valid_filepath,
     valid_image_format,
-    valid_resize_value,
     valid_rotate_value,
     valid_start_time,
     valid_stop_time,
@@ -593,39 +592,6 @@ def test_valid_dimensions_valid_dimensions(
 def test_valid_dimensions_invalid_dimensions(dimensions: tuple[int, int]):
     with pytest.raises(ValidationError):
         valid_dimensions(dimensions)
-
-
-@pytest.mark.parametrize(
-    ("resize_value", "expected_value"),
-    [
-        (1.0, 1.0),
-        (1, 1.0),
-        ("0.01", 0.01),
-    ],
-)
-def test_valid_resize_value_valid_values(
-    resize_value: float | str, expected_value: float | str
-):
-    assert valid_resize_value(resize_value) == expected_value
-
-
-@pytest.mark.parametrize(
-    ("resize_value"),
-    [
-        (-1),
-        ("-1"),
-        (0),
-        ("0"),
-        (0.0),
-        ("0.0"),
-        ("abc"),
-        (""),
-        (None),
-    ],
-)
-def test_valid_resize_value_invalid_values(resize_value):
-    with pytest.raises(ValidationError):
-        valid_resize_value(resize_value)
 
 
 def test_valid_rotate_value_valid_rotate_ints():

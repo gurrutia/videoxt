@@ -1,3 +1,6 @@
+"""Contains custom exceptions raised by videoxt."""
+
+
 class VideoXTError(Exception):
     """A videoxt specific error occurred."""
 
@@ -11,10 +14,7 @@ class InvalidExtractionMethod(VideoXTError):
 
 
 class ClosedVideoCaptureError(VideoXTError):
-    """
-    An error occurred attempting to open or maintain a `cv2.VideoCapture` in an open
-    state.
-    """
+    """A `cv2.VideoCapture` was unexpectedly closed."""
 
     pass
 

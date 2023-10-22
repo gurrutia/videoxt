@@ -1,7 +1,4 @@
-"""
-Contains functions used to edit VideoFileClip or np.ndarray objects prior to extraction.
-"""
-
+"""Contains functions used to edit a VideoFileClip or np.ndarray prior to extraction."""
 import cv2  # type: ignore
 import numpy as np
 from moviepy.editor import afx  # type: ignore
@@ -65,7 +62,7 @@ def edit_clip_image(
     clip: VideoFileClip, dimensions: tuple[int, int], rotate: int, monochrome: bool
 ) -> VideoFileClip:
     """
-    dit the image properties of a VideoFileClip by resizing, rotating, and converting
+    Edit the image properties of a VideoFileClip by resizing, rotating, and converting
     to monochrome if specified and return the edited clip.
 
     Args:

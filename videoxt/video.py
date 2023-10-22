@@ -1,3 +1,4 @@
+"""Contains Video class and functions for validating and retrieving video properties."""
 from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass, field
@@ -66,12 +67,12 @@ class Video:
         """Run video file validations and set attributes read from a validated video."""
         self.validate_filepath()
         self.validate_filesize_bytes()
-        self.validate_filesize()
         self.setattrs_from_opencap()
         self.validate_dimensions()
         self.validate_fps()
         self.validate_frame_count()
         self.setattrs_duration()
+        self.setattr_filesize()
         self.setattr_has_audio()
 
     def validate_filepath(self) -> Path:
@@ -79,26 +80,13 @@ class Video:
         self.filepath = V.valid_filepath(self.filepath, is_video=True)
         return self.filepath
 
-    def validate_filesize_bytes(self) -> int:
-        """Validate the video file size in bytes is a positive integer."""
-        try:
-            self.filesize_bytes = V.positive_int(self.filepath.stat().st_size)
-        except ValidationError as err:
-            raise VideoValidationError(
-                "The video file size could not be read. Please check the file."
-            ) from err
-
-        return self.filesize_bytes
-
-    def validate_filesize(self) -> str:
+    def setattr_filesize(self) -> str:
+        """Set the filesize attribute to a human-readable format."""
         self.filesize = U.convert_bytes(self.filesize_bytes)
         return self.filesize
 
     def setattrs_from_opencap(self) -> tuple[tuple[int, int], float, int]:
-        """
-        Set the dimensions, fps and frame count attributes read from an opened video
-        capture.
-        """
+        """Set the dimensions, fps and frame count read from an opened video capture."""
         properties = fetch_video_properties(self.filepath)
         self.dimensions = properties.get("dimensions", None)
         self.fps = properties.get("fps", None)
@@ -166,6 +154,17 @@ class Video:
         self.duration_timestamp = U.seconds_to_timestamp(self.duration_seconds)
         return self.duration, self.duration_seconds, self.duration_timestamp
 
+    def validate_filesize_bytes(self) -> int:
+        """Validate the video file size in bytes is a positive integer."""
+        try:
+            self.filesize_bytes = V.positive_int(self.filepath.stat().st_size)
+        except ValidationError as err:
+            raise VideoValidationError(
+                "The video file size could not be read. Please check the file."
+            ) from err
+
+        return self.filesize_bytes
+
     def setattr_has_audio(self) -> bool:
         """Set the has_audio attribute with moviepy.editor import VideoFileClip.audio"""
         with VideoFileClip(str(self.filepath)) as clip:
@@ -191,7 +190,6 @@ def fetch_video_properties(filepath: Path) -> dict[str, Any]:
             - "fps" (float): Frame rate of the video.
             - "frame_count" (int): Number of frames in the video.
     """
-
     with open_video_capture(filepath) as opencap:
         frame_height: int = opencap.get(cv2.CAP_PROP_FRAME_HEIGHT)
         frame_width: int = opencap.get(cv2.CAP_PROP_FRAME_WIDTH)
@@ -208,7 +206,7 @@ def fetch_video_properties(filepath: Path) -> dict[str, Any]:
 @contextmanager
 def open_video_capture(filepath: Path) -> Iterator[cv2.VideoCapture]:
     """
-    A context manager for opening a video file with `cv2.VideoCapture`.
+    Context manager for opening a video file with `cv2.VideoCapture`.
 
     Usage:
     -----
@@ -236,7 +234,6 @@ def open_video_capture(filepath: Path) -> Iterator[cv2.VideoCapture]:
         - `UnboundLocalError`: If the user cancels the operation. This is raised by
             `cv2.VideoCapture.release()` when the video capture is not opened.
     """
-
     try:
         video_capture = cv2.VideoCapture(str(filepath))
         if not video_capture.isOpened():

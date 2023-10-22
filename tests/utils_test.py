@@ -279,20 +279,29 @@ def test_calculate_duration_with_valid_inputs():
     assert result == expected_duration
 
 
-def test_calculate_duration_with_negative_frame_count_should_raise_value_error():
-    with pytest.raises(ValueError) as exc_info:
+def test_calculate_duration_with_negative_frame_count_should_raise_validation_error():
+    with pytest.raises(ValidationError):
         calculate_duration(-120, 30.0)
-    assert "Could not calculate duration, frame_count must be greater than 0" in str(
-        exc_info.value
-    )
 
 
-def test_calculate_duration_with_frame_count_zero_should_raise_value_error():
-    with pytest.raises(ValueError) as exc_info:
+def test_calculate_duration_with_frame_count_zero_should_raise_validation_error():
+    with pytest.raises(ValidationError):
         calculate_duration(0, 30.0)
-    assert "Could not calculate duration, frame_count must be greater than 0" in str(
-        exc_info.value
-    )
+
+
+def test_calculate_duration_with_frame_count_point_five_should_raise_validation_error():
+    with pytest.raises(ValidationError):
+        calculate_duration(0.5, 30.0)
+
+
+def test_calculate_duration_with_negative_fps_should_raise_validation_error():
+    with pytest.raises(ValidationError):
+        calculate_duration(120, -30.0)
+
+
+def test_calculate_duration_with_fps_zero_should_raise_validation_error():
+    with pytest.raises(ValidationError):
+        calculate_duration(120, 0.0)
 
 
 def test_timedelta_to_timestamp_with_zero_seconds():

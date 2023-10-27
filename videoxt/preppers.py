@@ -84,8 +84,6 @@ class ExtractionRange:
     def to_dict(self) -> dict[str, Any]:
         """Return a dictionary of the validated extraction start and stop points."""
         return {
-            "start_request": self.start_request,
-            "stop_request": self.stop_request,
             "start_second": self.start_second,
             "stop_second": self.stop_second,
             "start_timestamp": self.start_timestamp,

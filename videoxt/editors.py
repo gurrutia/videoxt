@@ -10,7 +10,9 @@ import videoxt.constants as C
 
 
 def trim_clip(
-    clip: VideoFileClip, start_second: Optional[float], stop_second: Optional[float]
+    clip: VideoFileClip,
+    start_second: Optional[float] = None,
+    stop_second: Optional[float] = None,
 ) -> VideoFileClip:
     """
     Trim a VideoFileClip to a specific time range and return the trimmed clip.

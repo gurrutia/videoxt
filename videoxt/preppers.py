@@ -295,3 +295,26 @@ def prepare_start_time(
         `float | int | str`: The start time requested or 0 if not provided.
     """
     return request_start_time if request_start_time is not None else 0
+
+
+def prepare_stop_time(
+    video_duration_seconds: float, request_stop_time: Optional[float | int | str] = None
+) -> float | int | str:
+    """
+    Return the stop time requested or the video's duration if not provided.
+
+    Args:
+    -----
+        `video_duration_seconds` (float):
+            Duration of the video in seconds.
+        `request_stop_time` (Optional[float | int | str]):
+            Optional stop time requested. Defaults to None.
+
+    Returns:
+    -----
+        `float | int | str`: The stop time requested or the video's duration if not
+            provided.
+    """
+    return (
+        request_stop_time if request_stop_time is not None else video_duration_seconds
+    )

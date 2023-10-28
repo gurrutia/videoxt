@@ -1,4 +1,6 @@
 """Contains functions used to edit a VideoFileClip or np.ndarray prior to extraction."""
+from typing import Optional
+
 import cv2  # type: ignore
 import numpy as np
 from moviepy.editor import afx  # type: ignore
@@ -8,7 +10,7 @@ import videoxt.constants as C
 
 
 def trim_clip(
-    clip: VideoFileClip, start_second: float, stop_second: float
+    clip: VideoFileClip, start_second: Optional[float], stop_second: Optional[float]
 ) -> VideoFileClip:
     """
     Trim a VideoFileClip to a specific time range and return the trimmed clip.
@@ -17,15 +19,24 @@ def trim_clip(
     -----
         `clip` (moviepy.editor.VideoFileClip):
             The clip to trim.
-        `start_second` (float):
-            The start time in seconds.
-        `stop_second` (float):
-            The stop time in seconds.
+        `start_second` (Optional[float]):
+            The start time in seconds. If None, the trim will start at the beginning.
+        `stop_second` (Optional[float]):
+            The stop time in seconds. If None, the clip will be trimmed to the end.
 
     Returns:
     -----
         `moviepy.editor.VideoFileClip`: The trimmed clip.
     """
+    if start_second is None and stop_second is None:
+        return clip
+
+    if start_second is None:
+        start_second = 0.0
+
+    if stop_second is None:
+        stop_second = clip.duration
+
     return clip.subclip(start_second, stop_second)
 
 

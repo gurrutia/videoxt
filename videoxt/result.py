@@ -33,7 +33,3 @@ class Result(ToJsonMixin):
     message: Optional[str] = None
     destpath: Optional[str] = None
     elapsed_time: Optional[float] = None
-
-    def __str__(self) -> str:
-        """Return a string representation of the Result."""
-        return f"[yellow]<Result>[/yellow]\n{self.json()}"

@@ -390,7 +390,19 @@ def test_custom_json_encoder_encode_custom_object():
     assert encoded_custom_obj == '"audio"'
 
 
-def test_to_json_mixin_to_json():
+def test_to_json_mixin_to_json_skip_private_keys_is_false():
+    @dataclass
+    class TestClass(ToJsonMixin):
+        a: str
+        b: int
+        _private: bool = True
+
+    test_obj = TestClass("c", 4)
+    expected_json = '{\n  "a": "c",\n  "b": 4,\n  "_private": true\n}'
+    assert test_obj.json(skip_private_keys=False) == expected_json
+
+
+def test_to_json_mixin_to_json_skip_private_keys_is_true():
     @dataclass
     class TestClass(ToJsonMixin):
         a: str
@@ -399,4 +411,4 @@ def test_to_json_mixin_to_json():
 
     test_obj = TestClass("c", 4)
     expected_json = '{\n  "a": "c",\n  "b": 4\n}'
-    assert test_obj.json() == expected_json
+    assert test_obj.json(skip_private_keys=True) == expected_json

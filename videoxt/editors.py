@@ -148,7 +148,10 @@ def edit_clip_motion(
 
 
 def edit_image(
-    image: np.ndarray, dimensions: tuple[int, int], rotate: int, monochrome: bool
+    image: np.ndarray,
+    dimensions: Optional[tuple[int, int]] = None,
+    rotate: Optional[int] = None,
+    monochrome: Optional[bool] = None,
 ) -> np.ndarray:
     """
     Edit a numpy.ndarray image by resizing, rotating, and converting to monochrome
@@ -158,21 +161,29 @@ def edit_image(
     -----
         `image` (np.ndarray):
             The image to edit.
-        `dimensions` (tuple[int, int]):
-            The dimensions to resize the image to.
-        `rotate` (int):
-            The degrees to rotate the image.
-        `monochrome` (bool):
-            Whether to convert the image to monochrome.
+        `dimensions` (Optional[tuple[int, int]]):
+            The dimensions to resize the image to. If None, the image will not be
+            resized.
+        `rotate` (Optional[int]):
+            The degrees to rotate the image. If None, the image will not be rotated.
+        `monochrome` (Optional[bool]):
+            Whether to convert the image to monochrome. If None, the black and white
+            filter will not be applied.
 
     Returns:
     -----
         `np.ndarray`: The edited image.
     """
-    image = cv2.resize(image, dimensions)
+    if dimensions is not None and dimensions != image.shape:
+        image = cv2.resize(image, dimensions)
 
-    if rotate != 0:
-        image = cv2.rotate(image, C.ROTATION_MAP[rotate])
+    if rotate != 0 and rotate is not None:
+        try:
+            rotate_value = C.ROTATION_MAP[rotate]
+        except KeyError:
+            pass  # XXX: log
+        else:
+            image = cv2.rotate(image, rotate_value)
 
     if monochrome:
         image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)

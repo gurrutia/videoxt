@@ -326,18 +326,22 @@ class CustomJSONEncoder(json.JSONEncoder):
 class ToJsonMixin:
     """A mixin for dataclasses that can be represented as JSON."""
 
-    def json(self) -> str:
+    def json(self, skip_private_keys: bool = False) -> str:
         """
         Return a JSON string representation of the dataclass.
 
-        Private attributes are excluded from the JSON string.
+        Args:
+        -----
+            `skip_private_keys` (bool):
+                If True, private keys (keys starting with '_') are not included in the
+                JSON string.
 
         Returns:
         -----
             `str`: JSON string representation of the dataclass.
         """
-        public_keys = {k: v for k, v in asdict(self).items() if not k.startswith("_")}
-        return json.dumps(public_keys, indent=2, cls=CustomJSONEncoder)
+        d = remove_private_keys(asdict(self)) if skip_private_keys else asdict(self)
+        return json.dumps(d, indent=2, cls=CustomJSONEncoder)
 
     def verbose_print(self, title: str) -> None:
         """Print the public keys of the JSON to console with a title."""

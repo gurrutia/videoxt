@@ -213,20 +213,20 @@ def prepare_extraction_range(
 
 def prepare_dimensions(
     video_dimensions: tuple[int, int],
-    resize: float,
     request_dimensions: Optional[tuple[int, int]] = None,
+    request_resize: Optional[float] = None,
 ) -> tuple[int, int]:
     """
-    Prepare validated dimensions for extraction considering resize factor.
+    Return dimensions to use for extraction.
 
     Args:
     -----
         `video_dimensions` (tuple[int, int]):
             Dimensions of the video.
-        `resize` (float):
-            Resize factor to apply to the video.
         `request_dimensions` (Optional[tuple[int, int]]):
-            Optional dimensions to use. Defaults to None.
+            Optional dimensions that override the video's dimensions.
+        `request_resize` (Optional[float]):
+            Requested resize factor to apply to the video's dimensions.
 
     Returns:
     -----
@@ -234,8 +234,8 @@ def prepare_dimensions(
     """
     dims = request_dimensions or video_dimensions
 
-    if resize != 1.0:
-        dims = (int(dims[0] * resize), int(dims[1] * resize))
+    if request_resize != 1.0 and request_resize is not None:
+        dims = (int(dims[0] * request_resize), int(dims[1] * request_resize))
 
     return dims
 

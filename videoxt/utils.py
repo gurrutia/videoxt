@@ -1,5 +1,6 @@
 """Utility functions and classes used throughout the library."""
 import json
+from collections import defaultdict
 from dataclasses import asdict, dataclass
 from datetime import timedelta
 from pathlib import Path
@@ -341,6 +342,25 @@ class DataclassType(Protocol):
     """Protocol representing dataclass attributes for type-hinting purposes."""
 
     __dataclass_fields__: ClassVar[dict]
+
+
+def remove_private_keys(d: dict[str, Any]) -> dict[str, Any]:
+    """
+    Return a copy of the dictionary without private keys (keys starting with '_').
+
+    Args:
+    -----
+        `d` (dict): The dictionary you want to remove private keys from.
+
+    Returns:
+    -----
+        `dict[str, Any]`: A new dictionary containing public keys only.
+    """
+    copied_dict: defaultdict[str, Any] = defaultdict(dict)
+    for k, v in d.items():
+        if not k.startswith("_"):
+            copied_dict[k] = remove_private_keys(v) if isinstance(v, dict) else v
+    return dict(copied_dict)
 
 
 def parse_kwargs(kwargs: dict[str, Any], obj: DataclassType) -> dict[str, Any]:

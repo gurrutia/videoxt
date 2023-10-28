@@ -390,3 +390,39 @@ def prepare_destpath_frames(
         return U.enumerate_dir(default_destdir, label="_frames")
 
     return request_destdir
+
+
+def prepare_images_expected(
+    start_frame: Optional[int] = None,
+    stop_frame: Optional[int] = None,
+    capture_rate: Optional[int] = None,
+) -> int:
+    """
+    Return the number of images (frames) expected to be written to disk.
+
+    Args:
+    -----
+        `start_frame` (Optional[int]):
+            The frame number to start extraction from.
+        `stop_frame` (Optional[int]):
+            The frame number to stop extraction at.
+        `capture_rate` (Optional[int]):
+            The number of frames to increment by.
+
+    Returns:
+    -----
+        `int`: The number of images expected to be extracted.
+
+    Raises:
+    -----
+        `PreparationError`:
+        - If the start frame, stop frame or capture rate is None
+        - If the capture rate is zero.
+    """
+    if start_frame is None or stop_frame is None or capture_rate is None:
+        raise PreparationError("Start frame, stop frame or capture rate is None.")
+
+    try:
+        return math.ceil((stop_frame - start_frame) / capture_rate)
+    except ZeroDivisionError as e:
+        raise PreparationError("Capture rate is zero.") from e

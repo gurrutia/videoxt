@@ -316,7 +316,7 @@ class CustomJSONEncoder(json.JSONEncoder):
             return str(obj)
         if isinstance(obj, ExtractionMethod):
             return obj.value
-        return json.JSONEncoder.default(self, obj)
+        return super().default(obj)
 
 
 @dataclass

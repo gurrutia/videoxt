@@ -88,11 +88,12 @@ def edit_clip_image(
         `clip` (moviepy.editor.VideoFileClip):
             The clip to edit.
         `dimensions` (Optional[tuple[int, int]]):
-            The dimensions to resize the clip to.
+            The dimensions to resize the clip to. If None, the clip will not be resized.
         `rotate` (Optional[int]):
-            The degrees to rotate the clip.
+            The degrees to rotate the clip. If None, the clip will not be rotated.
         `monochrome` (Optional[bool]):
-            Whether to convert the clip to monochrome.
+            Whether to convert the clip to monochrome. If None, the black and white
+            filter will not be applied.
 
     Returns:
     -----
@@ -122,14 +123,14 @@ def edit_clip_motion(
 
     Args:
     -----
-        `clip` (VideoFileClip):
+        `clip` (moviepy.editor.VideoFileClip):
             The clip to edit.
         `speed` (Optional[float]):
-            The speed multiplier.
+            The speed multiplier. If None, the speed will not be adjusted.
         `reverse` (Optional[bool]):
-            Whether to reverse the clip.
+            Whether to reverse the clip. If None, the clip will not be reversed.
         `bounce` (Optional[bool]):
-            Whether to bounce the clip.
+            Whether to bounce the clip. If None, the clip will not be bounced.
 
     Returns:
     -----

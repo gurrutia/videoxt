@@ -1,5 +1,6 @@
 """Containers for extraction results."""
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Optional
 
 from videoxt.utils import ToJsonMixin
@@ -12,15 +13,15 @@ class Result(ToJsonMixin):
 
     Attributes:
     -----
-        `success` (bool):
+        `success` (Optional[bool]):
             Whether the extraction was successful.
-        `method` (str):
+        `method` (Optional[str]):
             The name of the method that was called.
-        `message` (str):
+        `message` (Optional[str]):
             A message describing the result of the extraction.
-        `destpath` (str):
+        `destpath` (Optional[Path]):
             The path to the destination file or directory.
-        `elapsed_time` (float):
+        `elapsed_time` (Optional[float]):
             The number of seconds it took to complete the extraction.
 
     Methods:
@@ -31,5 +32,5 @@ class Result(ToJsonMixin):
     success: Optional[bool] = None
     method: Optional[str] = None
     message: Optional[str] = None
-    destpath: Optional[str] = None
+    destpath: Optional[Path] = None
     elapsed_time: Optional[float] = None

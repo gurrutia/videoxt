@@ -6,6 +6,8 @@ from datetime import timedelta
 from pathlib import Path
 from typing import Any, ClassVar, Optional, Protocol
 
+from rich import print
+
 from videoxt.constants import ExtractionMethod
 from videoxt.validators import positive_float, positive_int, valid_filename
 
@@ -336,6 +338,15 @@ class ToJsonMixin:
         """
         public_keys = {k: v for k, v in asdict(self).items() if not k.startswith("_")}
         return json.dumps(public_keys, indent=2, cls=CustomJSONEncoder)
+
+    def verbose_print(self, title: str) -> None:
+        """Print the public keys of the JSON to console with a title."""
+        color_map = {
+            "PreparedRequest": "bright_magenta",
+            "Result": "yellow",
+        }
+        color = color_map.get(title, "white")
+        print(f"<[{color}]{title}[/{color}]>\n{self.json(skip_private_keys=True)}")
 
 
 class DataclassType(Protocol):

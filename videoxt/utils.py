@@ -310,7 +310,7 @@ def convert_bytes(n: int) -> str:
 class CustomJSONEncoder(json.JSONEncoder):
     """A custom JSON encoder for types that are not JSON serializable."""
 
-    def default(self, obj) -> Any:
+    def default(self, obj: Any) -> Any:
         """Return a JSON serializable representation of the object."""
         if isinstance(obj, (Path, timedelta)):
             return str(obj)

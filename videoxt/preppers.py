@@ -242,10 +242,10 @@ def prepare_dimensions(
 
 def prepare_destpath(
     video_filepath: Path,
-    suffix: str,
     request_filename: Optional[str] = None,
-    request_dir: Optional[Path] = None,
-    overwrite: bool = False,
+    request_destdir: Optional[Path] = None,
+    prepared_suffix: Optional[str] = None,
+    prepared_overwrite: Optional[bool] = None,
 ) -> Path:
     """
     Construct and return the destination path for the extracted file.
@@ -254,13 +254,13 @@ def prepare_destpath(
     -----
         `video_filepath` (pathlib.Path):
             Path to the video file.
-        `request_suffix` (str):
-            Required file suffix to use (with or without the leading '.').
         `request_filename` (Optional[str]):
             Optional filename to use. Defaults to None.
         `request_destdir` (Optional[pathlib.Path]):
             Optional directory to save the processed file. Defaults to None.
-        `overwrite` (bool):
+        `prepared_suffix` (str):
+            Required file suffix to use (with or without the leading '.').
+        `prepared_overwrite` (bool):
             If True, allows overwriting an existing file with the same name.
             Defaults to False.
 
@@ -268,17 +268,29 @@ def prepare_destpath(
     -----
         `pathlib.Path`: Path to the destination file.
 
+    Raises:
+    -----
+        `PreparationError`: If the prepared suffix is None.
+
     Notes:
     -----
         - Uses `request_filename` with the specified `suffix` if provided; otherwise,
             uses video file's name.
-        - Saves the file in `request_dir` if provided; otherwise, saves in the video's
-            directory.
+        - Saves the file in `request_destdir` if provided; otherwise, saves in the
+            video's directory.
         - Handles overwriting: if `overwrite` is True, may overwrite existing file with
             the same name; if False, ensures a unique filename before saving.
     """
-    base_dir = request_dir or video_filepath.parent
-    suffix = suffix if suffix.startswith(".") else f".{suffix}"
+    if prepared_suffix is None:
+        raise PreparationError("Suffix is None.")
+
+    if prepared_overwrite is None:
+        prepared_overwrite = False
+
+    base_dir = request_destdir or video_filepath.parent
+    suffix = (
+        prepared_suffix if prepared_suffix.startswith(".") else f".{prepared_suffix}"
+    )
 
     if request_filename:
         filename = f"{request_filename}{suffix}"
@@ -287,7 +299,7 @@ def prepare_destpath(
 
     dest_path = base_dir / filename
 
-    if overwrite is True and dest_path != video_filepath:
+    if prepared_overwrite is True and dest_path != video_filepath:
         return dest_path
     else:
         return U.enumerate_filepath(dest_path, label="_vxt")

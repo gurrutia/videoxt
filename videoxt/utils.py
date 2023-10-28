@@ -118,13 +118,13 @@ def timedelta_to_timestamp(duration: timedelta) -> str:
     return f"{int(hours):02}:{int(minutes):02}:{int(seconds):02}"
 
 
-def append_enumeration(index: int, label: Optional[str] = None) -> str:
+def append_enumeration(index: int, tag: Optional[str] = None) -> str:
     """
-    Return an enumerated file name with the given index and optional label.
+    Return an enumerated file name with the given index and optional tag.
 
     The returned string is intended to be appended to a file name or directory name.
-    If the label is None, only the index is used to enumerate the file name starting
-    from 1. If a label is provided, the label is appended to the file name before the
+    If the tag is None, only the index is used to enumerate the file name starting
+    from 1. If a tag is provided, the tag is appended to the file name before the
     index. Mimics the behavior of Windows when creating a file or directory with the
     same name as an existing file or directory.
 
@@ -134,17 +134,17 @@ def append_enumeration(index: int, label: Optional[str] = None) -> str:
         ' (1)'
         >>> append_enumeration(2)
         ' (2)'
-        >>> append_enumeration(1, label="_vxt")
+        >>> append_enumeration(1, tag="_vxt")
         '_vxt'
-        >>> append_enumeration(2, label="_vxt")
+        >>> append_enumeration(2, tag="_vxt")
         '_vxt (2)'
 
     Args:
     -----
         `index` (int):
             The enumeration index. Must be greater than 0.
-        `label` (Optional[str]):
-            The label to enumerate. If None, only the index is used.
+        `tag` (Optional[str]):
+            The tag to enumerate. If None, only the index is used.
 
     Returns:
     -----
@@ -153,39 +153,39 @@ def append_enumeration(index: int, label: Optional[str] = None) -> str:
     if index < 1:
         raise ValueError(f"Enumeration index must be greater than 0, got {index}.")
 
-    if label is None:
+    if tag is None:
         return f" ({index})"
 
-    # Ensure the label doesn't contain invalid characters.
-    label = valid_filename(label)
+    # Ensure the tag doesn't contain invalid characters.
+    tag = valid_filename(tag)
 
-    return f"{label} ({index})" if index > 1 else label
+    return f"{tag} ({index})" if index > 1 else tag
 
 
-def enumerate_dir(directory: Path, label: Optional[str] = None) -> Path:
+def enumerate_dir(directory: Path, tag: Optional[str] = None) -> Path:
     """
     Return a non-existent, potentially enumerated directory path.
 
     See `videoxt.utils.append_enumeration` for more information on how the directory
-    name is enumerated with or without a label.
+    name is enumerated with or without a tag.
 
     Usage:
     -----
         >>> from pathlib import Path
         >>> path = Path("test_dir")  # Assume 'test_dir' doesn't exist.
-        >>> enumerate_dir(path, label="_frames")
+        >>> enumerate_dir(path, tag="_frames")
         Path('test_dir')
-        >>> enumerate_dir(path, label="_frames")
+        >>> enumerate_dir(path, tag="_frames")
         Path('test_dir_frames')
-        >>> enumerate_dir(path, label="_frames")
+        >>> enumerate_dir(path, tag="_frames")
         Path('test_dir_frames (2)')
 
     Args:
     -----
         `directory`:
             The path to the directory to potentially enumerate.
-        `label` (Optional[str]):
-            The label to enumerate. If None, only the index is used.
+        `tag` (Optional[str]):
+            The tag to enumerate. If None, only the index is used.
 
     Returns:
     -----
@@ -196,29 +196,29 @@ def enumerate_dir(directory: Path, label: Optional[str] = None) -> Path:
 
     index = 1
     while True:
-        append_str = append_enumeration(index, label=label)
+        append_str = append_enumeration(index, tag=tag)
         new_dir = directory.with_name(f"{directory.name}{append_str}")
         if not new_dir.exists():
             return new_dir
         index += 1
 
 
-def enumerate_filepath(filepath: Path, label: Optional[str] = None) -> Path:
+def enumerate_filepath(filepath: Path, tag: Optional[str] = None) -> Path:
     """
     Return a non-existent, potentially enumerated file path.
 
     See `videoxt.utils.append_enumeration` for more information on how the file name
-    is enumerated with or without a label.
+    is enumerated with or without a tag.
 
     Usage:
     -----
         >>> from pathlib import Path
         >>> filepath = Path('test.mp4')  # Assume 'test.mp4' doesn't exist.
-        >>> enumerate_filepath(filepath, label="_vxt")
+        >>> enumerate_filepath(filepath, tag="_vxt")
         Path('test.mp4')
-        >>> enumerate_filepath(filepath, label="_vxt")
+        >>> enumerate_filepath(filepath, tag="_vxt")
         Path('test_vxt.mp4')
-        >>> enumerate_filepath(filepath, label="_vxt")
+        >>> enumerate_filepath(filepath, tag="_vxt")
         Path('test_vxt (2).mp4')
 
     Args:
@@ -234,7 +234,7 @@ def enumerate_filepath(filepath: Path, label: Optional[str] = None) -> Path:
 
     index = 1
     while True:
-        append_str = append_enumeration(index, label)
+        append_str = append_enumeration(index, tag)
         new_filename = f"{filepath.stem}{append_str}{filepath.suffix}"
         new_filepath = filepath.with_name(new_filename)
 

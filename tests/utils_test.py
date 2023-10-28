@@ -147,7 +147,7 @@ def test_enumerate_dir_existing_dir(tmp_path: Path):
     `tmp_path` is a built-in pytest fixture that creates a temporary directory.
     """
     expected_path = tmp_path.with_name(f"{tmp_path.name}_vxt")
-    assert enumerate_dir(tmp_path, label="_vxt") == expected_path
+    assert enumerate_dir(tmp_path, tag="_vxt") == expected_path
 
 
 def test_enumerate_dir_new_dir(tmp_path: Path):
@@ -164,7 +164,7 @@ def test_enumerate_filepath_existing_file(fixture_tmp_text_filepath: Path):
     stem = fixture_tmp_text_filepath.stem
     suffix = fixture_tmp_text_filepath.suffix
     expected_path = fixture_tmp_text_filepath.with_name(f"{stem}_vxt{suffix}")
-    assert enumerate_filepath(fixture_tmp_text_filepath, label="_vxt") == expected_path
+    assert enumerate_filepath(fixture_tmp_text_filepath, tag="_vxt") == expected_path
 
 
 def test_enumerate_filepath_new_file(fixture_tmp_text_filepath: Path):
@@ -260,10 +260,10 @@ def test_append_enumeration_when_only_index_is_entered():
     assert append_enumeration(3) == " (3)"
 
 
-def test_append_enumeration_when_index_and_label_are_entered():
-    assert append_enumeration(1, label="_vxt") == "_vxt"
-    assert append_enumeration(2, label="_vxt") == "_vxt (2)"
-    assert append_enumeration(3, label="_vxt") == "_vxt (3)"
+def test_append_enumeration_when_index_and_tag_are_entered():
+    assert append_enumeration(1, tag="_vxt") == "_vxt"
+    assert append_enumeration(2, tag="_vxt") == "_vxt (2)"
+    assert append_enumeration(3, tag="_vxt") == "_vxt (3)"
 
 
 def test_append_enumeration_when_index_is_0():

@@ -74,7 +74,10 @@ def edit_clip_audio(
 
 
 def edit_clip_image(
-    clip: VideoFileClip, dimensions: tuple[int, int], rotate: int, monochrome: bool
+    clip: VideoFileClip,
+    dimensions: Optional[tuple[int, int]] = None,
+    rotate: Optional[int] = None,
+    monochrome: Optional[bool] = None,
 ) -> VideoFileClip:
     """
     Edit the image properties of a VideoFileClip by resizing, rotating, and converting
@@ -84,18 +87,19 @@ def edit_clip_image(
     -----
         `clip` (moviepy.editor.VideoFileClip):
             The clip to edit.
-        `dimensions` (tuple[int, int]):
+        `dimensions` (Optional[tuple[int, int]]):
             The dimensions to resize the clip to.
-        `rotate` (int):
+        `rotate` (Optional[int]):
             The degrees to rotate the clip.
-        `monochrome` (bool):
+        `monochrome` (Optional[bool]):
             Whether to convert the clip to monochrome.
 
     Returns:
     -----
         `moviepy.editor.VideoFileClip`: The edited clip.
     """
-    clip = clip.resize(dimensions)
+    if dimensions is not None:
+        clip = clip.resize(dimensions)
 
     if rotate != 0:
         clip = clip.rotate(rotate)

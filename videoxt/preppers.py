@@ -277,3 +277,21 @@ def prepare_destpath(
         return dest_path
     else:
         return U.enumerate_filepath(dest_path, label="_vxt")
+
+
+def prepare_start_time(
+    request_start_time: Optional[float | int | str] = None,
+) -> float | int | str:
+    """
+    Return the start time requested or 0 if not provided.
+
+    Args:
+    -----
+        `request_start_time` (Optional[float | int | str]):
+            Optional start time requested. Defaults to None.
+
+    Returns:
+    -----
+        `float | int | str`: The start time requested or 0 if not provided.
+    """
+    return request_start_time if request_start_time is not None else 0

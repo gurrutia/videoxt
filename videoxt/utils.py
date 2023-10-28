@@ -162,7 +162,7 @@ def append_enumeration(index: int, label: Optional[str] = None) -> str:
     return f"{label} ({index})" if index > 1 else label
 
 
-def enumerate_dir(dir: Path, label: Optional[str] = None) -> Path:
+def enumerate_dir(directory: Path, label: Optional[str] = None) -> Path:
     """
     Return a non-existent, potentially enumerated directory path.
 
@@ -182,22 +182,22 @@ def enumerate_dir(dir: Path, label: Optional[str] = None) -> Path:
 
     Args:
     -----
-        `dir`:
+        `directory`:
             The path to the directory to potentially enumerate.
         `label` (Optional[str]):
             The label to enumerate. If None, only the index is used.
 
     Returns:
-    ------
+    -----
         `pathlib.Path`: The path to a non-existent directory.
     """
-    if not dir.exists():
-        return dir
+    if not directory.exists():
+        return directory
 
     index = 1
     while True:
         append_str = append_enumeration(index, label=label)
-        new_dir = dir.with_name(f"{dir.name}{append_str}")
+        new_dir = directory.with_name(f"{directory.name}{append_str}")
         if not new_dir.exists():
             return new_dir
         index += 1

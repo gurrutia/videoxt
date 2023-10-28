@@ -41,7 +41,9 @@ def trim_clip(
 
 
 def edit_clip_audio(
-    clip: VideoFileClip, volume: float, normalize: bool
+    clip: VideoFileClip,
+    volume: Optional[float] = None,
+    normalize: Optional[bool] = None,
 ) -> VideoFileClip:
     """
     Edit the audio of a VideoFileClip by adjusting its volume and normalizing the
@@ -51,10 +53,10 @@ def edit_clip_audio(
     -----
         `clip` (moviepy.editor.VideoFileClip):
             The clip to edit.
-        `volume` (float):
-            The volume multiplier.
-        `normalize` (bool):
-            Whether to normalize the audio.
+        `volume` (Optional[float]):
+            The volume multiplier. If None, the volume will not be adjusted.
+        `normalize` (Optional[bool]):
+            Whether to normalize the audio. If None, the audio will not be normalized.
 
     Returns:
     -----

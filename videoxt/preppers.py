@@ -362,3 +362,31 @@ def prepare_fps(video_fps: float, request_fps: Optional[float] = None) -> float:
         `float`: The frames per second requested or the video's fps if not provided.
     """
     return request_fps if request_fps is not None else video_fps
+
+
+def prepare_destpath_frames(
+    video_filepath: Path,
+    request_destdir: Optional[Path] = None,
+    prepared_overwrite: Optional[bool] = None,
+) -> Path:
+    """
+    Return the directory extracted images will be saved in.
+
+    If no specific `destdir` is requested, the images will be saved in a directory
+    created in the same location as the video file. The directory will share the
+    video file's name and have a '_frames' suffix.
+
+    Returns:
+    -----
+        `pathlib.Path`: The directory for saving images extracted from the video.
+    """
+    if prepared_overwrite is None:
+        prepared_overwrite = False
+
+    if request_destdir is None:
+        default_destdir = video_filepath.parent / f"{video_filepath.name}"
+        if prepared_overwrite is True:
+            return default_destdir / "_frames"
+        return U.enumerate_dir(default_destdir, label="_frames")
+
+    return request_destdir

@@ -108,9 +108,9 @@ def edit_clip_image(
 
 def edit_clip_motion(
     clip: VideoFileClip,
-    speed: Optional[float],
-    reverse: Optional[bool],
-    bounce: Optional[bool],
+    speed: Optional[float] = None,
+    reverse: Optional[bool] = None,
+    bounce: Optional[bool] = None,
 ) -> VideoFileClip:
     """
     Edit the moving image properties of a VideoFileClip by adjusting its speed,

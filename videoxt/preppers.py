@@ -6,6 +6,7 @@ from typing import Any, Optional
 
 import videoxt.utils as U
 import videoxt.validators as V
+from videoxt.exceptions import PreparationError
 
 
 @dataclass
@@ -16,16 +17,16 @@ class ExtractionRange:
     The range is represented in seconds, as timestamps, and frame numbers. Validations
     and preparations are run on init.
 
-    Attributes:
+    Fields:
     -----
-        `start_request` (float | int | str):
-            Start time of the extraction in seconds or as a timestamp (`HH:MM:SS`).
-        `stop_request` (float | int | str):
-            Stop time of the extraction in seconds or as a timestamp (`HH:MM:SS`).
         `duration_seconds` (float):
             Duration of the video in seconds.
         `frame_count` (int):
             Number of frames in the video.
+        `start_time` (float | int | str):
+            Start time of the extraction in seconds or as a timestamp (`HH:MM:SS`).
+        `stop_time` (float | int | str):
+            Stop time of the extraction in seconds or as a timestamp (`HH:MM:SS`).
         `fps` (float):
             Frames per second to use for extraction.
 
@@ -33,11 +34,11 @@ class ExtractionRange:
     -----
     >>> from videoxt.preppers import ExtractionRange
     >>> extraction_range = ExtractionRange(
-    ...     start_request=0,
-    ...     stop_request=10,
-    ...     fps=30,
-    ...     frame_count=600,
     ...     duration_seconds=20,
+    ...     frame_count=600,
+    ...     start_time=10,
+    ...     stop_time=0,
+    ...     fps=30,
     ... )
     >>> extraction_range.start_second
     0
@@ -53,10 +54,10 @@ class ExtractionRange:
     300
     """
 
-    start_request: float | int | str
-    stop_request: float | int | str
     duration_seconds: float = field(repr=False)
     frame_count: int = field(repr=False)
+    start_time: float | int | str
+    stop_time: float | int | str
     fps: float = field(repr=False)
     start_second: float = field(init=False)
     stop_second: float = field(init=False)
@@ -95,18 +96,18 @@ class ExtractionRange:
     def _prepare_start_second(self) -> float:
         """Convert the start time requested to seconds (float)."""
         self.start_second = (
-            float(self.start_request)
-            if isinstance(self.start_request, (float, int))
-            else U.timestamp_to_seconds(self.start_request)
+            float(self.start_time)
+            if isinstance(self.start_time, (float, int))
+            else U.timestamp_to_seconds(self.start_time)
         )
         return self.start_second
 
     def _prepare_stop_second(self) -> float:
         """Convert the stop time requested to seconds (float)."""
         self.stop_second = (
-            float(self.stop_request)
-            if isinstance(self.stop_request, (float, int))
-            else U.timestamp_to_seconds(self.stop_request)
+            float(self.stop_time)
+            if isinstance(self.stop_time, (float, int))
+            else U.timestamp_to_seconds(self.stop_time)
         )
         return self.stop_second
 
@@ -126,18 +127,18 @@ class ExtractionRange:
     def _prepare_start_timestamp(self) -> str:
         """Convert the start time requested to a timestamp (str) `HH:MM:SS`."""
         self.start_timestamp = (
-            self.start_request
-            if isinstance(self.start_request, str)
-            else U.seconds_to_timestamp(self.start_request)
+            self.start_time
+            if isinstance(self.start_time, str)
+            else U.seconds_to_timestamp(self.start_time)
         )
         return self.start_timestamp
 
     def _prepare_stop_timestamp(self) -> str:
         """Convert the stop time requested to a timestamp (str) `HH:MM:SS`."""
         self.stop_timestamp = (
-            self.stop_request
-            if isinstance(self.stop_request, str)
-            else U.seconds_to_timestamp(self.stop_request)
+            self.stop_time
+            if isinstance(self.stop_time, str)
+            else U.seconds_to_timestamp(self.stop_time)
         )
         return self.stop_timestamp
 
@@ -157,11 +158,11 @@ class ExtractionRange:
 
 
 def prepare_extraction_range(
-    start_request: float | int | str,
-    stop_request: float | int | str,
     duration_seconds: float,
     frame_count: int,
-    fps: float,
+    prepared_start_time: Optional[float | int | str] = None,
+    prepared_stop_time: Optional[float | int | str] = None,
+    prepared_fps: Optional[float] = None,
 ) -> dict[str, Any]:
     """
     Return a dictionary representing a validated extraction start and stop points.
@@ -171,27 +172,40 @@ def prepare_extraction_range(
 
     Args:
     -----
-        `start_request` (float | int | str):
-            Start time of the extraction in seconds or as a timestamp (`HH:MM:SS`).
-        `stop_request` (float | int | str):
-            Stop time of the extraction in seconds or as a timestamp (`HH:MM:SS`).
         `duration_seconds` (float):
             Duration of the video in seconds.
         `frame_count` (int):
             Number of frames in the video.
-        `fps` (float):
-            Frames per second to use for extraction.
+        `prepared_start_time` (Optional[float | int | str]):
+            Prepared start time of the extraction in seconds or as a timestamp
+            (`HH:MM:SS`).
+        `request_stop_time` (Optional[float | int | str]):
+            Prepared stop time of the extraction in seconds or as a timestamp
+            (`HH:MM:SS`).
+        `prepared_fps` (Optional[float]):
+            The prepared frames per second used to calculate the frame numbers.
 
     Returns:
     -----
         `dict[str, Any]`: Dictionary of validated extraction start and stop points.
+
+    Raises:
+    -----
+        `PreparationError`: If the prepared start and stop times or fps are None.
     """
+    if (
+        prepared_start_time is None
+        or prepared_stop_time is None
+        or prepared_fps is None
+    ):
+        raise PreparationError("Start time, stop time or fps are None.")
+
     extraction_range = ExtractionRange(
-        start_request=start_request,
-        stop_request=stop_request,
         duration_seconds=duration_seconds,
         frame_count=frame_count,
-        fps=fps,
+        start_time=prepared_start_time,
+        stop_time=prepared_stop_time,
+        fps=prepared_fps,
     )
 
     return extraction_range.to_dict()

@@ -379,10 +379,10 @@ def prepare_destpath_frames(
         prepared_overwrite = False
 
     if request_destdir is None:
-        default_destdir = video_filepath.parent / f"{video_filepath.name}"
+        default_destdir = video_filepath.parent / f"{video_filepath.name}_frames"
         if prepared_overwrite is True:
-            return default_destdir / "_frames"
-        return U.enumerate_dir(default_destdir, label="_frames")
+            return default_destdir
+        return U.enumerate_dir(default_destdir)
 
     return request_destdir
 

@@ -318,3 +318,21 @@ def prepare_stop_time(
     return (
         request_stop_time if request_stop_time is not None else video_duration_seconds
     )
+
+
+def prepare_fps(video_fps: float, request_fps: Optional[float] = None) -> float:
+    """
+    Return the frames per second requested or the video's fps if not provided.
+
+    Args:
+    -----
+        `video_fps` (float):
+            Frames per second of the video.
+        `request_fps` (Optional[float]):
+            Optional frames per second requested. Defaults to None.
+
+    Returns:
+    -----
+        `float`: The frames per second requested or the video's fps if not provided.
+    """
+    return request_fps if request_fps is not None else video_fps

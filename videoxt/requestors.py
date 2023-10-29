@@ -1041,9 +1041,9 @@ class PreparedAudioRequest(PreparedBaseRequest):
         self._prepare_audio_format()
         self._prepare_destpath()
         self._prepare_speed()
-        self._prepare_volume()
         self._prepare_bounce()
         self._prepare_reverse()
+        self._prepare_volume()
         self._prepare_normalize()
         self._is_prepared = True
         return self
@@ -1077,12 +1077,6 @@ class PreparedAudioRequest(PreparedBaseRequest):
             self.speed = 1.0
         return self.speed
 
-    def _prepare_volume(self) -> float:
-        """Set volume to 1.0 if not specified."""
-        if self.volume is None:
-            self.volume = 1.0
-        return self.volume
-
     def _prepare_bounce(self) -> bool:
         """Set bounce to False if not specified."""
         if self.bounce is None:
@@ -1091,14 +1085,20 @@ class PreparedAudioRequest(PreparedBaseRequest):
 
     def _prepare_reverse(self) -> bool:
         """Set reverse to False if not specified."""
-        if self.bounce is None:
-            self.bounce = False
+        if self.reverse is None:
+            self.reverse = False
         return self.reverse
+
+    def _prepare_volume(self) -> float:
+        """Set volume to 1.0 if not specified."""
+        if self.volume is None:
+            self.volume = 1.0
+        return self.volume
 
     def _prepare_normalize(self) -> bool:
         """Set normalize to False if not specified."""
-        if self.bounce is None:
-            self.bounce = False
+        if self.normalize is None:
+            self.normalize = False
         return self.normalize
 
 
@@ -1255,7 +1255,7 @@ class PreparedClipRequest(PreparedBaseRequest):
         """Set rotate to 0 if not specified."""
         if self.volume is None:
             self.volume = 0
-        return self.rotate
+        return self.volume
 
     def _prepare_bounce(self) -> bool:
         """Set bounce to False if not specified."""

@@ -376,9 +376,23 @@ def valid_stop_time(stop_time: float | int | str) -> float | str:
     try:
         stop_time_float = float(stop_time)
     except ValueError:
-        return valid_stop_timestamp(str(stop_time))
+        try:
+            return valid_stop_timestamp(str(stop_time))
+        except ValidationError:
+            raise ValidationError(
+                f"Invalid stop time, got {stop_time!r}\n"
+                "Stop time must be a positive number or a properly formatted "
+                "timestamp (Ex: 'HH:MM:SS')."
+            )
     else:
-        return positive_float(stop_time_float)
+        try:
+            return positive_float(stop_time_float)
+        except ValidationError:
+            raise ValidationError(
+                f"Invalid stop time, got {stop_time!r}\n"
+                "Stop time must be a positive number or a properly formatted "
+                "timestamp (Ex: 'HH:MM:SS')."
+            )
 
 
 def valid_extraction_range(

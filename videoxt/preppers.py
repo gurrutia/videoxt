@@ -372,16 +372,15 @@ def prepare_destpath_frames(
     -----
         `pathlib.Path`: The directory for saving images extracted from the video.
     """
-    if prepared_overwrite is None:
-        prepared_overwrite = False
+    if request_destdir is not None and request_destdir != video_filepath:
+        return request_destdir
 
-    if request_destdir is None:
-        default_destdir = video_filepath.parent / f"{video_filepath.name}_frames"
-        if prepared_overwrite is True:
-            return default_destdir
-        return U.enumerate_dir(default_destdir)
+    default_destdir = video_filepath.parent / video_filepath.name
 
-    return request_destdir
+    if prepared_overwrite is True:
+        return default_destdir.with_name(f"{video_filepath.name}_frames")
+
+    return U.enumerate_dir(default_destdir, tag="_frames")
 
 
 def prepare_images_expected(

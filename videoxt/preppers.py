@@ -285,19 +285,16 @@ def prepare_destpath(
         raise PreparationError("Suffix is None.")
 
     base_dir = request_destdir or video_filepath.parent
-
     suffix = (
         prepared_suffix if prepared_suffix.startswith(".") else f".{prepared_suffix}"
     )
-
     filename = f"{request_filename or video_filepath.stem}{suffix}"
-
     dest_path = base_dir / filename
 
     if prepared_overwrite is True and dest_path != video_filepath:
         return dest_path
 
-    return U.enumerate_filepath(dest_path, label="_vxt")
+    return U.enumerate_filepath(dest_path, tag="_vxt")
 
 
 def prepare_start_time(

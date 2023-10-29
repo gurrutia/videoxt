@@ -577,11 +577,11 @@ def valid_video_file_suffix(suffix: str) -> str:
     -----
         `ValidationError`: If the video format is not supported.
     """
-    suffix = suffix.lower().lstrip(".")
-    if suffix not in C.SUPPORTED_VIDEO_FORMATS:
+    sfx = suffix.lower().lstrip(".")
+    if sfx not in C.SUPPORTED_VIDEO_FORMATS:
         raise ValidationError(
-            f"Invalid file suffix, got {suffix!r}\n"
+            f"Invalid video file suffix, got {suffix!r}\n"
             f"Supported: {C.SUPPORTED_VIDEO_FORMATS}"
         )
 
-    return suffix
+    return sfx

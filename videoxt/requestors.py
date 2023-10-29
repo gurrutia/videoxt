@@ -940,12 +940,14 @@ class PreparedBaseRequest(PreparedRequest):
 
     def _prepare_verbose(self) -> bool:
         """Set verbose to False if not specified."""
-        self.verbose = self.verbose or False
+        if self.verbose is None:
+            self.verbose = False
         return self.verbose
 
     def _prepare_overwrite(self) -> bool:
         """Set overwrite to False if not specified."""
-        self.overwrite = self.overwrite or False
+        if self.overwrite is None:
+            self.overwrite = False
         return self.overwrite
 
 
@@ -1053,7 +1055,8 @@ class PreparedAudioRequest(PreparedBaseRequest):
 
     def _prepare_audio_format(self) -> str:
         """Set audio format to 'mp3' if not specified."""
-        self.audio_format = self.audio_format or "mp3"
+        if self.audio_format is None:
+            self.audio_format = "mp3"
         return self.audio_format
 
     def _prepare_destpath(self) -> Path:
@@ -1070,27 +1073,32 @@ class PreparedAudioRequest(PreparedBaseRequest):
 
     def _prepare_speed(self) -> float:
         """Set speed to 1.0 if not specified."""
-        self.speed = self.speed or 1.0
+        if self.speed is None:
+            self.speed = 1.0
         return self.speed
 
     def _prepare_volume(self) -> float:
         """Set volume to 1.0 if not specified."""
-        self.volume = self.volume or 1.0
+        if self.volume is None:
+            self.volume = 1.0
         return self.volume
 
     def _prepare_bounce(self) -> bool:
         """Set bounce to False if not specified."""
-        self.bounce = self.bounce or False
+        if self.bounce is None:
+            self.bounce = False
         return self.bounce
 
     def _prepare_reverse(self) -> bool:
         """Set reverse to False if not specified."""
-        self.reverse = self.reverse or False
+        if self.bounce is None:
+            self.bounce = False
         return self.reverse
 
     def _prepare_normalize(self) -> bool:
         """Set normalize to False if not specified."""
-        self.normalize = self.normalize or False
+        if self.bounce is None:
+            self.bounce = False
         return self.normalize
 
 
@@ -1220,7 +1228,8 @@ class PreparedClipRequest(PreparedBaseRequest):
 
     def _prepare_resize(self) -> float:
         """Set resize to 1.0 if not specified."""
-        self.resize = self.resize or 1.0
+        if self.resize is None:
+            self.resize = 1.0
         return self.resize
 
     def _prepare_dimensions(self) -> tuple[int, int]:
@@ -1232,37 +1241,44 @@ class PreparedClipRequest(PreparedBaseRequest):
 
     def _prepare_speed(self) -> float:
         """Set speed to 1.0 if not specified."""
-        self.speed = self.speed or 1.0
+        if self.speed is None:
+            self.speed = 1.0
         return self.speed
 
     def _prepare_volume(self) -> float:
         """Set volume to 1.0 if not specified."""
-        self.volume = self.volume or 1.0
+        if self.volume is None:
+            self.volume = 1.0
         return self.volume
 
     def _prepare_rotate(self) -> int:
         """Set rotate to 0 if not specified."""
-        self.rotate = self.rotate or 0
+        if self.volume is None:
+            self.volume = 0
         return self.rotate
 
     def _prepare_bounce(self) -> bool:
         """Set bounce to False if not specified."""
-        self.bounce = self.bounce or False
+        if self.bounce is None:
+            self.bounce = False
         return self.bounce
 
     def _prepare_monochrome(self) -> bool:
         """Set monochrome to False if not specified."""
-        self.monochrome = self.monochrome or False
+        if self.monochrome is None:
+            self.monochrome = False
         return self.monochrome
 
     def _prepare_normalize(self) -> bool:
         """Set normalize to False if not specified."""
-        self.normalize = self.normalize or False
+        if self.normalize is None:
+            self.normalize = False
         return self.normalize
 
     def _prepare_reverse(self) -> bool:
         """Set reverse to False if not specified."""
-        self.reverse = self.reverse or False
+        if self.reverse is None:
+            self.reverse = False
         return self.reverse
 
 
@@ -1372,22 +1388,26 @@ class PreparedFramesRequest(PreparedBaseRequest):
 
     def _prepare_filename(self) -> str:
         """Set filename to the video filename. Used for naming the extracted images."""
-        self.filename = self.filename or self.video.filepath.stem
+        if self.filename is None:
+            self.filename = self.video.filepath.stem
         return self.filename
 
     def _prepare_image_format(self) -> str:
         """Set image format to 'jpg' if not specified."""
-        self.image_format = self.image_format or "jpg"
+        if self.image_format is None:
+            self.image_format = "jpg"
         return self.image_format
 
     def _prepare_capture_rate(self) -> int:
         """Set capture rate to 1 if not specified."""
-        self.capture_rate = self.capture_rate or 1
+        if self.capture_rate is None:
+            self.capture_rate = 1
         return self.capture_rate
 
     def _prepare_resize(self) -> float:
         """Set resize to 1.0 if not specified."""
-        self.resize = self.resize or 1.0
+        if self.resize is None:
+            self.resize = 1.0
         return self.resize
 
     def _prepare_dimensions(self) -> tuple[int, int]:
@@ -1399,12 +1419,14 @@ class PreparedFramesRequest(PreparedBaseRequest):
 
     def _prepare_rotate(self) -> int:
         """Set rotate to 0 if not specified."""
-        self.rotate = self.rotate or 0
+        if self.rotate is None:
+            self.rotate = 0
         return self.rotate
 
     def _prepare_monochrome(self) -> bool:
         """Set monochrome to False if not specified."""
-        self.monochrome = self.monochrome or False
+        if self.monochrome is None:
+            self.monochrome = False
         return self.monochrome
 
     def _prepare_images_expected(self) -> int:
@@ -1528,7 +1550,8 @@ class PreparedGifRequest(PreparedBaseRequest):
 
     def _prepare_resize(self) -> float:
         """Set resize to 1.0 if not specified."""
-        self.resize = self.resize or 1.0
+        if self.resize is None:
+            self.resize = 1.0
         return self.resize
 
     def _prepare_dimensions(self) -> tuple[int, int]:
@@ -1540,25 +1563,30 @@ class PreparedGifRequest(PreparedBaseRequest):
 
     def _prepare_rotate(self) -> int:
         """Set rotate to 0 if not specified."""
-        self.rotate = self.rotate or 0
+        if self.rotate is None:
+            self.rotate = 0
         return self.rotate
 
     def _prepare_speed(self) -> float:
         """Set speed to 1.0 if not specified."""
-        self.speed = self.speed or 1.0
+        if self.speed is None:
+            self.speed = 1.0
         return self.speed
 
     def _prepare_bounce(self) -> bool:
         """Set bounce to False if not specified."""
-        self.bounce = self.bounce or False
+        if self.bounce is None:
+            self.bounce = False
         return self.bounce
 
     def _prepare_monochrome(self) -> bool:
         """Set monochrome to False if not specified."""
-        self.monochrome = self.monochrome or False
+        if self.monochrome is None:
+            self.monochrome = False
         return self.monochrome
 
     def _prepare_reverse(self) -> bool:
         """Set reverse to False if not specified."""
-        self.reverse = self.reverse or False
+        if self.reverse is None:
+            self.reverse = False
         return self.reverse

@@ -178,7 +178,7 @@ def valid_filepath(filepath: Path | str, is_video: bool = False) -> Path:
         raise ValidationError(f"Invalid filepath, got {filepath!r}")
 
     if not fp.exists():
-        raise ValidationError(f"File not found, got {filepath}")
+        raise ValidationError(f"File not found, got {filepath!r}")
 
     if not fp.is_file():
         raise ValidationError(f"Filepath provided is not a file, got {filepath}")

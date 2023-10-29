@@ -63,16 +63,16 @@ def extract_audio(
     filepath: Path | str,
     start_time: float | int | str = 0,
     stop_time: Optional[float | int | str] = None,
-    fps: Optional[float] = None,
     destdir: Optional[Path | str] = None,
     filename: Optional[str] = None,
     verbose: bool = False,
     overwrite: bool = False,
+    fps: Optional[float] = None,
     audio_format: str = "mp3",
     speed: float = 1,
-    volume: float = 1,
     bounce: bool = False,
     reverse: bool = False,
+    volume: float = 1,
     normalize: bool = False,
 ) -> Result:
     """
@@ -82,7 +82,7 @@ def extract_audio(
     -----
         `filepath` (pathlib.Path | str):
             Path to the video file with extension.
-        `start_time` (Optional[float | int | str]):
+        `start_time` (float | int | str):
             Specify the extraction's start time in seconds, or as a string in "HH:MM:SS"
             format. Defaults to 0 if not specified.
         `stop_time` (Optional[float | int | str]):
@@ -94,10 +94,10 @@ def extract_audio(
         `filename` (Optional[str]):
             Specify the name of the extracted file(s). Defaults to the video filename
             if not specified.
-        `verbose` (Optional[bool]):
+        `verbose` (bool):
             If True, the prepared request and extraction results will be printed as JSON
             to console. Defaults to False if not specified.
-        `overwrite` (Optional[bool]):
+        `overwrite` (bool):
             If True, permits overwriting the destination path if the file or directory
             already exists. Defaults to False if not specified.
         `fps` (Optional[float]):
@@ -106,21 +106,21 @@ def extract_audio(
             extraction range. This option should be used only in rare cases where `cv2`
             fails to accurately read the fps. If not specified, it defaults to the fps
             of the video as read by `cv2`.
-        `audio_format` (Optional[str]):
+        `audio_format` (str):
             Set the extracted audio file format. Defaults to 'mp3' if not specified.
             See: `videoxt.constants.SUPPORTED_AUDIO_FORMATS`.
-        `speed` (Optional[float]):
+        `speed` (float):
             Set the speed of the extracted audio. A value of 0.5 will halve the speed of
             the extracted audio. Defaults to 1.0 if not specified (no change).
-        `bounce` (Optional[bool]):
+        `bounce` (bool):
             If True, bounce the extracted audio bommerang-style. Defaults to False if
             not specified.
-        `reverse` (Optional[bool]):
+        `reverse` (bool):
             If True, reverse the extracted audio. Defaults to False if not specified.
-        `volume` (Optional[float]):
+        `volume` (float):
             Set the volume of the extracted audio. A value of 0.5 will halve the volume
             of the extracted audio. Defaults to 1.0 if not specified (no change).
-        `normalize` (Optional[bool]):
+        `normalize` (bool):
             If True, normalize the audio. Normalization adjusts the gain of the audio to
             ensure consistent levels, preventing distortion and enhancing clarity in
             some cases. Defaults to False if not specified.
@@ -153,20 +153,20 @@ def extract_clip(
     filepath: Path | str,
     start_time: float | int | str = 0,
     stop_time: Optional[float | int | str] = None,
-    fps: Optional[float] = None,
     destdir: Optional[Path | str] = None,
     filename: Optional[str] = None,
     verbose: bool = False,
     overwrite: bool = False,
-    resize: Optional[float] = None,
-    rotate: Optional[int] = None,
-    speed: Optional[float] = None,
-    volume: Optional[float] = None,
-    monochrome: Optional[bool] = None,
-    bounce: Optional[bool] = None,
-    reverse: Optional[bool] = None,
-    normalize: Optional[bool] = None,
+    fps: Optional[float] = None,
     dimensions: Optional[tuple[int, int]] = None,
+    resize: float = 1.0,
+    rotate: int = 0,
+    speed: float = 1.0,
+    bounce: bool = False,
+    reverse: bool = False,
+    monochrome: bool = False,
+    volume: float = 0,
+    normalize: bool = False,
 ) -> Result:
     """
     Extract a clip from a video file as `mp4`.
@@ -178,7 +178,7 @@ def extract_clip(
     -----
         `filepath` (pathlib.Path | str):
             Path to the video file with extension.
-        `start_time` (Optional[float | int | str]):
+        `start_time` (float | int | str):
             Specify the extraction's start time in seconds, or as a string in "HH:MM:SS"
             format. Defaults to 0 if not specified.
         `stop_time` (Optional[float | int | str]):
@@ -190,10 +190,10 @@ def extract_clip(
         `filename` (Optional[str]):
             Specify the name of the extracted file(s). Defaults to the video filename
             if not specified.
-        `verbose` (Optional[bool]):
+        `verbose` (bool):
             If True, the prepared request and extraction results will be printed as JSON
             to console. Defaults to False if not specified.
-        `overwrite` (Optional[bool]):
+        `overwrite` (bool):
             If True, permits overwriting the destination path if the file or directory
             already exists. Defaults to False if not specified.
         `fps` (Optional[float]):
@@ -205,28 +205,28 @@ def extract_clip(
         `dimensions` (Optional[Tuple[int, int]]):
             Specify the dimensions (frame width, frame height) of the clip. Defaults to
             the video dimensions if not specified.
-        `resize` (Optional[float]):
+        `resize` (float):
             Resize the dimensions of the clip by a factor of `n`. A value of 0.5
             will halve the dimensions. If you specify `dimensions`, `resize` will apply
             to the dimensions you specify. Defaults to 1.0 if not specified (no change).
-        `rotate` (Optional[int]):
+        `rotate` (int):
             Rotate the clip by `n` degrees. Allowed values: 0, 90, 180 or 270. Defaults
             to 0 if not specified (no change).
-        `speed` (Optional[float]):
+        `speed` (float):
             Set the speed of the extracted clip. A value of 0.5 will halve the playback
             speed of the clip. Defaults to 1.0 if not specified (no change).
-        `bounce` (Optional[bool]):
+        `bounce` (bool):
             If True, bounce the extracted clip bommerang-style. Defaults to False if
             not specified.
-        `reverse` (Optional[bool]):
+        `reverse` (bool):
             If True, reverse the extracted clip. Defaults to False if not specified.
-        `monochrome` (Optional[bool]):
+        `monochrome` (bool):
             If True, apply a black-and-white filter to the clip. Defaults to False if
             not specified.
-        `volume` (Optional[float]):
+        `volume` (float):
             Set the volume of the extracted clip's audio. A value of 0.5 will halve the
             volume of the clip's audio. Defaults to 1.0 if not specified (no change).
-        `normalize` (Optional[bool]):
+        `normalize` (bool):
             If True, normalize the audio. Normalization adjusts the gain of the audio to
             ensure consistent levels, preventing distortion and enhancing clarity in
             some cases. Defaults to False if not specified.
@@ -262,17 +262,17 @@ def extract_frames(
     filepath: Path | str,
     start_time: float | int | str = 0,
     stop_time: Optional[float | int | str] = None,
-    fps: Optional[float] = None,
     destdir: Optional[Path | str] = None,
     filename: Optional[str] = None,
     verbose: bool = False,
     overwrite: bool = False,
+    fps: Optional[float] = None,
     image_format: str = "jpg",
     capture_rate: int = 1,
-    resize: Optional[float] = None,
-    rotate: Optional[int] = None,
-    monochrome: Optional[bool] = None,
     dimensions: Optional[tuple[int, int]] = None,
+    resize: float = 1.0,
+    rotate: int = 0,
+    monochrome: bool = False,
 ) -> Result:
     """
     Extract individual frames from a video and save them to disk as images.
@@ -282,7 +282,9 @@ def extract_frames(
 
     Args:
     -----
-        `start_time` (Optional[float | int | str]):
+        `filepath` (pathlib.Path | str):
+            Path to the video file with extension.
+        `start_time` (float | int | str):
             Specify the extraction's start time in seconds, or as a string in "HH:MM:SS"
             format. Defaults to 0 if not specified.
         `stop_time` (Optional[float | int | str]):
@@ -294,10 +296,10 @@ def extract_frames(
         `filename` (Optional[str]):
             Specify the name of the extracted file(s). Defaults to the video filename
             if not specified.
-        `verbose` (Optional[bool]):
+        `verbose` (bool):
             If True, the prepared request and extraction results will be printed as JSON
             to console. Defaults to False if not specified.
-        `overwrite` (Optional[bool]):
+        `overwrite` (bool):
             If True, permits overwriting the destination path if the file or directory
             already exists. Defaults to False if not specified.
         `fps` (Optional[float]):
@@ -306,23 +308,23 @@ def extract_frames(
             extraction range. This option should be used only in rare cases where `cv2`
             fails to accurately read the fps. If not specified, it defaults to the fps
             of the video as read by `cv2`.
-        `image_format` (Optional[str]):
+        `image_format` (str):
             Set the extracted image file format. Defaults to 'jpg' if not specified.
             See: `videoxt.constants.SUPPORTED_IMAGE_FORMATS`.
-        `capture_rate` (Optional[int]):
+        `capture_rate` (int):
             Capture every Nth video frame. Defaults to 1 if not specified, which
             extracts every frame within the extraction range.
-        `dimensions` (Optional[Tuple[int, int]]):
+        `dimensions` (Optional[tuple[int, int]]):
             Specify the dimensions (frame width, frame height) of the images. Defaults
             to the video dimensions if not specified.
-        `resize` (Optional[float]):
+        `resize` (float):
             Resize the dimensions of the images by a factor of `n`. A value of 0.5
             will halve the dimensions. If you specify `dimensions`, `resize` will apply
             to the dimensions you specify. Defaults to 1.0 if not specified (no change).
-        `rotate` (Optional[int]):
+        `rotate` (int):
             Rotate the images by `n` degrees. Allowed values: 0, 90, 180 or 270.
             Defaults to 0 if not specified (no change).
-        `monochrome` (Optional[bool]):
+        `monochrome` (bool):
             If True, apply a black-and-white filter to the images. Defaults to False if
             not specified.
 
@@ -354,18 +356,18 @@ def extract_gif(
     filepath: Path | str,
     start_time: float | int | str = 0,
     stop_time: Optional[float | int | str] = None,
-    fps: Optional[float] = None,
     destdir: Optional[Path | str] = None,
     filename: Optional[str] = None,
     verbose: bool = False,
     overwrite: bool = False,
+    fps: Optional[float] = None,
     dimensions: Optional[tuple[int, int]] = None,
-    resize: Optional[float] = None,
-    rotate: Optional[int] = None,
-    speed: float = 1,
-    monochrome: bool = False,
+    resize: float = 1.0,
+    rotate: int = 0,
+    speed: float = 1.0,
     bounce: bool = False,
     reverse: bool = False,
+    monochrome: bool = False,
 ) -> Result:
     """
     Extract a GIF from a video file.
@@ -375,9 +377,9 @@ def extract_gif(
 
     Args:
     -----
-        `filepath` (Path, str):
+        `filepath` (pathlib.Path | str):
             Path to the video file with extension.
-        `start_time` (Optional[float | int | str]):
+        `start_time` (float | int | str):
             Specify the extraction's start time in seconds, or as a string in "HH:MM:SS"
             format. Defaults to 0 if not specified.
         `stop_time` (Optional[float | int | str]):
@@ -389,10 +391,10 @@ def extract_gif(
         `filename` (Optional[str]):
             Specify the name of the extracted file(s). Defaults to the video filename
             if not specified.
-        `verbose` (Optional[bool]):
+        `verbose` (bool):
             If True, the prepared request and extraction results will be printed as JSON
             to console. Defaults to False if not specified.
-        `overwrite` (Optional[bool]):
+        `overwrite` (bool):
             If True, permits overwriting the destination path if the file or directory
             already exists. Defaults to False if not specified.
         `fps` (Optional[float]):
@@ -404,22 +406,22 @@ def extract_gif(
         `dimensions` (Optional[Tuple[int, int]]):
             Specify the dimensions (frame width, frame height) of the gif. Defaults to
             the video dimensions if not specified.
-        `resize` (Optional[float]):
+        `resize` (float):
             Resize the dimensions of the gif by a factor of `n`. A value of 0.5
             will halve the dimensions. If you specify `dimensions`, `resize` will apply
             to the dimensions you specify. Defaults to 1.0 if not specified (no change).
-        `rotate` (Optional[int]):
+        `rotate` (int):
             Rotate the gif by `n` degrees. Allowed values: 0, 90, 180 or 270. Defaults
             to 0 if not specified (no change).
-        `speed` (Optional[float]):
+        `speed` (float):
             Set the speed of the extracted gif. A value of 0.5 will halve the playback
             speed of the gif. Defaults to 1.0 if not specified (no change).
-        `bounce` (Optional[bool]):
+        `bounce` (bool):
             If True, bounce the extracted gif bommerang-style. Defaults to False if
             not specified.
-        `reverse` (Optional[bool]):
+        `reverse` (bool):
             If True, reverse the extracted gif. Defaults to False if not specified.
-        `monochrome` (Optional[bool]):
+        `monochrome` (bool):
             If True, apply a black-and-white filter to the gif. Defaults to False if
             not specified.
 

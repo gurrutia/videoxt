@@ -654,3 +654,113 @@ def valid_fps(fps: float | int | str) -> float:
         raise ValidationError(
             f"Invalid fps, got {fps!r}\nFPS must be a positive number."
         )
+
+
+def valid_dimensions_str(dimensions: str) -> tuple[int, int]:
+    # expected input is 'WxH' (Ex: '1920x1080')
+    if not dimensions:
+        raise ValidationError(
+            f"Empty dimensions provided, got {dimensions!r}\n"
+            "Expected format: 'WxH' (Ex: '1920x1080')"
+        )
+
+    if dimensions.count("x") > 1:
+        raise ValidationError(
+            f"Too many dimensions provided, got {dimensions!r}\n"
+            "Expected format: 'WxH' (Ex: '1920x1080')"
+        )
+
+    try:
+        dims = tuple(positive_int(dim) for dim in tuple(dimensions.split("x")))
+    except ValidationError:
+        raise ValidationError(
+            f"Invalid dimensions, got {dimensions!r}\n"
+            "Dimensions must be positive integers.\n"
+            "Expected format: 'WxH' (Ex: '1920x1080')"
+        )
+
+    return cast(tuple[int, int], dims)
+
+
+def valid_resize(resize: float | int | str) -> float:
+    """
+    Validate and return a positive float resize value.
+
+    Args:
+    -----
+        `resize` (float | int | str): The resize value to validate.
+
+    Returns:
+    -----
+        `float`: The resize value as a float if valid.
+
+    Raises:
+    -----
+        `ValidationError`: If the resize value is None or not a positive float.
+    """
+    if resize is None:
+        raise ValidationError("Resize value cannot be None.")
+
+    try:
+        return positive_float(resize)
+    except ValidationError:
+        raise ValidationError(
+            f"Invalid resize value, got {resize!r}\n"
+            "Resize value must be a positive number."
+        )
+
+
+def valid_speed(speed: float | int | str) -> float:
+    """
+    Validate and return a positive float speed value.
+
+    Args:
+    -----
+        `speed` (float | int | str): The speed value to validate.
+
+    Returns:
+    -----
+        `float`: The speed value as a float if valid.
+
+    Raises:
+    -----
+        `ValidationError`: If the speed value is None or not a positive float.
+    """
+    if speed is None:
+        raise ValidationError("Speed value cannot be None.")
+
+    try:
+        return positive_float(speed)
+    except ValidationError:
+        raise ValidationError(
+            f"Invalid speed value, got {speed!r}\n"
+            "Speed value must be a positive number."
+        )
+
+
+def valid_capture_rate(capture_rate: float | int | str) -> int:
+    """
+    Validate and return a positive integer capture rate.
+
+    Args:
+    -----
+        `capture_rate` (float | int | str): The capture rate to validate.
+
+    Returns:
+    -----
+        `int`: The capture rate as an integer if valid.
+
+    Raises:
+    -----
+        `ValidationError`: If the capture rate is None or not a positive integer.
+    """
+    if capture_rate is None:
+        raise ValidationError("Capture rate cannot be None.")
+
+    try:
+        return positive_int(capture_rate)
+    except ValidationError:
+        raise ValidationError(
+            f"Invalid capture rate, got {capture_rate!r}\n"
+            "Capture rate must be a positive integer."
+        )

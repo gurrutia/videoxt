@@ -39,20 +39,20 @@ class Extractor(Protocol):
 @dataclass
 class AudioExtractor:  # XXX: Optimize.
     """
-        Instantiate me with a `PreparedAudioRequest` and I'll provide you with an
-        `extract()` method that will extract audio from the video file in the request,
-        apply requested edits to the audio, and save it to disk.
-    A
-        Fields:
-        -----
-            `request` (PreparedAudioRequest):
-                Request parameters the extractor will use to perform the extraction.
+    Instantiate me with a `PreparedAudioRequest` and I'll provide you with an
+    `extract()` method that will extract audio from the video file in the request,
+    apply requested edits to the audio, and save it to disk.
 
-        Public Methods:
-        -----
-            `extract()` -> `pathlib.Path`:
-                Execute audio extraction and return the path to the extracted audio
-                file.
+    Fields:
+    -----
+        `request` (PreparedAudioRequest):
+            Request parameters the extractor will use to perform the extraction.
+
+    Public Methods:
+    -----
+        `extract()` -> `pathlib.Path`:
+            Execute audio extraction and return the path to the extracted audio
+            file.
     """
 
     request: R.PreparedAudioRequest

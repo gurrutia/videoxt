@@ -593,11 +593,11 @@ def valid_volume(volume: float | int | str) -> float:
         return volume if volume > 0 else 0
 
     try:
-        converted_volume = non_negative_float(volume)
-    except ValidationError:
-        pass
-    else:
-        return converted_volume if converted_volume > 0 else 0
+        vol = float(volume)
+    except (ValueError, TypeError):
+        raise ValidationError(f"Volume expects numeric value, got {volume!r}")
+
+    return vol if vol > 0 else 0
 
 
 def valid_video_file_suffix(suffix: str) -> str:

@@ -590,9 +590,14 @@ def valid_volume(volume: float | int | str) -> float:
         raise ValidationError("Volume cannot be None.")
 
     if isinstance(volume, (float, int)):
-        return 0 if volume <= 0 else volume
+        return volume if volume > 0 else 0
+
+    try:
+        converted_volume = non_negative_float(volume)
+    except ValidationError:
+        pass
     else:
-        return non_negative_float(volume)
+        return converted_volume if converted_volume > 0 else 0
 
 
 def valid_video_file_suffix(suffix: str) -> str:

@@ -613,3 +613,30 @@ def valid_video_file_suffix(suffix: str) -> str:
         )
 
     return sfx
+
+
+def valid_fps(fps: float | int | str) -> float:
+    """
+    Validate and return a positive float fps.
+
+    Args:
+    -----
+        `fps` (float | int | str): The fps to validate.
+
+    Returns:
+    -----
+        `float`: The fps as a float if valid.
+
+    Raises:
+    -----
+        `ValidationError`: If the fps is None or not a positive float.
+    """
+    if fps is None:
+        raise ValidationError("FPS cannot be None.")
+
+    try:
+        return positive_float(fps)
+    except ValidationError:
+        raise ValidationError(
+            f"Invalid fps, got {fps!r}\nFPS must be a positive number."
+        )

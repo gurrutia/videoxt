@@ -315,6 +315,8 @@ class CustomJSONEncoder(json.JSONEncoder):
 
     def default(self, obj: Any) -> Any:
         """Return a JSON serializable representation of the object."""
+        if isinstance(obj, Path):
+            return obj.as_posix()
         if isinstance(obj, (Path, timedelta)):
             return str(obj)
         if isinstance(obj, ExtractionMethod):

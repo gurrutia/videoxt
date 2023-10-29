@@ -8,9 +8,9 @@ Contents:
 -----
 - `extract`: Extract audio, individual frames, short clips and GIFs from videos.
 - `extract_audio`: Extract audio from a video file.
-- `extract_clip`: Extract a clip from a video file as `mp4`.
+- `extract_clip`: Extract a short clip from a video file as `mp4`.
 - `extract_frames`: Extract individual frames from a video and save them as images.
-- `extract_gif`: Extract a GIF from a video file.
+- `extract_gif`: Create a GIF from a video between two specified points.
 
 Basic Usage:
 -----

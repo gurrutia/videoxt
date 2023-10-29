@@ -4,7 +4,7 @@
 
 [![PyPI](https://img.shields.io/pypi/v/videoxt)](https://pypi.org/project/videoxt) [![Downloads](https://static.pepy.tech/badge/videoxt)](https://pepy.tech/project/videoxt)
 
-<b>VideoXT</b> is a Python library and command-line tool that allows you to easily extract audio, clips, frames or create a GIF between two points in a video.
+<b>VideoXT</b> is a simple library and CLI tool for extracting audio, individual frames, short clips and GIFs from videos.
 
 
 [![demo](https://user-images.githubusercontent.com/3451528/229325416-30faad6c-725f-4783-9a9f-1b83245810ec.jpg)](https://user-images.githubusercontent.com/3451528/229325422-0da43958-34b0-438e-9049-73a98a7924d7.mp4)

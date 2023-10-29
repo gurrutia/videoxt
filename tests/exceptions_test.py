@@ -1,12 +1,16 @@
 import pytest
 
 from videoxt.exceptions import (
+    AudioWriteError,
+    BuildImagePathError,
+    ClipWriteError,
     ClosedVideoCaptureError,
     FrameReadError,
     FrameWriteError,
+    GifWriteError,
     InvalidExtractionMethod,
     NoAudioError,
-    RequestPreparationError,
+    PreparationError,
     ValidationError,
     VideoCaptureSetError,
     VideoValidationError,
@@ -17,12 +21,16 @@ from videoxt.exceptions import (
 @pytest.mark.parametrize(
     "exception",
     [
+        AudioWriteError,
+        BuildImagePathError,
+        ClipWriteError,
         ClosedVideoCaptureError,
         FrameReadError,
         FrameWriteError,
+        GifWriteError,
         InvalidExtractionMethod,
         NoAudioError,
-        RequestPreparationError,
+        PreparationError,
         ValidationError,
         VideoCaptureSetError,
         VideoValidationError,

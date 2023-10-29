@@ -25,8 +25,8 @@ class VideoValidationError(VideoXTError):
     pass
 
 
-class RequestPreparationError(VideoXTError):
-    """An error occurred while preparing a `PreparedRequest` object."""
+class PreparationError(VideoXTError):
+    """An error occurred while preparing a request."""
 
     pass
 
@@ -57,5 +57,29 @@ class VideoCaptureSetError(VideoXTError):
 
 class FrameWriteError(VideoXTError):
     """An error occurred while writing a frame to file using `cv2`."""
+
+    pass
+
+
+class GifWriteError(VideoXTError):
+    """An error occurred while writing a gif to file."""
+
+    pass
+
+
+class AudioWriteError(VideoXTError):
+    """An error occurred while writing an audio file."""
+
+    pass
+
+
+class ClipWriteError(VideoXTError):
+    """An error occurred while writing a clip to file."""
+
+    pass
+
+
+class BuildImagePathError(VideoXTError):
+    """An error occurred while building an image path."""
 
     pass

@@ -109,6 +109,10 @@ class ExtractionRange:
             if isinstance(self.stop_time, (float, int))
             else U.timestamp_to_seconds(self.stop_time)
         )
+
+        if self.stop_second > self.duration_seconds:
+            self.stop_second = self.duration_seconds
+
         return self.stop_second
 
     def _validate_range(self) -> tuple[float, float, float]:
@@ -126,20 +130,12 @@ class ExtractionRange:
 
     def _prepare_start_timestamp(self) -> str:
         """Convert the start time requested to a timestamp (str) `HH:MM:SS`."""
-        self.start_timestamp = (
-            self.start_time
-            if isinstance(self.start_time, str)
-            else U.seconds_to_timestamp(self.start_time)
-        )
+        self.start_timestamp = U.seconds_to_timestamp(self.start_second)
         return self.start_timestamp
 
     def _prepare_stop_timestamp(self) -> str:
         """Convert the stop time requested to a timestamp (str) `HH:MM:SS`."""
-        self.stop_timestamp = (
-            self.stop_time
-            if isinstance(self.stop_time, str)
-            else U.seconds_to_timestamp(self.stop_time)
-        )
+        self.stop_timestamp = U.seconds_to_timestamp(self.stop_second)
         return self.stop_timestamp
 
     def _prepare_start_frame(self) -> int:

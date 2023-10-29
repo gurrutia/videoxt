@@ -207,7 +207,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         "-dm",
         type=V.valid_dimensions_str,
         metavar="",
-        help="Resize the output to a specific width and height (Ex: --dm 1920x1080).",
+        help="Resize the output to a specific width and height (Ex: -dm 1920x1080).",
     )
     parent_parser_image.add_argument(
         "--resize",

@@ -131,13 +131,6 @@ class ExtractionHandler:
             result.success = False
             result.message = f"Extraction failed: {error_msg}"
 
-        except Exception as error_msg:
-            import traceback
-
-            traceback.print_exc()
-            result.success = False
-            result.message = f"Extraction failed: {error_msg}"
-
         else:
             result.success = True
             result.message = "Extraction successful."

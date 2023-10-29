@@ -1204,13 +1204,13 @@ class PreparedClipRequest(PreparedBaseRequest):
         self._prepare_destpath()
         self._prepare_resize()
         self._prepare_dimensions()
-        self._prepare_speed()
-        self._prepare_volume()
         self._prepare_rotate()
+        self._prepare_speed()
         self._prepare_bounce()
-        self._prepare_monochrome()
-        self._prepare_normalize()
         self._prepare_reverse()
+        self._prepare_monochrome()
+        self._prepare_volume()
+        self._prepare_normalize()
         self._is_prepared = True
         return self
 
@@ -1239,23 +1239,17 @@ class PreparedClipRequest(PreparedBaseRequest):
         )
         return self.dimensions
 
+    def _prepare_rotate(self) -> int:
+        """Set rotate to 0 if not specified."""
+        if self.rotate is None:
+            self.rotate = 0
+        return self.rotate
+
     def _prepare_speed(self) -> float:
         """Set speed to 1.0 if not specified."""
         if self.speed is None:
             self.speed = 1.0
         return self.speed
-
-    def _prepare_volume(self) -> float:
-        """Set volume to 1.0 if not specified."""
-        if self.volume is None:
-            self.volume = 1.0
-        return self.volume
-
-    def _prepare_rotate(self) -> int:
-        """Set rotate to 0 if not specified."""
-        if self.volume is None:
-            self.volume = 0
-        return self.volume
 
     def _prepare_bounce(self) -> bool:
         """Set bounce to False if not specified."""
@@ -1263,23 +1257,29 @@ class PreparedClipRequest(PreparedBaseRequest):
             self.bounce = False
         return self.bounce
 
+    def _prepare_reverse(self) -> bool:
+        """Set reverse to False if not specified."""
+        if self.reverse is None:
+            self.reverse = False
+        return self.reverse
+
     def _prepare_monochrome(self) -> bool:
         """Set monochrome to False if not specified."""
         if self.monochrome is None:
             self.monochrome = False
         return self.monochrome
 
+    def _prepare_volume(self) -> float:
+        """Set volume to 1.0 if not specified."""
+        if self.volume is None:
+            self.volume = 1.0
+        return self.volume
+
     def _prepare_normalize(self) -> bool:
         """Set normalize to False if not specified."""
         if self.normalize is None:
             self.normalize = False
         return self.normalize
-
-    def _prepare_reverse(self) -> bool:
-        """Set reverse to False if not specified."""
-        if self.reverse is None:
-            self.reverse = False
-        return self.reverse
 
 
 @dataclass

@@ -114,28 +114,38 @@ class ExtractionHandler:
         _timer_start = perf_counter()
         try:
             if self.method == ExtractionMethod.FRAMES:
-                result.destpath = extractor.extract()
+                extractor.extract()
             else:
                 transient_msg = (
                     f"[yellow]Extracting {self.method.value}...[/yellow]\n"
                     "Press [red][bold]Ctrl+C[/red][/bold] to cancel."
                 )
                 with Console().status(transient_msg):
-                    result.destpath = extractor.extract()
+                    extractor.extract()
 
         except KeyboardInterrupt:
             result.success = False
             result.message = "Extraction cancelled."
 
-        except VideoXTError as e:
+        except VideoXTError as error_msg:
             result.success = False
-            result.message = f"Extraction failed: {e}"
+            result.message = f"Extraction failed: {error_msg}"
+
+        except Exception as error_msg:
+            import traceback
+
+            traceback.print_exc()
+            result.success = False
+            result.message = f"Extraction failed: {error_msg}"
 
         else:
             result.success = True
             result.message = "Extraction successful."
 
         finally:
+            if extractor.request.destpath.exists():
+                result.destpath = extractor.request.destpath
+
             result.elapsed_time = perf_counter() - _timer_start
             return result
 

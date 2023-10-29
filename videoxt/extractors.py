@@ -65,7 +65,7 @@ class AudioExtractor:  # XXX: Optimize.
             else self.request.prepare()  # XXX: log
         )
 
-    def extract(self) -> Path | None:
+    def extract(self) -> Path:
         """
         Extract audio from a video within a given time range and return the path to the
         saved audio file. Optional edits to audio are applied before saving to disk.
@@ -73,7 +73,7 @@ class AudioExtractor:  # XXX: Optimize.
         Returns:
         -----
             `pathlib.Path | None`:
-                The path to the extracted audio file or None if the write failed.
+                The path to the extracted audio file if the write was successful.
         """
         with VideoFileClip(str(self.request.video.filepath)) as clip:
             subclip = self._edit_clip_audio(clip)
@@ -103,14 +103,14 @@ class AudioExtractor:  # XXX: Optimize.
 
         return clip
 
-    def _write_audio_file(self, subclip: VideoFileClip) -> Path | None:
+    def _write_audio_file(self, subclip: VideoFileClip) -> Path:
         """
         Write the audio from a subclip to disk and return the path to the audio file.
 
         Returns:
         -----
-            `pathlib.Path | None`:
-                The path to the extracted audio file or None if the write failed.
+            `pathlib.Path`:
+                The path to the extracted audio file if the write was successful.
 
         Raises:
         -----
@@ -125,8 +125,8 @@ class AudioExtractor:  # XXX: Optimize.
             raise AudioWriteError(
                 f"Error writing audio to {self.request.destpath}"
             ) from e
-        finally:
-            return self.request.destpath if self.request.destpath.exists() else None
+        else:
+            return self.request.destpath
 
 
 @dataclass
@@ -157,15 +157,15 @@ class ClipExtractor:  # XXX: Optimize.
             else self.request.prepare()  # XXX: log
         )
 
-    def extract(self) -> Path | None:
+    def extract(self) -> Path:
         """
         Extract a subclip from a video within a given time range and return the file
         path to clip. Optional edits to the clip are applied before saving to disk.
 
         Returns:
         -----
-            `pathlib.Path | None`:
-                The path to the extracted clip or None if the extraction failed.
+            `pathlib.Path`:
+                The path to the extracted clip if the write was successful.
         """
         with VideoFileClip(str(self.request.video.filepath)) as clip:
             subclip = self._edit_clip(clip)
@@ -199,14 +199,14 @@ class ClipExtractor:  # XXX: Optimize.
 
         return clip
 
-    def _write_subclip(self, subclip: VideoFileClip) -> Path | None:
+    def _write_subclip(self, subclip: VideoFileClip) -> Path:
         """
         Write a subclip to disk and return the path to the clip.
 
         Returns:
         -----
-            `pathlib.Path | None`:
-                The path to the extracted clip or None if the extraction failed.
+            `pathlib.Path`:
+                The path to the extracted clip if the write was successful.
 
         Raises:
         -----
@@ -218,8 +218,8 @@ class ClipExtractor:  # XXX: Optimize.
             raise ClipWriteError(
                 f"Error writing clip to {self.request.destpath}"
             ) from e
-        finally:
-            return self.request.destpath if self.request.destpath.exists() else None
+        else:
+            return self.request.destpath
 
 
 @dataclass
@@ -267,24 +267,19 @@ class FramesExtractor:  # XXX: Optimize.
         from rich.progress import track
 
         # Open the video capture and iterate over the frames to write to disk.
-        try:
-            with open_video_capture(self.request.video.filepath) as opencap:
-                for edited_frame, image_path in track(
-                    self._preprocess_frames(opencap),
-                    total=self.request.images_expected,
-                    transient=True,
-                    description=(
-                        "[yellow]Extracting frames...[/yellow]\n"
-                        "Press [red][bold]Ctrl+C[/red][/bold] to cancel."
-                    ),
-                ):
-                    self._write_image(edited_frame, image_path)
+        with open_video_capture(self.request.video.filepath) as opencap:
+            for edited_frame, image_path in track(
+                self._preprocess_frames(opencap),
+                total=self.request.images_expected,
+                transient=True,
+                description=(
+                    "[yellow]Extracting frames...[/yellow]\n"
+                    "Press [red][bold]Ctrl+C[/red][/bold] to cancel."
+                ),
+            ):
+                self._write_image(edited_frame, image_path)
 
-        except KeyboardInterrupt:
-            raise KeyboardInterrupt("Extraction cancelled.")
-
-        finally:
-            return self.request.destpath
+        return self.request.destpath
 
     def _preprocess_frames(
         self, opencap: cv2.VideoCapture
@@ -465,15 +460,15 @@ class GifExtractor:  # XXX: Optimize.
             else self.request.prepare()  # XXX: log
         )
 
-    def extract(self) -> Path | None:
+    def extract(self) -> Path:
         """
         Extract a gif from a video within a given time range and return the file path
         the gif. Optional edits to the gif are applied before saving to disk.
 
         Returns:
         -----
-            `pathlib.Path | None`:
-                The path to the extracted gif or None if the extraction failed.
+            `pathlib.Path`:
+                The path to the extracted gif if the write was successful.
         """
         with VideoFileClip(str(self.request.video.filepath)) as clip:
             subclip = self._edit_clip(clip)
@@ -505,14 +500,14 @@ class GifExtractor:  # XXX: Optimize.
 
         return clip
 
-    def _write_gif(self, subclip: VideoFileClip) -> Path | None:
+    def _write_gif(self, subclip: VideoFileClip) -> Path:
         """
         Write an edited subclip to disk as a gif.
 
         Returns:
         -----
-            `pathlib.Path | None`:
-                The path to the extracted gif or None if the extraction failed.
+            `pathlib.Path`:
+                The path to the extracted gif if the write was successful.
 
         Raises:
         -----
@@ -524,5 +519,5 @@ class GifExtractor:  # XXX: Optimize.
             raise GifWriteError(
                 f"Error writing gif to {self.request.destpath!r}"
             ) from e
-        finally:
-            return self.request.destpath if self.request.destpath.exists() else None
+        else:
+            return self.request.destpath

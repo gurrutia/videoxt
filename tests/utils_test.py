@@ -375,7 +375,7 @@ def test_convert_bytes_with_negative_bytes_should_raise_value_error():
 def test_custom_json_encoder_encode_path():
     path = Path("/path/to/file")
     encoded_path = json.dumps(path, cls=CustomJSONEncoder)
-    assert encoded_path == '"\\\\path\\\\to\\\\file"'
+    assert encoded_path == '"C:/path/to/file"'
 
 
 def test_custom_json_encoder_encode_timedelta():

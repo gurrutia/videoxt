@@ -11,6 +11,7 @@ from videoxt.result import Result
 def extract(
     method: str,
     filepath: Path | str,
+    skip_validation: bool = False,
     **options: Optional[dict[str, Any]],
 ) -> Result:
     """
@@ -26,9 +27,13 @@ def extract(
     -----
         `method` (str):
             The extraction method to use ("audio", "clip", "frames", "gif").
-        `filepath` (pathlib.Path | str) :
+        `filepath` (pathlib.Path | str):
             Path to the video file with extension.
-        `**options` (Optional[dict[str, Any]]) :
+        `skip_validation` (bool):
+            If True, skips validation of the extraction options. This can slightly
+            improve speed, but it is not recommended unless you are sure that the
+            options are valid.
+        `**options` (Optional[dict[str, Any]]):
             Extraction options specific to the chosen extraction method.
 
     Returns:
@@ -51,7 +56,7 @@ def extract(
 
     else:
         handler = ExtractionHandler(method_enum)
-        return handler.execute(filepath, options)
+        return handler.execute(filepath, options, skip_validation=skip_validation)
 
 
 def extract_audio(
@@ -75,7 +80,7 @@ def extract_audio(
 
     Args:
     -----
-        `filepath` (pathlib.Path | str) :
+        `filepath` (pathlib.Path | str):
             Path to the video file with extension.
         `start_time` (Optional[float | int | str]):
             Specify the extraction's start time in seconds, or as a string in "HH:MM:SS"
@@ -370,7 +375,7 @@ def extract_gif(
 
     Args:
     -----
-        `filepath` (Path, str) :
+        `filepath` (Path, str):
             Path to the video file with extension.
         `start_time` (Optional[float | int | str]):
             Specify the extraction's start time in seconds, or as a string in "HH:MM:SS"

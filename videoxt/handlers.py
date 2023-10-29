@@ -55,7 +55,10 @@ class ExtractionHandler:
         self.object_factory = ObjectFactory(self.method)
 
     def execute(
-        self, filepath: Path | str, options: Optional[dict[str, Any]] = None
+        self,
+        filepath: Path | str,
+        options: Optional[dict[str, Any]] = None,
+        skip_validation: bool = False,
     ) -> Result:
         """
         Make the necessary objects used to perform the extraction and execute the
@@ -68,13 +71,18 @@ class ExtractionHandler:
             `options` (Optional[dict[str, Any]]):
                 Extraction options specific to the chosen extraction method. If None,
                 default options will be used.
-
+            `skip_validation` (bool):
+                If True, skips validation of the extraction options. This can slightly
+                improve speed, but it is not recommended unless you are sure that the
+                options are valid.
         Returns:
         -----
             `Result`: A dataclass containing the extraction details.
         """
         video = self.object_factory.make_video(filepath)
-        request = self.object_factory.make_prepared_request(video, options)
+        request = self.object_factory.make_prepared_request(
+            video, options, skip_validation
+        )
         extractor = self.object_factory.make_extractor(request)
         result = self.object_factory.make_result()
 
@@ -201,7 +209,10 @@ class ObjectFactory:
         return Video(Path(filepath))
 
     def make_prepared_request(
-        self, video: Video, options: Optional[dict[str, Any]] = None
+        self,
+        video: Video,
+        options: Optional[dict[str, Any]] = None,
+        skip_validation: bool = False,
     ) -> PreparedRequest:
         """
         Use the given video and options to create a `PreparedRequest` object.
@@ -213,6 +224,10 @@ class ObjectFactory:
             `options` (Optional[dict[str, Any]]):
                 Extraction options specific to the chosen extraction method. If None,
                 default options will be used.
+            `skip_validation` (bool):
+                If True, skips validation of the extraction options. This can slightly
+                improve speed, but it is not recommended unless you are sure that the
+                options are valid.
 
         Returns:
         -----
@@ -220,6 +235,9 @@ class ObjectFactory:
         """
         if options is None:
             return self.PREPARED_REQUEST_MAP[self.method](video).prepare()
+
+        if skip_validation:
+            return self.PREPARED_REQUEST_MAP[self.method](video, **options).prepare()
 
         return self.REQUEST_MAP[self.method](**options).validate().prepare(video)
 

@@ -122,13 +122,13 @@ def non_negative_float(n: float | int | str) -> float:
     return value
 
 
-def valid_dir(dir: Path | str) -> Path:
+def valid_dir(directory: Path | str) -> Path:
     """
     Validate a path is a directory and exists and return it.
 
     Args:
     -----
-        `dir` (pathlib.Path | str): The directory to validate.
+        `directory` (pathlib.Path | str): The directory to validate.
 
     Returns:
     -----
@@ -138,13 +138,13 @@ def valid_dir(dir: Path | str) -> Path:
     -----
         `ValidationError`: If the path is not a directory or does not exist.
     """
-    if dir is None:
-        raise ValidationError(f"Directory cannot be None, got {dir!r}")
+    if directory is None:
+        raise ValidationError(f"Directory cannot be None, got {directory!r}")
 
-    dir_path = Path(dir)
+    dir_path = Path(directory)
 
     if not dir_path.is_dir():
-        raise ValidationError(f"Directory not found, got {dir_path!r}")
+        raise ValidationError(f"Directory not found, got {directory!r}")
 
     return dir_path
 

@@ -81,7 +81,7 @@ def execute_extraction(
 
     try:
         videoxt.api.extract(method, filepath, skip_validation=True, **options)
-    except (KeyboardInterrupt, VideoXTError) as error_msg:
+    except VideoXTError as error_msg:
         print(error_msg)
         return 1
     else:

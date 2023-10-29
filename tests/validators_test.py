@@ -376,8 +376,20 @@ def test_valid_dir_valid_string(tmp_path: Path):
     assert valid_dir(str(tmp_path)) == tmp_path
 
 
-def test_valid_dir_with_dot_as_path():
+def test_valid_dir_with_dot_as_path_returns_cwd():
+    assert valid_dir(Path(".")) == Path().cwd()
+
+
+def test_valid_dir_with_dot_as_string_returns_cwd():
     assert valid_dir(".") == Path().cwd()
+
+
+def test_valid_dir_with_two_dots_as_path_returns_parent_dir():
+    assert valid_dir(Path("..")) == Path().cwd().parent
+
+
+def test_valid_dir_with_two_dots_as_string_returns_parent_dir():
+    assert valid_dir("..") == Path().cwd().parent
 
 
 def test_valid_dir_valid_path_with_trailing_slash(tmp_path: Path):
@@ -396,6 +408,11 @@ def test_valid_dir_invalid_path(tmp_path: Path):
 def test_valid_dir_invalid_string(tmp_path: Path):
     with pytest.raises(ValidationError):
         valid_dir(str(tmp_path / "invalid"))
+
+
+def test_valid_dir_with_forward_slash():
+    with pytest.raises(ValidationError):
+        valid_dir("/")
 
 
 def test_valid_dir_none():

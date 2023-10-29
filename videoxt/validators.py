@@ -146,8 +146,14 @@ def valid_dir(directory: Path | str) -> Path:
     if not dir_path.is_dir():
         raise ValidationError(f"Directory not found, got {directory!r}")
 
+    if dir_path == Path("/"):
+        raise ValidationError(f"Invalid directory, got {directory!r}")
+
     if dir_path == Path("."):
         dir_path = Path.cwd()
+
+    if dir_path == Path(".."):
+        dir_path = Path.cwd().parent
 
     return dir_path
 

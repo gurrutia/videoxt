@@ -310,7 +310,7 @@ class AudioRequest(BaseRequest):
 
     def _validate_volume(self) -> float | None:
         """Validate the requested volume if specified."""
-        self.volume = None if self.volume is None else V.validate_volume(self.volume)
+        self.volume = None if self.volume is None else V.valid_volume(self.volume)
         return self.volume
 
 
@@ -475,7 +475,7 @@ class ClipRequest(BaseRequest):
 
     def _validate_volume(self) -> float | None:
         """Validate the requested volume if specified."""
-        self.volume = None if self.volume is None else V.validate_volume(self.volume)
+        self.volume = None if self.volume is None else V.valid_volume(self.volume)
         return self.volume
 
 

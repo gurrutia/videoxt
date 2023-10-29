@@ -21,7 +21,7 @@ from videoxt.validators import (
     valid_stop_time,
     valid_timestamp,
     valid_video_file_suffix,
-    validate_volume,
+    valid_volume,
 )
 
 
@@ -760,22 +760,22 @@ def test_valid_video_file_suffix_with_unsupported_video_file_suffix():
         valid_video_file_suffix(".abc")
 
 
-def test_validate_volume_with_valid_volume():
-    assert validate_volume(-1) == 0.0
-    assert validate_volume(0.0) == 0.0
-    assert validate_volume(0.5) == 0.5
-    assert validate_volume(1.0) == 1.0
-    assert validate_volume(1.5) == 1.5
-    assert validate_volume("2") == 2.0
-    assert validate_volume("3.0") == 3.0
+def test_valid_volume_with_valid_volume():
+    assert valid_volume(-1) == 0.0
+    assert valid_volume(0.0) == 0.0
+    assert valid_volume(0.5) == 0.5
+    assert valid_volume(1.0) == 1.0
+    assert valid_volume(1.5) == 1.5
+    assert valid_volume("2") == 2.0
+    assert valid_volume("3.0") == 3.0
 
 
-def test_validate_volume_with_invalid_input():
+def test_valid_volume_with_invalid_input():
     with pytest.raises(ValidationError):
-        validate_volume("abc")
+        valid_volume("abc")
     with pytest.raises(ValidationError):
-        validate_volume(None)
+        valid_volume(None)
     with pytest.raises(ValidationError):
-        validate_volume("")
+        valid_volume("")
     with pytest.raises(ValidationError):
-        validate_volume(" ")
+        valid_volume(" ")

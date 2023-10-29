@@ -561,7 +561,7 @@ def valid_image_format(image_format: str) -> str:
     return fmt
 
 
-def validate_volume(volume: float | int | str) -> float:
+def valid_volume(volume: float | int | str) -> float:
     """
     Validate and return non-negative float audio volume. If input is negative, set to 0.
 
@@ -578,7 +578,7 @@ def validate_volume(volume: float | int | str) -> float:
         `ValidationError`: If the volume is None.
     """
     if volume is None:
-        raise ValidationError("Volume cannot be None")
+        raise ValidationError("Volume cannot be None.")
 
     if isinstance(volume, (float, int)):
         return 0 if volume <= 0 else volume

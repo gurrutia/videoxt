@@ -181,7 +181,7 @@ def valid_filepath(filepath: Path | str, is_video: bool = False) -> Path:
         raise ValidationError(f"File not found, got {filepath!r}")
 
     if not fp.is_file():
-        raise ValidationError(f"Filepath provided is not a file, got {filepath}")
+        raise ValidationError(f"Filepath provided is not a file, got {filepath!r}")
 
     if is_video:
         valid_video_file_suffix(fp.suffix)
@@ -337,9 +337,23 @@ def valid_start_time(start_time: float | int | str) -> float | str:
     try:
         start_time_float = float(start_time)
     except ValueError:
-        return valid_start_timestamp(str(start_time))
+        try:
+            return valid_start_timestamp(str(start_time))
+        except ValidationError:
+            raise ValidationError(
+                f"Invalid start time, got {start_time!r}\n"
+                "Start time must be a non-negative number or a properly formatted "
+                "timestamp (Ex: 'HH:MM:SS')."
+            )
     else:
-        return non_negative_float(start_time_float)
+        try:
+            return non_negative_float(start_time_float)
+        except ValidationError:
+            raise ValidationError(
+                f"Invalid start time, got {start_time!r}\n"
+                "Start time must be a non-negative number or a properly formatted "
+                "timestamp (Ex: 'HH:MM:SS')."
+            )
 
 
 def valid_stop_time(stop_time: float | int | str) -> float | str:

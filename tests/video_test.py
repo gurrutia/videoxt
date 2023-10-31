@@ -1,125 +1,115 @@
-import os
-import tempfile
-from pathlib import Path
-
-import cv2
-import numpy as np
+import cv2  # type: ignore
 import pytest
 
-from videoxt.video import get_video_properties
-from videoxt.video import open_video_capture
-from videoxt.video import Video
-from videoxt.video import VideoProperties
+from videoxt.exceptions import ClosedVideoCaptureError
+from videoxt.video import Video, fetch_video_properties, open_video_capture
 
 
-@pytest.fixture(scope="function")
-def tmp_video_file() -> Path:
-    """Create a temporary video file for testing purposes.
-
-    Yields:
-        Path: Filepath of the temporary video file.
-    """
-    width = 640
-    height = 480
-    fps = 30.0
-    duration_seconds = 2
-    codec = "mp4v"
-
-    temp_dir = tempfile.mkdtemp()
-    temp_file = os.path.join(temp_dir, "tmp_video.mp4")
-    fourcc = cv2.VideoWriter_fourcc(*codec)
-    out = cv2.VideoWriter(temp_file, fourcc, fps, (width, height))
-
-    for i in range(duration_seconds * int(fps)):
-        frame = cv2.putText(
-            np.zeros((480, 640, 3), dtype=np.uint8),
-            f"Frame {i + 1}",
-            (240, 240),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            1,
-            (255, 255, 255),
-            2,
-        )
-        out.write(frame)
-    out.release()
-
-    yield Path(temp_file)
-
-    if os.path.exists(temp_file):
-        os.remove(temp_file)
-        os.rmdir(temp_dir)
-
-
-@pytest.fixture
-def tmp_video_capture(tmp_video_file):
-    """Create a temporary `cv2.VideoCapture` object."""
-    with open_video_capture(tmp_video_file) as opencap:
-        yield opencap
-
-
-def test_open_video_capture(tmp_video_file):
-    """Test that a video capture object is returned"""
-    with open_video_capture(tmp_video_file) as opencap:
+def test_open_video_capture_if_filepath_as_path_and_is_valid_video_file(
+    fixture_tmp_video_filepath,
+):
+    with open_video_capture(fixture_tmp_video_filepath) as opencap:
+        assert opencap.isOpened()
         assert isinstance(opencap, cv2.VideoCapture)
 
 
-def test_open_video_capture_context(tmp_video_capture):
-    """Test that the video capture object is released after exiting the context"""
-    assert tmp_video_capture.isOpened()
+def test_open_video_capture_if_filepath_as_str_and_is_valid_video_file(
+    fixture_tmp_video_filepath,
+):
+    with open_video_capture(str(fixture_tmp_video_filepath)) as opencap:
+        assert opencap.isOpened()
+        assert isinstance(opencap, cv2.VideoCapture)
 
 
-def test_open_video_capture_exception(tmp_video_file):
-    """Test that an exception is raised when the video file does not exist"""
-    non_existing_file = tmp_video_file / "non_existing.mp4"
-    with pytest.raises(FileNotFoundError):
+def test_open_video_capture_if_filepath_is_none():
+    with pytest.raises(ClosedVideoCaptureError):
+        with open_video_capture(None) as opencap:
+            assert not opencap.isOpened()
+
+
+def test_open_video_capture_if_filepath_is_int():
+    with pytest.raises(ClosedVideoCaptureError):
+        with open_video_capture(1) as opencap:
+            assert not opencap.isOpened()
+
+
+def test_open_video_capture_if_filepath_doesnt_exist(fixture_tmp_dir):
+    non_existing_file = fixture_tmp_dir / "non_existing.mp4"
+    with pytest.raises(ClosedVideoCaptureError):
         with open_video_capture(non_existing_file) as opencap:
             assert not opencap.isOpened()
 
 
-def test_video_properties_dataclass():
-    """Test that the `VideoProperties` dataclass is initialized as expected."""
-    video_properties = VideoProperties(
-        dimensions=(640, 480),
-        fps=30.0,
-        frame_count=60,
-        length_seconds=2.0,
-        length_timestamp="0:00:02",
-        suffix="mp4",
+def test_open_video_capture_if_filepath_is_a_directory(fixture_tmp_dir):
+    with pytest.raises(ClosedVideoCaptureError):
+        with open_video_capture(fixture_tmp_dir) as opencap:
+            assert not opencap.isOpened()
+
+
+def test_open_video_capture_if_filepath_is_an_existing_text_file(
+    fixture_tmp_text_filepath,
+):
+    with pytest.raises(ClosedVideoCaptureError):
+        with open_video_capture(fixture_tmp_text_filepath) as opencap:
+            assert not opencap.isOpened()
+
+
+def test_open_video_capture_if_filepath_is_a_video_file_with_zero_second_duration(
+    fixture_tmp_video_filepath_zero_seconds,
+):
+    with pytest.raises(ClosedVideoCaptureError):
+        with open_video_capture(fixture_tmp_video_filepath_zero_seconds) as opencap:
+            assert not opencap.isOpened()
+
+
+def test_fetch_video_properties_if_filepath_is_valid_video_file(
+    fixture_tmp_video_filepath, fixture_tmp_video_properties
+):
+    fetched_properties = fetch_video_properties(fixture_tmp_video_filepath)
+    assert isinstance(fetched_properties, dict)
+    assert (
+        fetched_properties["dimensions"] == fixture_tmp_video_properties["dimensions"]
     )
-    assert isinstance(video_properties, VideoProperties)
-    assert video_properties.dimensions == (640, 480)
-    assert video_properties.fps == 30.0
-    assert video_properties.frame_count == 60
-    assert video_properties.length_seconds == 2.0
-    assert video_properties.length_timestamp == "0:00:02"
-    assert video_properties.suffix == "mp4"
-
-
-def test_get_video_properties(tmp_video_file):
-    """Test that the video properties are returned as expected"""
-    video_properties = get_video_properties(tmp_video_file)
-    assert isinstance(video_properties, VideoProperties)
-    assert video_properties.dimensions == (640, 480)
-    assert video_properties.fps == 30.0
-    assert video_properties.frame_count == 60
-    assert video_properties.length_seconds == 2.0
-    assert video_properties.length_timestamp == "0:00:02"
-    assert video_properties.suffix == "mp4"
-
-
-def test_video_dataclass(tmp_video_file):
-    """Test that the `Video` dataclass is initialized as expected."""
-    video_properties = VideoProperties(
-        dimensions=(640, 480),
-        fps=30.0,
-        frame_count=60,
-        length_seconds=2.0,
-        length_timestamp="0:00:02",
-        suffix="mp4",
+    assert fetched_properties["fps"] == fixture_tmp_video_properties["fps"]
+    assert (
+        fetched_properties["frame_count"] == fixture_tmp_video_properties["frame_count"]
     )
-    video = Video(
-        filepath=tmp_video_file,
-    )
+
+
+def test_video_object_is_instance_of_video_dataclass(fixture_tmp_video_filepath):
+    video = Video(fixture_tmp_video_filepath)
     assert isinstance(video, Video)
-    assert video.filepath == tmp_video_file
-    assert video.properties == video_properties
+
+
+def test_video_object_attributes_match_expected_values(
+    fixture_tmp_video_filepath, fixture_tmp_video_properties
+):
+    video = Video(fixture_tmp_video_filepath)
+    assert video.filepath == fixture_tmp_video_filepath
+    assert video.dimensions == fixture_tmp_video_properties["dimensions"]
+    assert video.fps == fixture_tmp_video_properties["fps"]
+    assert video.frame_count == fixture_tmp_video_properties["frame_count"]
+    assert video.duration == fixture_tmp_video_properties["duration"]
+    assert video.duration_seconds == fixture_tmp_video_properties["duration_seconds"]
+    assert (
+        video.duration_timestamp == fixture_tmp_video_properties["duration_timestamp"]
+    )
+    assert video.has_audio == fixture_tmp_video_properties["has_audio"]
+    assert (
+        video.filesize_bytes
+        == fixture_tmp_video_properties["video_file_path"].stat().st_size
+    )
+
+
+def test_video_object_with_invalid_filepath_raises_cv2_error(
+    fixture_tmp_video_filepath_zero_seconds,
+):
+    with pytest.raises(ClosedVideoCaptureError):
+        Video(fixture_tmp_video_filepath_zero_seconds)
+
+
+def test_fetch_video_properties_with_invalid_filepath_raises_cv2_error(
+    fixture_tmp_video_filepath_zero_seconds,
+):
+    with pytest.raises(ClosedVideoCaptureError):
+        fetch_video_properties(fixture_tmp_video_filepath_zero_seconds)

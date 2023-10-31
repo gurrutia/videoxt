@@ -35,7 +35,7 @@ jobs:
     - build
     runs-on: ubuntu-latest
     environment:
-      name: pypi
+      name: publish
       url: https://pypi.org/p/videoxt
     permissions:
       id-token: write  # IMPORTANT: mandatory for trusted publishing
@@ -96,7 +96,7 @@ jobs:
     runs-on: ubuntu-latest
 
     environment:
-      name: testpypi
+      name: test-publish
       url: https://test.pypi.org/p/videoxt
 
     permissions:

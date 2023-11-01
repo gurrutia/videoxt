@@ -30,6 +30,21 @@ class ExtractionRange:
         `fps` (float):
             Frames per second to use for extraction.
 
+    Attributes:
+    -----
+        `start_second` (float):
+            Start time of the extraction in seconds.
+        `stop_second` (float):
+            Stop time of the extraction in seconds.
+        `start_timestamp` (str):
+            Start time of the extraction as a timestamp (`HH:MM:SS`).
+        `stop_timestamp` (str):
+            Stop time of the extraction as a timestamp (`HH:MM:SS`).
+        `start_frame` (int):
+            Start time of the extraction as a frame number.
+        `stop_frame` (int):
+            Stop time of the extraction as a frame number.
+
     Usage:
     -----
     >>> from videoxt.preppers import ExtractionRange

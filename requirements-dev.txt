@@ -1,10 +1,10 @@
+coverage
 isort
 mypy
 pre-commit
 pycln
 pydocstyle
 pytest
-pytest-cov
 pyupgrade
 ruff
 setup-cfg-fmt

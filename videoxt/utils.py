@@ -44,8 +44,7 @@ def timestamp_to_seconds(timestamp: str) -> float:
     timestamp = timestamp.split(".")[0]
     time_parts = timestamp.split(":")
     total_seconds = sum(
-        float(part) * 60**exponent
-        for exponent, part in enumerate(reversed(time_parts))
+        float(part) * 60**exponent for exponent, part in enumerate(reversed(time_parts))
     )
 
     return total_seconds

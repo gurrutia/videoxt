@@ -145,3 +145,6 @@ dmypy.json
 
 # custom
 *_frames*
+
+# ruff
+.ruff_cache

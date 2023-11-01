@@ -657,7 +657,22 @@ def valid_fps(fps: float | int | str) -> float:
 
 
 def valid_dimensions_str(dimensions: str) -> tuple[int, int]:
-    # expected input is 'WxH' (Ex: '1920x1080')
+    """
+    Validate and return a tuple of positive integers from a string of dimensions.
+
+    Args:
+    -----
+        `dimensions` (str): The dimensions to validate.
+
+    Returns:
+    -----
+        `tuple[int, int]`: The dimensions as a tuple of integers if valid.
+
+    Raises:
+    -----
+        `ValidationError`: If the dimensions are None, empty, or not in this format:
+            'WxH' (Ex: '1920x1080').
+    """
     if not dimensions:
         raise ValidationError(
             f"Empty dimensions provided, got {dimensions!r}\n"

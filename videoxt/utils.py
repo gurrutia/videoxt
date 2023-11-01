@@ -104,6 +104,10 @@ def timedelta_to_timestamp(duration: timedelta) -> str:
     Returns:
     -----
         `str`: A timestamp string in the format "HH:MM:SS".
+
+    Raises:
+    -----
+        `ValueError`: If the duration is negative.
     """
     total_seconds = duration.total_seconds()
 

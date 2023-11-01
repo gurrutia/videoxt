@@ -101,11 +101,6 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     Returns:
     -----
         `int`: 0 if the extraction was successful, 1 otherwise.
-
-    Raises:
-    -----
-        `argparse.ArgumentTypeError`:
-            Raised when an argument is not of the expected type.
     """
     # parent_parser houses arguments common to all subparsers
     parent_parser = argparse.ArgumentParser(add_help=False)

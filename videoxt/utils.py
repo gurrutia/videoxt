@@ -154,13 +154,12 @@ def append_enumeration(index: int, tag: Optional[str] = None) -> str:
     -----
         `str`: The enumerated string to append to a file name or directory name.
     """
-    if index < 1:
-        raise ValueError(f"Enumeration index must be greater than 0, got {index}.")
+    index = 1 if index < 1 else index
 
     if tag is None:
         return f" ({index})"
 
-    # Ensure the tag doesn't contain invalid characters.
+    # Ensure the tag doesn't contain invalid characters for a file name.
     tag = valid_filename(tag)
 
     return f"{tag} ({index})" if index > 1 else tag

@@ -267,8 +267,15 @@ def test_append_enumeration_when_index_and_tag_are_entered():
 
 
 def test_append_enumeration_when_index_is_0():
-    with pytest.raises(ValueError):
-        append_enumeration(0)
+    assert append_enumeration(0) == " (1)"
+    assert append_enumeration(0, tag="_vxt") == "_vxt"
+
+
+def test_append_enumeration_when_index_is_negative():
+    assert append_enumeration(-1) == " (1)"
+    assert append_enumeration(-2) == " (1)"
+    assert append_enumeration(-3) == " (1)"
+    assert append_enumeration(-1, tag="_vxt") == "_vxt"
 
 
 def test_calculate_duration_with_valid_inputs():

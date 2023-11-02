@@ -1,5 +1,5 @@
 """Contains functions used to edit a VideoFileClip or np.ndarray prior to extraction."""
-from typing import Optional
+from typing import Any, Optional
 
 import cv2  # type: ignore
 import numpy as np
@@ -149,18 +149,18 @@ def edit_clip_motion(
 
 
 def edit_image(
-    image: np.ndarray,
+    image: np.ndarray[Any, Any],
     dimensions: Optional[tuple[int, int]] = None,
     rotate: Optional[int] = None,
     monochrome: Optional[bool] = None,
-) -> np.ndarray:
+) -> np.ndarray[Any, Any]:
     """
     Edit a numpy.ndarray image by resizing, rotating, and converting to monochrome
     if specified and return the edited image.
 
     Args:
     -----
-        `image` (np.ndarray):
+        `image` (np.ndarray[Any, Any]):
             The image to edit.
         `dimensions` (Optional[tuple[int, int]]):
             The dimensions to resize the image to. If None, the image will not be
@@ -173,7 +173,7 @@ def edit_image(
 
     Returns:
     -----
-        `np.ndarray`: The edited image.
+        `np.ndarray[Any, Any]`: The edited image.
     """
     if dimensions is not None and dimensions != image.shape:
         image = cv2.resize(image, dimensions)

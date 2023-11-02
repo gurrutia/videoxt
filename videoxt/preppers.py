@@ -81,7 +81,7 @@ class ExtractionRange:
     start_frame: int = field(init=False)
     stop_frame: int = field(init=False)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """
         Start procedure that prepares and validates the extraction range.
 

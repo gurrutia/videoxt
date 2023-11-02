@@ -60,7 +60,7 @@ def split_cli_args(args: argparse.Namespace) -> tuple[str, str, dict[str, Any]]:
 def execute_extraction(
     method: str,
     filepath: str,
-    **options: dict,
+    **options: dict[str, Any],
 ) -> int:
     """
     Trigger the extraction procedure and return the exit code (0 means success).

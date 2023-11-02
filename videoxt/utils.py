@@ -43,7 +43,7 @@ def timestamp_to_seconds(timestamp: str) -> float:
     """
     timestamp = timestamp.split(".")[0]
     time_parts = timestamp.split(":")
-    total_seconds = sum(
+    total_seconds: float = sum(
         float(part) * 60**exponent for exponent, part in enumerate(reversed(time_parts))
     )
 
@@ -360,7 +360,7 @@ class ToJsonMixin:
 class DataclassType(Protocol):
     """Protocol representing dataclass attributes for type-hinting purposes."""
 
-    __dataclass_fields__: ClassVar[dict]
+    __dataclass_fields__: ClassVar[dict[str, Any]]
 
 
 def remove_private_keys(d: dict[str, Any]) -> dict[str, Any]:

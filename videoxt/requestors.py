@@ -2,7 +2,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 import videoxt.preppers as P
 import videoxt.validators as V
@@ -886,7 +886,7 @@ class PreparedBaseRequest(PreparedRequest):
     overwrite: Optional[bool] = None
     fps: Optional[float] = None
     destpath: Path = field(init=False)
-    extraction_range: dict = field(init=False, default_factory=dict)
+    extraction_range: dict[str, Any] = field(init=False, default_factory=dict)
     _is_prepared: bool = field(init=False)
 
     def prepare(self) -> "PreparedBaseRequest":
@@ -926,7 +926,7 @@ class PreparedBaseRequest(PreparedRequest):
         self.fps = P.prepare_fps(self.video.fps, self.fps)
         return self.fps
 
-    def _prepare_extraction_range(self) -> dict:
+    def _prepare_extraction_range(self) -> dict[str, Any]:
         """Prepare, set and return a dictionary representing the extraction range."""
         self.extraction_range = P.prepare_extraction_range(
             self.video.duration_seconds,

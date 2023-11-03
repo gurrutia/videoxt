@@ -17,7 +17,7 @@
 * <a href="#frames">*Frames*</a><br/>
 * <a href="#gif">*GIF*</a><br/>
 * <a href="#clip">*Clip*</a><br/>
-* <a href="#examples">More Examples</a><br/>
+* <a href="#more-examples">More Examples</a><br/>
 * <a href="#used-by">Used By</a>
 
 ---

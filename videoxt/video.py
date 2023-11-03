@@ -28,7 +28,7 @@ class Video:
 
     Fields:
     -----
-        `filepath` (pathlib.Path): Path to the video file.
+        `filepath` (Path): Path to the video file.
 
     Attributes:
     -----
@@ -179,7 +179,7 @@ def fetch_video_properties(filepath: Path) -> dict[str, Any]:
 
     Args:
     -----
-        `filepath` (pathlib.Path): Path to the video file.
+        `filepath` (Path): Path to the video file.
 
     Returns:
     -----
@@ -218,7 +218,7 @@ def open_video_capture(filepath: Path) -> Iterator[cv2.VideoCapture]:
 
     Args:
     -----
-        `filepath` (pathlib.Path): Path to the video file.
+        `filepath` (Path): Path to the video file.
 
     Yields:
     -----

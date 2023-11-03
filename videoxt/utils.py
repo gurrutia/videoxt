@@ -4,7 +4,7 @@ from collections import defaultdict
 from dataclasses import asdict, dataclass
 from datetime import timedelta
 from pathlib import Path
-from typing import Any, ClassVar, Optional, Protocol
+from typing import Any, ClassVar, Protocol
 
 from rich import print
 
@@ -121,7 +121,7 @@ def timedelta_to_timestamp(duration: timedelta) -> str:
     return f"{int(hours):02}:{int(minutes):02}:{int(seconds):02}"
 
 
-def append_enumeration(index: int, tag: Optional[str] = None) -> str:
+def append_enumeration(index: int, tag: str | None = None) -> str:
     """
     Return an enumerated file name with the given index and optional tag.
 
@@ -146,7 +146,7 @@ def append_enumeration(index: int, tag: Optional[str] = None) -> str:
     -----
         `index` (int):
             The enumeration index. Must be greater than 0.
-        `tag` (Optional[str]):
+        `tag` (str | None):
             The tag to enumerate. If None, only the index is used.
 
     Returns:
@@ -164,7 +164,7 @@ def append_enumeration(index: int, tag: Optional[str] = None) -> str:
     return f"{tag} ({index})" if index > 1 else tag
 
 
-def enumerate_dir(directory: Path, tag: Optional[str] = None) -> Path:
+def enumerate_dir(directory: Path, tag: str | None = None) -> Path:
     """
     Return a non-existent, potentially enumerated directory path.
 
@@ -186,12 +186,12 @@ def enumerate_dir(directory: Path, tag: Optional[str] = None) -> Path:
     -----
         `directory`:
             The path to the directory to potentially enumerate.
-        `tag` (Optional[str]):
+        `tag` (str | None):
             The tag to enumerate. If None, only the index is used.
 
     Returns:
     -----
-        `pathlib.Path`: The path to a non-existent directory.
+        `Path`: The path to a non-existent directory.
     """
     if not directory.exists():
         return directory
@@ -205,7 +205,7 @@ def enumerate_dir(directory: Path, tag: Optional[str] = None) -> Path:
         index += 1
 
 
-def enumerate_filepath(filepath: Path, tag: Optional[str] = None) -> Path:
+def enumerate_filepath(filepath: Path, tag: str | None = None) -> Path:
     """
     Return a non-existent, potentially enumerated file path.
 
@@ -225,11 +225,11 @@ def enumerate_filepath(filepath: Path, tag: Optional[str] = None) -> Path:
 
     Args:
     -----
-        `filepath` (pathlib.Path): The path to the file to potentially enumerate.
+        `filepath` (Path): The path to the file to potentially enumerate.
 
     Returns:
     -----
-        `pathlib.Path`: The path to a non-existent file.
+        `Path`: The path to a non-existent file.
     """
     if not filepath.exists():
         return filepath

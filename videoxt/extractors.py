@@ -50,7 +50,7 @@ class AudioExtractor:  # XXX: Optimize.
 
     Public Methods:
     -----
-        `extract()` -> `pathlib.Path`:
+        `extract()` -> `Path`:
             Execute audio extraction and return the path to the extracted audio
             file.
     """
@@ -72,7 +72,7 @@ class AudioExtractor:  # XXX: Optimize.
 
         Returns:
         -----
-            `pathlib.Path | None`:
+            `Path | None`:
                 The path to the extracted audio file if the write was successful.
         """
         with VideoFileClip(str(self.request.video.filepath)) as clip:
@@ -109,7 +109,7 @@ class AudioExtractor:  # XXX: Optimize.
 
         Returns:
         -----
-            `pathlib.Path`:
+            `Path`:
                 The path to the extracted audio file if the write was successful.
 
         Raises:
@@ -143,7 +143,7 @@ class ClipExtractor:  # XXX: Optimize.
 
     Public Methods:
     -----
-        `extract()` -> `pathlib.Path`:
+        `extract()` -> `Path`:
             Execute subclip extraction and return the path to the extracted clip.
     """
 
@@ -164,7 +164,7 @@ class ClipExtractor:  # XXX: Optimize.
 
         Returns:
         -----
-            `pathlib.Path`:
+            `Path`:
                 The path to the extracted clip if the write was successful.
         """
         with VideoFileClip(str(self.request.video.filepath)) as clip:
@@ -205,7 +205,7 @@ class ClipExtractor:  # XXX: Optimize.
 
         Returns:
         -----
-            `pathlib.Path`:
+            `Path`:
                 The path to the extracted clip if the write was successful.
 
         Raises:
@@ -236,7 +236,7 @@ class FramesExtractor:  # XXX: Optimize.
 
     Public Methods:
     -----
-        `extract()` -> `pathlib.Path`:
+        `extract()` -> `Path`:
             Execute frames extraction and return the path to the directory where the
             extracted images were saved.
     """
@@ -258,7 +258,7 @@ class FramesExtractor:  # XXX: Optimize.
 
         Returns:
         -----
-            `pathlib.Path`: The directory where the extracted images were saved.
+            `Path`: The directory where the extracted images were saved.
         """
 
         # Create the destination directory if it doesn't exist.
@@ -293,7 +293,7 @@ class FramesExtractor:  # XXX: Optimize.
 
         Yields:
         -----
-            `tuple[pathlib.Path, np.ndarray[Any, Any]]`:
+            `tuple[Path, np.ndarray[Any, Any]]`:
                 A tuple containing the image path and frame.
         """
         # Iterate over the range of frames to extract.
@@ -328,7 +328,7 @@ class FramesExtractor:  # XXX: Optimize.
 
         Returns:
         -----
-            `pathlib.Path`: The filepath for the next image to be written.
+            `Path`: The filepath for the next image to be written.
 
         Raises:
         -----
@@ -418,7 +418,7 @@ class FramesExtractor:  # XXX: Optimize.
         -----
             `edited_frame` (np.ndarray[Any, Any]):
                 The edited video frame to write to disk as an image.
-            `image_path` (pathlib.Path):
+            `image_path` (Path):
                 The path to write the image to.
 
         Raises:
@@ -450,7 +450,7 @@ class GifExtractor:  # XXX: Optimize.
 
     Public Methods:
     -----
-        `extract()` -> `pathlib.Path`:
+        `extract()` -> `Path`:
             Execute gif extraction and return the path to the extracted gif.
     """
 
@@ -471,7 +471,7 @@ class GifExtractor:  # XXX: Optimize.
 
         Returns:
         -----
-            `pathlib.Path`:
+            `Path`:
                 The path to the extracted gif if the write was successful.
         """
         with VideoFileClip(str(self.request.video.filepath)) as clip:
@@ -510,7 +510,7 @@ class GifExtractor:  # XXX: Optimize.
 
         Returns:
         -----
-            `pathlib.Path`:
+            `Path`:
                 The path to the extracted gif if the write was successful.
 
         Raises:

@@ -22,7 +22,7 @@ options:
 import argparse
 from collections.abc import Sequence
 from functools import partial
-from typing import Any, Optional
+from typing import Any
 
 import videoxt.api
 import videoxt.validators as V
@@ -88,7 +88,7 @@ def execute_extraction(
         return 0
 
 
-def main(argv: Optional[Sequence[str]] = None) -> int:
+def main(argv: Sequence[str] | None = None) -> int:
     """
     The main entry point when called from the command-line. By default, `verbose` mode
     is enabled, which prints details about the prepared extraction request and the
@@ -96,7 +96,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     Args:
     -----
-        `argv` (Optional[Sequence[str]]): The arguments from the CLI.
+        `argv` (Sequence[str] | None): The arguments from the CLI.
 
     Returns:
     -----

@@ -1,6 +1,6 @@
 """Simple interface for extracting audio, clips, frames, and gifs from a video file."""
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from videoxt.constants import ExtractionMethod
 from videoxt.exceptions import InvalidExtractionMethod
@@ -12,7 +12,7 @@ def extract(
     method: str,
     filepath: Path | str,
     skip_validation: bool = False,
-    **options: Optional[dict[str, Any]],
+    **options: dict[str, Any] | None,
 ) -> Result:
     """
     Extract audio, individual frames, short clips and GIFs from videos.
@@ -27,13 +27,13 @@ def extract(
     -----
         `method` (str):
             The extraction method to use ("audio", "clip", "frames", "gif").
-        `filepath` (pathlib.Path | str):
+        `filepath` (Path | str):
             Path to the video file with extension.
         `skip_validation` (bool):
             If True, skips validation of the extraction options. This can slightly
             improve speed, but it is not recommended unless you are sure that the
             options are valid.
-        `**options` (Optional[dict[str, Any]]):
+        `**options` (dict[str, Any] | None):
             Extraction options specific to the chosen extraction method.
 
     Returns:
@@ -62,12 +62,12 @@ def extract(
 def extract_audio(
     filepath: Path | str,
     start_time: float | int | str = 0,
-    stop_time: Optional[float | int | str] = None,
-    destdir: Optional[Path | str] = None,
-    filename: Optional[str] = None,
+    stop_time: float | int | str | None = None,
+    destdir: Path | str | None = None,
+    filename: str | None = None,
     verbose: bool = False,
     overwrite: bool = False,
-    fps: Optional[float] = None,
+    fps: float | None = None,
     audio_format: str = "mp3",
     speed: float = 1,
     bounce: bool = False,
@@ -80,18 +80,18 @@ def extract_audio(
 
     Args:
     -----
-        `filepath` (pathlib.Path | str):
+        `filepath` (Path | str):
             Path to the video file with extension.
         `start_time` (float | int | str):
             Specify the extraction's start time in seconds, or as a string in "HH:MM:SS"
             format. Defaults to 0 if not specified.
-        `stop_time` (Optional[float | int | str]):
+        `stop_time` (float | int | str | None):
             Specify the extraction's stop time in seconds, or as a string in "HH:MM:SS"
             format. Defaults to the video duration if not specified.
-        `destdir` (Optional[pathlib.Path]):
+        `destdir` (Path | None):
             Specify the directory you want to save output to. Defaults to the video's
             directory if not specified.
-        `filename` (Optional[str]):
+        `filename` (str | None):
             Specify the name of the extracted file(s). Defaults to the video filename
             if not specified.
         `verbose` (bool):
@@ -100,7 +100,7 @@ def extract_audio(
         `overwrite` (bool):
             If True, permits overwriting the destination path if the file or directory
             already exists. Defaults to False if not specified.
-        `fps` (Optional[float]):
+        `fps` (float | None):
             Override the frames per second (fps) value obtained from `cv2` when reading
             the video. This value is used to set the start and stop frames for the
             extraction range. This option should be used only in rare cases where `cv2`
@@ -152,13 +152,13 @@ def extract_audio(
 def extract_clip(
     filepath: Path | str,
     start_time: float | int | str = 0,
-    stop_time: Optional[float | int | str] = None,
-    destdir: Optional[Path | str] = None,
-    filename: Optional[str] = None,
+    stop_time: float | int | str | None = None,
+    destdir: Path | str | None = None,
+    filename: str | None = None,
     verbose: bool = False,
     overwrite: bool = False,
-    fps: Optional[float] = None,
-    dimensions: Optional[tuple[int, int]] = None,
+    fps: float | None = None,
+    dimensions: tuple[int, int] | None = None,
     resize: float = 1.0,
     rotate: int = 0,
     speed: float = 1.0,
@@ -176,18 +176,18 @@ def extract_clip(
 
     Args:
     -----
-        `filepath` (pathlib.Path | str):
+        `filepath` (Path | str):
             Path to the video file with extension.
         `start_time` (float | int | str):
             Specify the extraction's start time in seconds, or as a string in "HH:MM:SS"
             format. Defaults to 0 if not specified.
-        `stop_time` (Optional[float | int | str]):
+        `stop_time` (float | int | str | None):
             Specify the extraction's stop time in seconds, or as a string in "HH:MM:SS"
             format. Defaults to the video duration if not specified.
-        `destdir` (Optional[pathlib.Path]):
+        `destdir` (Path | None):
             Specify the directory you want to save output to. Defaults to the video's
             directory if not specified.
-        `filename` (Optional[str]):
+        `filename` (str | None):
             Specify the name of the extracted file(s). Defaults to the video filename
             if not specified.
         `verbose` (bool):
@@ -196,13 +196,13 @@ def extract_clip(
         `overwrite` (bool):
             If True, permits overwriting the destination path if the file or directory
             already exists. Defaults to False if not specified.
-        `fps` (Optional[float]):
+        `fps` (float | None):
             Override the frames per second (fps) value obtained from `cv2` when reading
             the video. This value is used to set the start and stop frames for the
             extraction range. This option should be used only in rare cases where `cv2`
             fails to accurately read the fps. If not specified, it defaults to the fps
             of the video as read by `cv2`.
-        `dimensions` (Optional[Tuple[int, int]]):
+        `dimensions` (tuple[int, int] | None):
             Specify the dimensions (frame width, frame height) of the clip. Defaults to
             the video dimensions if not specified.
         `resize` (float):
@@ -261,15 +261,15 @@ def extract_clip(
 def extract_frames(
     filepath: Path | str,
     start_time: float | int | str = 0,
-    stop_time: Optional[float | int | str] = None,
-    destdir: Optional[Path | str] = None,
-    filename: Optional[str] = None,
+    stop_time: float | int | str | None = None,
+    destdir: Path | str | None = None,
+    filename: str | None = None,
     verbose: bool = False,
     overwrite: bool = False,
-    fps: Optional[float] = None,
+    fps: float | None = None,
     image_format: str = "jpg",
     capture_rate: int = 1,
-    dimensions: Optional[tuple[int, int]] = None,
+    dimensions: tuple[int, int] | None = None,
     resize: float = 1.0,
     rotate: int = 0,
     monochrome: bool = False,
@@ -282,18 +282,18 @@ def extract_frames(
 
     Args:
     -----
-        `filepath` (pathlib.Path | str):
+        `filepath` (Path | str):
             Path to the video file with extension.
         `start_time` (float | int | str):
             Specify the extraction's start time in seconds, or as a string in "HH:MM:SS"
             format. Defaults to 0 if not specified.
-        `stop_time` (Optional[float | int | str]):
+        `stop_time` (float | int | str | None):
             Specify the extraction's stop time in seconds, or as a string in "HH:MM:SS"
             format. Defaults to the video duration if not specified.
-        `destdir` (Optional[pathlib.Path]):
+        `destdir` (Path | None):
             Specify the directory you want to save output to. Defaults to the video's
             directory if not specified.
-        `filename` (Optional[str]):
+        `filename` (str | None):
             Specify the name of the extracted file(s). Defaults to the video filename
             if not specified.
         `verbose` (bool):
@@ -302,7 +302,7 @@ def extract_frames(
         `overwrite` (bool):
             If True, permits overwriting the destination path if the file or directory
             already exists. Defaults to False if not specified.
-        `fps` (Optional[float]):
+        `fps` (float | None):
             Override the frames per second (fps) value obtained from `cv2` when reading
             the video. This value is used to set the start and stop frames for the
             extraction range. This option should be used only in rare cases where `cv2`
@@ -314,7 +314,7 @@ def extract_frames(
         `capture_rate` (int):
             Capture every Nth video frame. Defaults to 1 if not specified, which
             extracts every frame within the extraction range.
-        `dimensions` (Optional[tuple[int, int]]):
+        `dimensions` (tuple[int, int] | None):
             Specify the dimensions (frame width, frame height) of the images. Defaults
             to the video dimensions if not specified.
         `resize` (float):
@@ -355,13 +355,13 @@ def extract_frames(
 def extract_gif(
     filepath: Path | str,
     start_time: float | int | str = 0,
-    stop_time: Optional[float | int | str] = None,
-    destdir: Optional[Path | str] = None,
-    filename: Optional[str] = None,
+    stop_time: float | int | str | None = None,
+    destdir: Path | str | None = None,
+    filename: str | None = None,
     verbose: bool = False,
     overwrite: bool = False,
-    fps: Optional[float] = None,
-    dimensions: Optional[tuple[int, int]] = None,
+    fps: float | None = None,
+    dimensions: tuple[int, int] | None = None,
     resize: float = 1.0,
     rotate: int = 0,
     speed: float = 1.0,
@@ -377,18 +377,18 @@ def extract_gif(
 
     Args:
     -----
-        `filepath` (pathlib.Path | str):
+        `filepath` (Path | str):
             Path to the video file with extension.
         `start_time` (float | int | str):
             Specify the extraction's start time in seconds, or as a string in "HH:MM:SS"
             format. Defaults to 0 if not specified.
-        `stop_time` (Optional[float | int | str]):
+        `stop_time` (float | int | str | None):
             Specify the extraction's stop time in seconds, or as a string in "HH:MM:SS"
             format. Defaults to the video duration if not specified.
-        `destdir` (Optional[pathlib.Path]):
+        `destdir` (Path | None):
             Specify the directory you want to save output to. Defaults to the video's
             directory if not specified.
-        `filename` (Optional[str]):
+        `filename` (str | None):
             Specify the name of the extracted file(s). Defaults to the video filename
             if not specified.
         `verbose` (bool):
@@ -397,13 +397,13 @@ def extract_gif(
         `overwrite` (bool):
             If True, permits overwriting the destination path if the file or directory
             already exists. Defaults to False if not specified.
-        `fps` (Optional[float]):
+        `fps` (float | None):
             Override the frames per second (fps) value obtained from `cv2` when reading
             the video. This value is used to set the start and stop frames for the
             extraction range. This option should be used only in rare cases where `cv2`
             fails to accurately read the fps. If not specified, it defaults to the fps
             of the video as read by `cv2`.
-        `dimensions` (Optional[Tuple[int, int]]):
+        `dimensions` (tuple[int, int] | None):
             Specify the dimensions (frame width, frame height) of the gif. Defaults to
             the video dimensions if not specified.
         `resize` (float):

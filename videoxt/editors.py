@@ -1,5 +1,5 @@
 """Contains functions used to edit a VideoFileClip or np.ndarray prior to extraction."""
-from typing import Any, Optional
+from typing import Any
 
 import cv2  # type: ignore
 import numpy as np
@@ -11,8 +11,8 @@ import videoxt.constants as C
 
 def trim_clip(
     clip: VideoFileClip,
-    start_second: Optional[float] = None,
-    stop_second: Optional[float] = None,
+    start_second: float | None = None,
+    stop_second: float | None = None,
 ) -> VideoFileClip:
     """
     Trim a VideoFileClip to a specific time range and return the trimmed clip.
@@ -21,9 +21,9 @@ def trim_clip(
     -----
         `clip` (moviepy.editor.VideoFileClip):
             The clip to trim.
-        `start_second` (Optional[float]):
+        `start_second` (float | None):
             The start time in seconds. If None, the trim will start at the beginning.
-        `stop_second` (Optional[float]):
+        `stop_second` (float | None):
             The stop time in seconds. If None, the clip will be trimmed to the end.
 
     Returns:
@@ -44,8 +44,8 @@ def trim_clip(
 
 def edit_clip_audio(
     clip: VideoFileClip,
-    volume: Optional[float] = None,
-    normalize: Optional[bool] = None,
+    volume: float | None = None,
+    normalize: bool | None = None,
 ) -> VideoFileClip:
     """
     Edit the audio of a VideoFileClip by adjusting its volume and normalizing the
@@ -55,9 +55,9 @@ def edit_clip_audio(
     -----
         `clip` (moviepy.editor.VideoFileClip):
             The clip to edit.
-        `volume` (Optional[float]):
+        `volume` (float | None):
             The volume multiplier. If None, the volume will not be adjusted.
-        `normalize` (Optional[bool]):
+        `normalize` (bool | None):
             Whether to normalize the audio. If None, the audio will not be normalized.
 
     Returns:
@@ -75,9 +75,9 @@ def edit_clip_audio(
 
 def edit_clip_image(
     clip: VideoFileClip,
-    dimensions: Optional[tuple[int, int]] = None,
-    rotate: Optional[int] = None,
-    monochrome: Optional[bool] = None,
+    dimensions: tuple[int, int] | None = None,
+    rotate: int | None = None,
+    monochrome: bool | None = None,
 ) -> VideoFileClip:
     """
     Edit the image properties of a VideoFileClip by resizing, rotating, and converting
@@ -87,11 +87,11 @@ def edit_clip_image(
     -----
         `clip` (moviepy.editor.VideoFileClip):
             The clip to edit.
-        `dimensions` (Optional[tuple[int, int]]):
+        `dimensions` (tuple[int, int] | None):
             The dimensions to resize the clip to. If None, the clip will not be resized.
-        `rotate` (Optional[int]):
+        `rotate` (int | None):
             The degrees to rotate the clip. If None, the clip will not be rotated.
-        `monochrome` (Optional[bool]):
+        `monochrome` (bool | None):
             Whether to convert the clip to monochrome. If None, the black and white
             filter will not be applied.
 
@@ -113,9 +113,9 @@ def edit_clip_image(
 
 def edit_clip_motion(
     clip: VideoFileClip,
-    speed: Optional[float] = None,
-    reverse: Optional[bool] = None,
-    bounce: Optional[bool] = None,
+    speed: float | None = None,
+    reverse: bool | None = None,
+    bounce: bool | None = None,
 ) -> VideoFileClip:
     """
     Edit the moving image properties of a VideoFileClip by adjusting its speed,
@@ -125,11 +125,11 @@ def edit_clip_motion(
     -----
         `clip` (moviepy.editor.VideoFileClip):
             The clip to edit.
-        `speed` (Optional[float]):
+        `speed` (float | None):
             The speed multiplier. If None, the speed will not be adjusted.
-        `reverse` (Optional[bool]):
+        `reverse` (bool | None):
             Whether to reverse the clip. If None, the clip will not be reversed.
-        `bounce` (Optional[bool]):
+        `bounce` (bool | None):
             Whether to bounce the clip. If None, the clip will not be bounced.
 
     Returns:
@@ -150,9 +150,9 @@ def edit_clip_motion(
 
 def edit_image(
     image: np.ndarray[Any, Any],
-    dimensions: Optional[tuple[int, int]] = None,
-    rotate: Optional[int] = None,
-    monochrome: Optional[bool] = None,
+    dimensions: tuple[int, int] | None = None,
+    rotate: int | None = None,
+    monochrome: bool | None = None,
 ) -> np.ndarray[Any, Any]:
     """
     Edit a numpy.ndarray image by resizing, rotating, and converting to monochrome
@@ -162,12 +162,12 @@ def edit_image(
     -----
         `image` (np.ndarray[Any, Any]):
             The image to edit.
-        `dimensions` (Optional[tuple[int, int]]):
+        `dimensions` (tuple[int, int] | None):
             The dimensions to resize the image to. If None, the image will not be
             resized.
-        `rotate` (Optional[int]):
+        `rotate` (int | None):
             The degrees to rotate the image. If None, the image will not be rotated.
-        `monochrome` (Optional[bool]):
+        `monochrome` (bool | None):
             Whether to convert the image to monochrome. If None, the black and white
             filter will not be applied.
 

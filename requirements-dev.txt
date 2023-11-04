@@ -1,12 +1,2 @@
-black
-flake8
-isort
-mypy
-pre-commit
-pycln
-pydocstyle
+coverage
 pytest
-pytest-cov
-pyupgrade
-setup-cfg-fmt
-tox

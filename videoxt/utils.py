@@ -4,7 +4,7 @@ from collections import defaultdict
 from dataclasses import asdict, dataclass
 from datetime import timedelta
 from pathlib import Path
-from typing import Any, ClassVar, Optional, Protocol
+from typing import Any, ClassVar, Protocol
 
 from rich import print
 
@@ -43,9 +43,8 @@ def timestamp_to_seconds(timestamp: str) -> float:
     """
     timestamp = timestamp.split(".")[0]
     time_parts = timestamp.split(":")
-    total_seconds = sum(
-        float(part) * 60**exponent
-        for exponent, part in enumerate(reversed(time_parts))
+    total_seconds: float = sum(
+        float(part) * 60**exponent for exponent, part in enumerate(reversed(time_parts))
     )
 
     return total_seconds
@@ -104,6 +103,10 @@ def timedelta_to_timestamp(duration: timedelta) -> str:
     Returns:
     -----
         `str`: A timestamp string in the format "HH:MM:SS".
+
+    Raises:
+    -----
+        `ValueError`: If the duration is negative.
     """
     total_seconds = duration.total_seconds()
 
@@ -118,7 +121,7 @@ def timedelta_to_timestamp(duration: timedelta) -> str:
     return f"{int(hours):02}:{int(minutes):02}:{int(seconds):02}"
 
 
-def append_enumeration(index: int, tag: Optional[str] = None) -> str:
+def append_enumeration(index: int, tag: str | None = None) -> str:
     """
     Return an enumerated file name with the given index and optional tag.
 
@@ -143,26 +146,25 @@ def append_enumeration(index: int, tag: Optional[str] = None) -> str:
     -----
         `index` (int):
             The enumeration index. Must be greater than 0.
-        `tag` (Optional[str]):
+        `tag` (str | None):
             The tag to enumerate. If None, only the index is used.
 
     Returns:
     -----
         `str`: The enumerated string to append to a file name or directory name.
     """
-    if index < 1:
-        raise ValueError(f"Enumeration index must be greater than 0, got {index}.")
+    index = 1 if index < 1 else index
 
     if tag is None:
         return f" ({index})"
 
-    # Ensure the tag doesn't contain invalid characters.
+    # Ensure the tag doesn't contain invalid characters for a file name.
     tag = valid_filename(tag)
 
     return f"{tag} ({index})" if index > 1 else tag
 
 
-def enumerate_dir(directory: Path, tag: Optional[str] = None) -> Path:
+def enumerate_dir(directory: Path, tag: str | None = None) -> Path:
     """
     Return a non-existent, potentially enumerated directory path.
 
@@ -184,12 +186,12 @@ def enumerate_dir(directory: Path, tag: Optional[str] = None) -> Path:
     -----
         `directory`:
             The path to the directory to potentially enumerate.
-        `tag` (Optional[str]):
+        `tag` (str | None):
             The tag to enumerate. If None, only the index is used.
 
     Returns:
     -----
-        `pathlib.Path`: The path to a non-existent directory.
+        `Path`: The path to a non-existent directory.
     """
     if not directory.exists():
         return directory
@@ -203,7 +205,7 @@ def enumerate_dir(directory: Path, tag: Optional[str] = None) -> Path:
         index += 1
 
 
-def enumerate_filepath(filepath: Path, tag: Optional[str] = None) -> Path:
+def enumerate_filepath(filepath: Path, tag: str | None = None) -> Path:
     """
     Return a non-existent, potentially enumerated file path.
 
@@ -223,11 +225,11 @@ def enumerate_filepath(filepath: Path, tag: Optional[str] = None) -> Path:
 
     Args:
     -----
-        `filepath` (pathlib.Path): The path to the file to potentially enumerate.
+        `filepath` (Path): The path to the file to potentially enumerate.
 
     Returns:
     -----
-        `pathlib.Path`: The path to a non-existent file.
+        `Path`: The path to a non-existent file.
     """
     if not filepath.exists():
         return filepath
@@ -358,7 +360,7 @@ class ToJsonMixin:
 class DataclassType(Protocol):
     """Protocol representing dataclass attributes for type-hinting purposes."""
 
-    __dataclass_fields__: ClassVar[dict]
+    __dataclass_fields__: ClassVar[dict[str, Any]]
 
 
 def remove_private_keys(d: dict[str, Any]) -> dict[str, Any]:

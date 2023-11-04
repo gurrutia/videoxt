@@ -737,20 +737,6 @@ def test_valid_video_filepath_with_supported_existing_filepath_lowercase_suffix(
     assert valid_filepath(path, is_video=True) == fixture_tmp_video_filepath
 
 
-def test_valid_video_filepath_with_supported_existing_filepath_mixedcase_suffix(
-    fixture_tmp_video_filepath,
-):
-    path = fixture_tmp_video_filepath.with_suffix(".Mp4")
-    assert valid_filepath(path, is_video=True) == fixture_tmp_video_filepath
-
-
-def test_valid_video_filepath_with_supported_existing_filepath_uppercase_suffix(
-    fixture_tmp_video_filepath,
-):
-    path = fixture_tmp_video_filepath.with_suffix(".MP4")
-    assert valid_filepath(path, is_video=True) == fixture_tmp_video_filepath
-
-
 def test_valid_video_filepath_with_supported_nonexistant_video_filepath(tmp_path: Path):
     path = tmp_path / "t.mp4"
     with pytest.raises(ValidationError):
@@ -782,6 +768,16 @@ def test_valid_video_filepath_with_directory_path(tmp_path: Path):
 def test_valid_video_file_suffix_with_supported_video_file_suffixes():
     for suffix in C.SUPPORTED_VIDEO_FORMATS:
         assert valid_video_file_suffix(suffix) == suffix
+
+
+def test_valid_video_file_suffix_with_uppercase_supported_video_file_suffixes():
+    for suffix in C.SUPPORTED_VIDEO_FORMATS:
+        assert valid_video_file_suffix(suffix.upper()) == suffix
+
+
+def test_valid_video_file_suffix_with_supported_video_file_suffixes_start_with_dot():
+    for suffix in C.SUPPORTED_VIDEO_FORMATS:
+        assert valid_video_file_suffix(f".{suffix}") == suffix
 
 
 def test_valid_video_file_suffix_with_unsupported_video_file_suffix():

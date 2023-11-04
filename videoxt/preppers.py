@@ -2,7 +2,7 @@
 import math
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 import videoxt.utils as U
 import videoxt.validators as V
@@ -29,6 +29,21 @@ class ExtractionRange:
             Stop time of the extraction in seconds or as a timestamp (`HH:MM:SS`).
         `fps` (float):
             Frames per second to use for extraction.
+
+    Attributes:
+    -----
+        `start_second` (float):
+            Start time of the extraction in seconds.
+        `stop_second` (float):
+            Stop time of the extraction in seconds.
+        `start_timestamp` (str):
+            Start time of the extraction as a timestamp (`HH:MM:SS`).
+        `stop_timestamp` (str):
+            Stop time of the extraction as a timestamp (`HH:MM:SS`).
+        `start_frame` (int):
+            Start time of the extraction as a frame number.
+        `stop_frame` (int):
+            Stop time of the extraction as a frame number.
 
     Usage:
     -----
@@ -66,7 +81,7 @@ class ExtractionRange:
     start_frame: int = field(init=False)
     stop_frame: int = field(init=False)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """
         Start procedure that prepares and validates the extraction range.
 
@@ -156,9 +171,9 @@ class ExtractionRange:
 def prepare_extraction_range(
     duration_seconds: float,
     frame_count: int,
-    prepared_start_time: Optional[float | int | str] = None,
-    prepared_stop_time: Optional[float | int | str] = None,
-    prepared_fps: Optional[float] = None,
+    prepared_start_time: float | int | str | None = None,
+    prepared_stop_time: float | int | str | None = None,
+    prepared_fps: float | None = None,
 ) -> dict[str, Any]:
     """
     Return a dictionary representing a validated extraction start and stop points.
@@ -172,13 +187,13 @@ def prepare_extraction_range(
             Duration of the video in seconds.
         `frame_count` (int):
             Number of frames in the video.
-        `prepared_start_time` (Optional[float | int | str]):
+        `prepared_start_time` (float | int | str | None):
             Prepared start time of the extraction in seconds or as a timestamp
             (`HH:MM:SS`).
-        `request_stop_time` (Optional[float | int | str]):
+        `request_stop_time` (float | int | str | None):
             Prepared stop time of the extraction in seconds or as a timestamp
             (`HH:MM:SS`).
-        `prepared_fps` (Optional[float]):
+        `prepared_fps` (float | None):
             The prepared frames per second used to calculate the frame numbers.
 
     Returns:
@@ -209,8 +224,8 @@ def prepare_extraction_range(
 
 def prepare_dimensions(
     video_dimensions: tuple[int, int],
-    request_dimensions: Optional[tuple[int, int]] = None,
-    request_resize: Optional[float] = None,
+    request_dimensions: tuple[int, int] | None = None,
+    request_resize: float | None = None,
 ) -> tuple[int, int]:
     """
     Return dimensions to use for extraction.
@@ -219,9 +234,9 @@ def prepare_dimensions(
     -----
         `video_dimensions` (tuple[int, int]):
             Dimensions of the video.
-        `request_dimensions` (Optional[tuple[int, int]]):
+        `request_dimensions` (tuple[int, int] | None):
             Optional dimensions that override the video's dimensions.
-        `request_resize` (Optional[float]):
+        `request_resize` (float | None):
             Requested resize factor to apply to the video's dimensions.
 
     Returns:
@@ -238,21 +253,21 @@ def prepare_dimensions(
 
 def prepare_destpath(
     video_filepath: Path,
-    request_filename: Optional[str] = None,
-    request_destdir: Optional[Path] = None,
-    prepared_suffix: Optional[str] = None,
-    prepared_overwrite: Optional[bool] = None,
+    request_filename: str | None = None,
+    request_destdir: Path | None = None,
+    prepared_suffix: str | None = None,
+    prepared_overwrite: bool | None = None,
 ) -> Path:
     """
     Construct and return the destination path for the extracted file.
 
     Args:
     -----
-        `video_filepath` (pathlib.Path):
+        `video_filepath` (Path):
             Path to the video file.
-        `request_filename` (Optional[str]):
+        `request_filename` (str | None):
             Optional filename to use. Defaults to None.
-        `request_destdir` (Optional[pathlib.Path]):
+        `request_destdir` (Path | None):
             Optional directory to save the processed file. Defaults to None.
         `prepared_suffix` (str):
             Required file suffix to use (with or without the leading '.').
@@ -262,7 +277,7 @@ def prepare_destpath(
 
     Returns:
     -----
-        `pathlib.Path`: Path to the destination file.
+        `Path`: Path to the destination file.
 
     Raises:
     -----
@@ -294,14 +309,14 @@ def prepare_destpath(
 
 
 def prepare_start_time(
-    request_start_time: Optional[float | int | str] = None,
+    request_start_time: float | int | str | None = None,
 ) -> float | int | str:
     """
     Return the start time requested or 0 if not provided.
 
     Args:
     -----
-        `request_start_time` (Optional[float | int | str]):
+        `request_start_time` (float | int | str | None):
             Optional start time requested. Defaults to None.
 
     Returns:
@@ -312,7 +327,7 @@ def prepare_start_time(
 
 
 def prepare_stop_time(
-    video_duration_seconds: float, request_stop_time: Optional[float | int | str] = None
+    video_duration_seconds: float, request_stop_time: float | int | str | None = None
 ) -> float | int | str:
     """
     Return the stop time requested or the video's duration if not provided.
@@ -321,7 +336,7 @@ def prepare_stop_time(
     -----
         `video_duration_seconds` (float):
             Duration of the video in seconds.
-        `request_stop_time` (Optional[float | int | str]):
+        `request_stop_time` (float | int | str | None):
             Optional stop time requested. Defaults to None.
 
     Returns:
@@ -334,7 +349,7 @@ def prepare_stop_time(
     )
 
 
-def prepare_fps(video_fps: float, request_fps: Optional[float] = None) -> float:
+def prepare_fps(video_fps: float, request_fps: float | None = None) -> float:
     """
     Return the frames per second requested or the video's fps if not provided.
 
@@ -342,7 +357,7 @@ def prepare_fps(video_fps: float, request_fps: Optional[float] = None) -> float:
     -----
         `video_fps` (float):
             Frames per second of the video.
-        `request_fps` (Optional[float]):
+        `request_fps` (float | None):
             Optional frames per second requested. Defaults to None.
 
     Returns:
@@ -354,8 +369,8 @@ def prepare_fps(video_fps: float, request_fps: Optional[float] = None) -> float:
 
 def prepare_destpath_frames(
     video_filepath: Path,
-    request_destdir: Optional[Path] = None,
-    prepared_overwrite: Optional[bool] = None,
+    request_destdir: Path | None = None,
+    prepared_overwrite: bool | None = None,
 ) -> Path:
     """
     Return the directory extracted images will be saved in.
@@ -366,7 +381,7 @@ def prepare_destpath_frames(
 
     Returns:
     -----
-        `pathlib.Path`: The directory for saving images extracted from the video.
+        `Path`: The directory for saving images extracted from the video.
     """
     if request_destdir is not None and request_destdir != video_filepath:
         return request_destdir
@@ -380,20 +395,20 @@ def prepare_destpath_frames(
 
 
 def prepare_images_expected(
-    start_frame: Optional[int] = None,
-    stop_frame: Optional[int] = None,
-    capture_rate: Optional[int] = None,
+    start_frame: int | None = None,
+    stop_frame: int | None = None,
+    capture_rate: int | None = None,
 ) -> int:
     """
     Return the number of images (frames) expected to be written to disk.
 
     Args:
     -----
-        `start_frame` (Optional[int]):
+        `start_frame` (int | None):
             The frame number to start extraction from.
-        `stop_frame` (Optional[int]):
+        `stop_frame` (int | None):
             The frame number to stop extraction at.
-        `capture_rate` (Optional[int]):
+        `capture_rate` (int | None):
             The number of frames to increment by.
 
     Returns:

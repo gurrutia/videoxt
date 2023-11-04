@@ -128,11 +128,11 @@ def valid_dir(directory: Path | str) -> Path:
 
     Args:
     -----
-        `directory` (pathlib.Path | str): The directory to validate.
+        `directory` (Path | str): The directory to validate.
 
     Returns:
     -----
-        `pathlib.Path`: The directory as a Path object if valid.
+        `Path`: The directory as a Path object if valid.
 
     Raises:
     -----
@@ -164,7 +164,7 @@ def valid_filepath(filepath: Path | str, is_video: bool = False) -> Path:
 
     Args:
     -----
-        `filepath` (pathlib.Path | str):
+        `filepath` (Path | str):
             The filepath to validate.
         `is_video` (bool) :
             If True, the filepath is checked against a set of supported video file
@@ -172,7 +172,7 @@ def valid_filepath(filepath: Path | str, is_video: bool = False) -> Path:
 
     Returns:
     -----
-        `pathlib.Path`: The filepath as a Path object if it is a file and exists.
+        `Path`: The filepath as a Path object if it is a file and exists.
 
     Raises:
     -----
@@ -202,7 +202,7 @@ def valid_filename(filename: str) -> str:
     """
     Validate a filename does not contain invalid characters and return it.
 
-    In the context of `videoxt`, a filename refers to a pathlib.Path().stem.
+    In the context of `videoxt`, a filename refers to a Path().stem.
 
     Args:
     -----
@@ -657,7 +657,22 @@ def valid_fps(fps: float | int | str) -> float:
 
 
 def valid_dimensions_str(dimensions: str) -> tuple[int, int]:
-    # expected input is 'WxH' (Ex: '1920x1080')
+    """
+    Validate and return a tuple of positive integers from a string of dimensions.
+
+    Args:
+    -----
+        `dimensions` (str): The dimensions to validate.
+
+    Returns:
+    -----
+        `tuple[int, int]`: The dimensions as a tuple of integers if valid.
+
+    Raises:
+    -----
+        `ValidationError`: If the dimensions are None, empty, or not in this format:
+            'WxH' (Ex: '1920x1080').
+    """
     if not dimensions:
         raise ValidationError(
             f"Empty dimensions provided, got {dimensions!r}\n"

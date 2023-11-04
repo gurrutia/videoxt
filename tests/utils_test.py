@@ -267,8 +267,15 @@ def test_append_enumeration_when_index_and_tag_are_entered():
 
 
 def test_append_enumeration_when_index_is_0():
-    with pytest.raises(ValueError):
-        append_enumeration(0)
+    assert append_enumeration(0) == " (1)"
+    assert append_enumeration(0, tag="_vxt") == "_vxt"
+
+
+def test_append_enumeration_when_index_is_negative():
+    assert append_enumeration(-1) == " (1)"
+    assert append_enumeration(-2) == " (1)"
+    assert append_enumeration(-3) == " (1)"
+    assert append_enumeration(-1, tag="_vxt") == "_vxt"
 
 
 def test_calculate_duration_with_valid_inputs():
@@ -373,9 +380,10 @@ def test_convert_bytes_with_negative_bytes_should_raise_value_error():
 
 
 def test_custom_json_encoder_encode_path():
-    path = Path("/path/to/file")
-    encoded_path = json.dumps(path, cls=CustomJSONEncoder)
-    assert encoded_path == '"C:/path/to/file"'
+    path_obj = Path("/path/to/file")
+    encoded_path = json.dumps(path_obj, cls=CustomJSONEncoder)
+    expected_path = path_obj.resolve().as_posix()
+    assert encoded_path == json.dumps(expected_path)
 
 
 def test_custom_json_encoder_encode_timedelta():

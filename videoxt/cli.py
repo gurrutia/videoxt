@@ -22,7 +22,7 @@ options:
 import argparse
 from collections.abc import Sequence
 from functools import partial
-from typing import Any, Optional
+from typing import Any
 
 import videoxt.api
 import videoxt.validators as V
@@ -60,7 +60,7 @@ def split_cli_args(args: argparse.Namespace) -> tuple[str, str, dict[str, Any]]:
 def execute_extraction(
     method: str,
     filepath: str,
-    **options: dict,
+    **options: dict[str, Any],
 ) -> int:
     """
     Trigger the extraction procedure and return the exit code (0 means success).
@@ -88,7 +88,7 @@ def execute_extraction(
         return 0
 
 
-def main(argv: Optional[Sequence[str]] = None) -> int:
+def main(argv: Sequence[str] | None = None) -> int:
     """
     The main entry point when called from the command-line. By default, `verbose` mode
     is enabled, which prints details about the prepared extraction request and the
@@ -96,16 +96,11 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     Args:
     -----
-        `argv` (Optional[Sequence[str]]): The arguments from the CLI.
+        `argv` (Sequence[str] | None): The arguments from the CLI.
 
     Returns:
     -----
         `int`: 0 if the extraction was successful, 1 otherwise.
-
-    Raises:
-    -----
-        `argparse.ArgumentTypeError`:
-            Raised when an argument is not of the expected type.
     """
     # parent_parser houses arguments common to all subparsers
     parent_parser = argparse.ArgumentParser(add_help=False)

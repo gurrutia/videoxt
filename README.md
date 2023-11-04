@@ -2,7 +2,7 @@
   <img src="https://user-images.githubusercontent.com/3451528/222875688-e8d60da9-0439-4996-936d-c75ffd47cb58.png" alt="videoxt" width="170"></a>
 </h1>
 
-[![PyPI](https://img.shields.io/pypi/v/videoxt)](https://pypi.org/project/videoxt) [![Downloads](https://static.pepy.tech/badge/videoxt)](https://pepy.tech/project/videoxt)
+[![PyPI](https://img.shields.io/pypi/v/videoxt)](https://pypi.org/project/videoxt) [![Downloads](https://static.pepy.tech/badge/videoxt)](https://pepy.tech/project/videoxt) ![tests](https://github.com/gurrutia/videoxt/actions/workflows/tox.yml/badge.svg)
 
 <b>VideoXT</b> is a simple library and CLI tool for extracting audio, individual frames, short clips and GIFs from videos.
 
@@ -17,7 +17,7 @@
 * <a href="#frames">*Frames*</a><br/>
 * <a href="#gif">*GIF*</a><br/>
 * <a href="#clip">*Clip*</a><br/>
-* <a href="#examples">More Examples</a><br/>
+* <a href="#more-examples">More Examples</a><br/>
 * <a href="#used-by">Used By</a>
 
 ---
@@ -26,8 +26,7 @@
 
 From the command-line:
 ```sh
-# from the command-line
-# extract all audio from a video (default: 'mp3')
+# extract audio from a video file (default: 'mp3')
 $ videoxt audio MyVideo.mp4
 {"video": {"filepath": "C:/Users/gurrutia/MyVideo.mp4", ...}, "start_time": 0, ...}
 # Extracting audio...

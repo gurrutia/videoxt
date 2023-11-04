@@ -2,7 +2,7 @@
 from collections.abc import Generator
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Protocol
+from typing import Any, Protocol
 
 import cv2  # type: ignore
 import numpy as np
@@ -50,7 +50,7 @@ class AudioExtractor:  # XXX: Optimize.
 
     Public Methods:
     -----
-        `extract()` -> `pathlib.Path`:
+        `extract()` -> `Path`:
             Execute audio extraction and return the path to the extracted audio
             file.
     """
@@ -72,7 +72,7 @@ class AudioExtractor:  # XXX: Optimize.
 
         Returns:
         -----
-            `pathlib.Path | None`:
+            `Path | None`:
                 The path to the extracted audio file if the write was successful.
         """
         with VideoFileClip(str(self.request.video.filepath)) as clip:
@@ -109,7 +109,7 @@ class AudioExtractor:  # XXX: Optimize.
 
         Returns:
         -----
-            `pathlib.Path`:
+            `Path`:
                 The path to the extracted audio file if the write was successful.
 
         Raises:
@@ -143,7 +143,7 @@ class ClipExtractor:  # XXX: Optimize.
 
     Public Methods:
     -----
-        `extract()` -> `pathlib.Path`:
+        `extract()` -> `Path`:
             Execute subclip extraction and return the path to the extracted clip.
     """
 
@@ -164,7 +164,7 @@ class ClipExtractor:  # XXX: Optimize.
 
         Returns:
         -----
-            `pathlib.Path`:
+            `Path`:
                 The path to the extracted clip if the write was successful.
         """
         with VideoFileClip(str(self.request.video.filepath)) as clip:
@@ -205,7 +205,7 @@ class ClipExtractor:  # XXX: Optimize.
 
         Returns:
         -----
-            `pathlib.Path`:
+            `Path`:
                 The path to the extracted clip if the write was successful.
 
         Raises:
@@ -236,7 +236,7 @@ class FramesExtractor:  # XXX: Optimize.
 
     Public Methods:
     -----
-        `extract()` -> `pathlib.Path`:
+        `extract()` -> `Path`:
             Execute frames extraction and return the path to the directory where the
             extracted images were saved.
     """
@@ -258,7 +258,7 @@ class FramesExtractor:  # XXX: Optimize.
 
         Returns:
         -----
-            `pathlib.Path`: The directory where the extracted images were saved.
+            `Path`: The directory where the extracted images were saved.
         """
 
         # Create the destination directory if it doesn't exist.
@@ -283,7 +283,7 @@ class FramesExtractor:  # XXX: Optimize.
 
     def _preprocess_frames(
         self, opencap: cv2.VideoCapture
-    ) -> Generator[tuple[np.ndarray, Path], None, None]:
+    ) -> Generator[tuple[np.ndarray[Any, Any], Path], None, None]:
         """
         Edit the frames to be extracted and yield the image path and the edited frame.
 
@@ -293,7 +293,7 @@ class FramesExtractor:  # XXX: Optimize.
 
         Yields:
         -----
-            `tuple[pathlib.Path, np.ndarray]`:
+            `tuple[Path, np.ndarray[Any, Any]]`:
                 A tuple containing the image path and frame.
         """
         # Iterate over the range of frames to extract.
@@ -328,7 +328,7 @@ class FramesExtractor:  # XXX: Optimize.
 
         Returns:
         -----
-            `pathlib.Path`: The filepath for the next image to be written.
+            `Path`: The filepath for the next image to be written.
 
         Raises:
         -----
@@ -345,10 +345,10 @@ class FramesExtractor:  # XXX: Optimize.
 
     def _read_video_frame(
         self, opencap: cv2.VideoCapture, frame_num: int
-    ) -> np.ndarray:
+    ) -> np.ndarray[Any, Any]:
         """
         Point the video capture to the frame number to read (0-based index) and return
-        a `np.ndarray` representing the video frame.
+        a `np.ndarray[Any, Any]` representing the video frame.
 
         Args:
         -----
@@ -359,7 +359,7 @@ class FramesExtractor:  # XXX: Optimize.
 
         Returns:
         -----
-            `np.ndarray`: The video frame from the capture.
+            `np.ndarray[Any, Any]`: The video frame from the capture.
 
         Raises:
         -----
@@ -373,7 +373,7 @@ class FramesExtractor:  # XXX: Optimize.
             - set() uses a 0-based index of the frame to be decoded/captured next.
             - set() returns True if the capture device has accepts the property value,
             even if property value remains unchanged.
-            - read() returns a tuple of (bool, np.ndarray).
+            - read() returns a tuple of (bool, np.ndarray[Any, Any]).
         """
         set_successful = opencap.set(cv2.CAP_PROP_POS_FRAMES, frame_num)
         if not set_successful:
@@ -382,6 +382,8 @@ class FramesExtractor:  # XXX: Optimize.
                 f"capture to frame number {frame_num}."
             )
 
+        read_successful: bool
+        frame: np.ndarray[Any, Any]
         read_successful, frame = opencap.read()
         if not read_successful:
             raise FrameReadError(
@@ -390,31 +392,33 @@ class FramesExtractor:  # XXX: Optimize.
 
         return frame
 
-    def _edit_video_frame(self, frame: np.ndarray) -> np.ndarray:
+    def _edit_video_frame(self, frame: np.ndarray[Any, Any]) -> np.ndarray[Any, Any]:
         """
         Apply optional edits to a np.ndarray before writing to disk as an image.
 
         Args:
         -----
-            `frame` (np.ndarray): The video frame to edit.
+            `frame` (np.ndarray[Any, Any]): The video frame to edit.
 
         Returns:
         -----
-            `np.ndarray`: The edited video frame.
+            `np.ndarray[Any, Any]`: The edited video frame.
         """
         return E.edit_image(
             frame, self.request.dimensions, self.request.rotate, self.request.monochrome
         )
 
-    def _write_image(self, edited_frame: np.ndarray, image_path: Path) -> None:
+    def _write_image(
+        self, edited_frame: np.ndarray[Any, Any], image_path: Path
+    ) -> None:
         """
         Write an edited frame to disk as an image.
 
         Args:
         -----
-            `edited_frame` (np.ndarray):
+            `edited_frame` (np.ndarray[Any, Any]):
                 The edited video frame to write to disk as an image.
-            `image_path` (pathlib.Path):
+            `image_path` (Path):
                 The path to write the image to.
 
         Raises:
@@ -446,7 +450,7 @@ class GifExtractor:  # XXX: Optimize.
 
     Public Methods:
     -----
-        `extract()` -> `pathlib.Path`:
+        `extract()` -> `Path`:
             Execute gif extraction and return the path to the extracted gif.
     """
 
@@ -467,7 +471,7 @@ class GifExtractor:  # XXX: Optimize.
 
         Returns:
         -----
-            `pathlib.Path`:
+            `Path`:
                 The path to the extracted gif if the write was successful.
         """
         with VideoFileClip(str(self.request.video.filepath)) as clip:
@@ -506,7 +510,7 @@ class GifExtractor:  # XXX: Optimize.
 
         Returns:
         -----
-            `pathlib.Path`:
+            `Path`:
                 The path to the extracted gif if the write was successful.
 
         Raises:

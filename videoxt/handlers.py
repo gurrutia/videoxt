@@ -4,7 +4,7 @@ extraction process.
 """
 from pathlib import Path
 from time import perf_counter
-from typing import Any, Optional
+from typing import Any
 
 from rich.console import Console
 
@@ -57,7 +57,7 @@ class ExtractionHandler:
     def execute(
         self,
         filepath: Path | str,
-        options: Optional[dict[str, Any]] = None,
+        options: dict[str, Any] | None = None,
         skip_validation: bool = False,
     ) -> Result:
         """
@@ -68,7 +68,7 @@ class ExtractionHandler:
         -----
             `filepath` (Path | str):
                 Path to the video file with extension.
-            `options` (Optional[dict[str, Any]]):
+            `options` (dict[str, Any] | None):
                 Extraction options specific to the chosen extraction method. If None,
                 default options will be used.
             `skip_validation` (bool):
@@ -214,7 +214,7 @@ class ObjectFactory:
     def make_prepared_request(
         self,
         video: Video,
-        options: Optional[dict[str, Any]] = None,
+        options: dict[str, Any] | None = None,
         skip_validation: bool = False,
     ) -> PreparedRequest:
         """
@@ -224,7 +224,7 @@ class ObjectFactory:
         -----
             `video` (Video):
                 The video object to use.
-            `options` (Optional[dict[str, Any]]):
+            `options` (dict[str, Any] | None):
                 Extraction options specific to the chosen extraction method. If None,
                 default options will be used.
             `skip_validation` (bool):

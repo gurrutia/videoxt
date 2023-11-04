@@ -26,9 +26,9 @@ class Video:
     `Video` object is required to validate and calculate attributes in primary objects
     and functions throughout.
 
-    Args:
+    Fields:
     -----
-        `filepath` (pathlib.Path): Path to the video file.
+        `filepath` (Path): Path to the video file.
 
     Attributes:
     -----
@@ -179,7 +179,7 @@ def fetch_video_properties(filepath: Path) -> dict[str, Any]:
 
     Args:
     -----
-        `filepath` (pathlib.Path): Path to the video file.
+        `filepath` (Path): Path to the video file.
 
     Returns:
     -----
@@ -218,7 +218,7 @@ def open_video_capture(filepath: Path) -> Iterator[cv2.VideoCapture]:
 
     Args:
     -----
-        `filepath` (pathlib.Path): Path to the video file.
+        `filepath` (Path): Path to the video file.
 
     Yields:
     -----
@@ -226,13 +226,11 @@ def open_video_capture(filepath: Path) -> Iterator[cv2.VideoCapture]:
 
     Raises:
     -----
-        - `cv2.error`:
+        - `ClosedVideoCaptureError`:
             - If `cv2.VideoCapture().isOpened()` returns False.
-            - If the file is not supported by OpenCV.
+            - If a `cv2.error` occurred while opening a `cv2.VideoCapture()`.
             - For more details see:
             https://docs.opencv.org/4.8.0/d8/dfe/classcv_1_1VideoCapture.html
-        - `UnboundLocalError`: If the user cancels the operation. This is raised by
-            `cv2.VideoCapture.release()` when the video capture is not opened.
     """
     try:
         video_capture = cv2.VideoCapture(str(filepath))
@@ -244,7 +242,7 @@ def open_video_capture(filepath: Path) -> Iterator[cv2.VideoCapture]:
 
     except cv2.error as err:
         raise ClosedVideoCaptureError(
-            "A cv2.error occurred opening the video file with cv2.VideoCapture. "
+            "A cv2.error occurred while opening a cv2.VideoCapture(). "
             f"Please check the file, got {filepath!r}"
         ) from err
 

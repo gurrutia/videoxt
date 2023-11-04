@@ -2,7 +2,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Optional
+from typing import Any
 
 import videoxt.preppers as P
 import videoxt.validators as V
@@ -60,25 +60,25 @@ class BaseRequest(Request):
 
     Fields
     -----
-        `start_time` (Optional[float | int | str]):
+        `start_time` (float | int | str | None):
             Specify the extraction's start time in seconds, or as a string in "HH:MM:SS"
             format. Defaults to 0 if not specified.
-        `stop_time` (Optional[float | int | str]):
+        `stop_time` (float | int | str | None):
             Specify the extraction's stop time in seconds, or as a string in "HH:MM:SS"
             format. Defaults to the video duration if not specified.
-        `destdir` (Optional[pathlib.Path]):
+        `destdir` (Path | None):
             Specify the directory you want to save output to. Defaults to the video's
             directory if not specified.
-        `filename` (Optional[str]):
+        `filename` (str | None):
             Specify the name of the extracted file(s). Defaults to the video filename
             if not specified.
-        `verbose` (Optional[bool]):
+        `verbose` (bool | None):
             If True, the prepared request and extraction results will be printed as JSON
             to console. Defaults to False if not specified.
-        `overwrite` (Optional[bool]):
+        `overwrite` (bool | None):
             If True, permits overwriting the destination path if the file or directory
             already exists. Defaults to False if not specified.
-        `fps` (Optional[float]):
+        `fps` (float | None):
             Override the frames per second (fps) value obtained from `cv2` when reading
             the video. This value is used to set the start and stop frames for the
             extraction range. This option should be used only in rare cases where `cv2`
@@ -99,13 +99,13 @@ class BaseRequest(Request):
         - `is_validated` -> `bool`: If the request has been validated.
     """
 
-    start_time: Optional[float | int | str] = None  # XXX: add timedelta support
-    stop_time: Optional[float | int | str] = None  # XXX: add timedelta support
-    destdir: Optional[Path] = None
-    filename: Optional[str] = None
-    verbose: Optional[bool] = None
-    overwrite: Optional[bool] = None
-    fps: Optional[float] = None
+    start_time: float | int | str | None = None  # XXX: add timedelta support
+    stop_time: float | int | str | None = None  # XXX: add timedelta support
+    destdir: Path | None = None
+    filename: str | None = None
+    verbose: bool | None = None
+    overwrite: bool | None = None
+    fps: float | None = None
     _is_validated: bool = field(init=False)
 
     def validate(self) -> "BaseRequest":
@@ -185,45 +185,45 @@ class AudioRequest(BaseRequest):
 
     Fields
     -----
-        `start_time` (Optional[float | int | str]):
+        `start_time` (float | int | str | None):
             Specify the extraction's start time in seconds, or as a string in "HH:MM:SS"
             format. Defaults to 0 if not specified.
-        `stop_time` (Optional[float | int | str]):
+        `stop_time` (float | int | str | None):
             Specify the extraction's stop time in seconds, or as a string in "HH:MM:SS"
             format. Defaults to the video duration if not specified.
-        `destdir` (Optional[pathlib.Path]):
+        `destdir` (Path | None):
             Specify the directory you want to save output to. Defaults to the video's
             directory if not specified.
-        `filename` (Optional[str]):
+        `filename` (str | None):
             Specify the name of the extracted file(s). Defaults to the video filename
             if not specified.
-        `verbose` (Optional[bool]):
+        `verbose` (bool | None):
             If True, the prepared request and extraction results will be printed as JSON
             to console. Defaults to False if not specified.
-        `overwrite` (Optional[bool]):
+        `overwrite` (bool | None):
             If True, permits overwriting the destination path if the file or directory
             already exists. Defaults to False if not specified.
-        `fps` (Optional[float]):
+        `fps` (float | None):
             Override the frames per second (fps) value obtained from `cv2` when reading
             the video. This value is used to set the start and stop frames for the
             extraction range. This option should be used only in rare cases where `cv2`
             fails to accurately read the fps. If not specified, it defaults to the fps
             of the video as read by `cv2`.
-        `audio_format` (Optional[str]):
+        `audio_format` (str | None):
             Set the extracted audio file format. Defaults to 'mp3' if not specified.
             See: `videoxt.constants.SUPPORTED_AUDIO_FORMATS`.
-        `speed` (Optional[float]):
+        `speed` (float | None):
             Set the speed of the extracted audio. A value of 0.5 will halve the speed of
             the extracted audio. Defaults to 1.0 if not specified (no change).
-        `bounce` (Optional[bool]):
+        `bounce` (bool | None):
             If True, bounce the extracted audio bommerang-style. Defaults to False if
             not specified.
-        `reverse` (Optional[bool]):
+        `reverse` (bool | None):
             If True, reverse the extracted audio. Defaults to False if not specified.
-        `volume` (Optional[float]):
+        `volume` (float | None):
             Set the volume of the extracted audio. A value of 0.5 will halve the volume
             of the extracted audio. Defaults to 1.0 if not specified (no change).
-        `normalize` (Optional[bool]):
+        `normalize` (bool | None):
             If True, normalize the audio. Normalization adjusts the gain of the audio to
             ensure consistent levels, preventing distortion and enhancing clarity in
             some cases. Defaults to False if not specified.
@@ -241,12 +241,12 @@ class AudioRequest(BaseRequest):
         - `is_validated` -> `bool`: If the request has been validated.
     """
 
-    audio_format: Optional[str] = None
-    speed: Optional[float] = None
-    bounce: Optional[bool] = None
-    reverse: Optional[bool] = None
-    volume: Optional[float] = None
-    normalize: Optional[bool] = None
+    audio_format: str | None = None
+    speed: float | None = None
+    bounce: bool | None = None
+    reverse: bool | None = None
+    volume: float | None = None
+    normalize: bool | None = None
 
     def validate(self) -> "AudioRequest":
         """Validate fields if specified and return a validated `AudioRequest`."""
@@ -324,55 +324,55 @@ class ClipRequest(BaseRequest):
 
     Fields
     -----
-        `start_time` (Optional[float | int | str]):
+        `start_time` (float | int | str | None):
             Specify the extraction's start time in seconds, or as a string in "HH:MM:SS"
             format. Defaults to 0 if not specified.
-        `stop_time` (Optional[float | int | str]):
+        `stop_time` (float | int | str | None):
             Specify the extraction's stop time in seconds, or as a string in "HH:MM:SS"
             format. Defaults to the video duration if not specified.
-        `destdir` (Optional[pathlib.Path]):
+        `destdir` (Path | None):
             Specify the directory you want to save output to. Defaults to the video's
             directory if not specified.
-        `filename` (Optional[str]):
+        `filename` (str | None):
             Specify the name of the extracted file(s). Defaults to the video filename
             if not specified.
-        `verbose` (Optional[bool]):
+        `verbose` (bool | None):
             If True, the prepared request and extraction results will be printed as JSON
             to console. Defaults to False if not specified.
-        `overwrite` (Optional[bool]):
+        `overwrite` (bool | None):
             If True, permits overwriting the destination path if the file or directory
             already exists. Defaults to False if not specified.
-        `fps` (Optional[float]):
+        `fps` (float | None):
             Override the frames per second (fps) value obtained from `cv2` when reading
             the video. This value is used to set the start and stop frames for the
             extraction range. This option should be used only in rare cases where `cv2`
             fails to accurately read the fps. If not specified, it defaults to the fps
             of the video as read by `cv2`.
-        `dimensions` (Optional[Tuple[int, int]]):
+        `dimensions` (tuple[int, int] | None):
             Specify the dimensions (frame width, frame height) of the clip. Defaults to
             the video dimensions if not specified.
-        `resize` (Optional[float]):
+        `resize` (float | None):
             Resize the dimensions of the clip by a factor of `n`. A value of 0.5
             will halve the dimensions. If you specify `dimensions`, `resize` will apply
             to the dimensions you specify. Defaults to 1.0 if not specified (no change).
-        `rotate` (Optional[int]):
+        `rotate` (int | None):
             Rotate the clip by `n` degrees. Allowed values: 0, 90, 180 or 270. Defaults
             to 0 if not specified (no change).
-        `speed` (Optional[float]):
+        `speed` (float | None):
             Set the speed of the extracted clip. A value of 0.5 will halve the playback
             speed of the clip. Defaults to 1.0 if not specified (no change).
-        `bounce` (Optional[bool]):
+        `bounce` (bool | None):
             If True, bounce the extracted clip bommerang-style. Defaults to False if
             not specified.
-        `reverse` (Optional[bool]):
+        `reverse` (bool | None):
             If True, reverse the extracted clip. Defaults to False if not specified.
-        `monochrome` (Optional[bool]):
+        `monochrome` (bool | None):
             If True, apply a black-and-white filter to the clip. Defaults to False if
             not specified.
-        `volume` (Optional[float]):
+        `volume` (float | None):
             Set the volume of the extracted clip's audio. A value of 0.5 will halve the
             volume of the clip's audio. Defaults to 1.0 if not specified (no change).
-        `normalize` (Optional[bool]):
+        `normalize` (bool | None):
             If True, normalize the audio. Normalization adjusts the gain of the audio to
             ensure consistent levels, preventing distortion and enhancing clarity in
             some cases. Defaults to False if not specified.
@@ -390,15 +390,15 @@ class ClipRequest(BaseRequest):
         - `is_validated` -> `bool`: If the request has been validated.
     """
 
-    dimensions: Optional[tuple[int, int]] = None
-    resize: Optional[float] = None
-    rotate: Optional[int] = None
-    speed: Optional[float] = None
-    bounce: Optional[bool] = None
-    reverse: Optional[bool] = None
-    monochrome: Optional[bool] = None
-    volume: Optional[float] = None
-    normalize: Optional[bool] = None
+    dimensions: tuple[int, int] | None = None
+    resize: float | None = None
+    rotate: int | None = None
+    speed: float | None = None
+    bounce: bool | None = None
+    reverse: bool | None = None
+    monochrome: bool | None = None
+    volume: float | None = None
+    normalize: bool | None = None
 
     def validate(self) -> "ClipRequest":
         """Validate fields if specified and return a validated `ClipRequest`."""
@@ -489,47 +489,47 @@ class FramesRequest(BaseRequest):
 
     Fields
     -----
-        `start_time` (Optional[float | int | str]):
+        `start_time` (float | int | str | None):
             Specify the extraction's start time in seconds, or as a string in "HH:MM:SS"
             format. Defaults to 0 if not specified.
-        `stop_time` (Optional[float | int | str]):
+        `stop_time` (float | int | str | None):
             Specify the extraction's stop time in seconds, or as a string in "HH:MM:SS"
             format. Defaults to the video duration if not specified.
-        `destdir` (Optional[pathlib.Path]):
+        `destdir` (Path | None):
             Specify the directory you want to save output to. Defaults to the video's
             directory if not specified.
-        `filename` (Optional[str]):
+        `filename` (str | None):
             Specify the name of the extracted file(s). Defaults to the video filename
             if not specified.
-        `verbose` (Optional[bool]):
+        `verbose` (bool | None):
             If True, the prepared request and extraction results will be printed as JSON
             to console. Defaults to False if not specified.
-        `overwrite` (Optional[bool]):
+        `overwrite` (bool | None):
             If True, permits overwriting the destination path if the file or directory
             already exists. Defaults to False if not specified.
-        `fps` (Optional[float]):
+        `fps` (float | None):
             Override the frames per second (fps) value obtained from `cv2` when reading
             the video. This value is used to set the start and stop frames for the
             extraction range. This option should be used only in rare cases where `cv2`
             fails to accurately read the fps. If not specified, it defaults to the fps
             of the video as read by `cv2`.
-        `image_format` (Optional[str]):
+        `image_format` (str | None):
             Set the extracted image file format. Defaults to 'jpg' if not specified.
             See: `videoxt.constants.SUPPORTED_IMAGE_FORMATS`.
-        `capture_rate` (Optional[int]):
+        `capture_rate` (int | None):
             Capture every Nth video frame. Defaults to 1 if not specified, which
             extracts every frame within the extraction range.
-        `dimensions` (Optional[Tuple[int, int]]):
+        `dimensions` (tuple[int, int] | None):
             Specify the dimensions (frame width, frame height) of the images. Defaults
             to the video dimensions if not specified.
-        `resize` (Optional[float]):
+        `resize` (float | None):
             Resize the dimensions of the images by a factor of `n`. A value of 0.5
             will halve the dimensions. If you specify `dimensions`, `resize` will apply
             to the dimensions you specify. Defaults to 1.0 if not specified (no change).
-        `rotate` (Optional[int]):
+        `rotate` (int | None):
             Rotate the images by `n` degrees. Allowed values: 0, 90, 180 or 270.
             Defaults to 0 if not specified (no change).
-        `monochrome` (Optional[bool]):
+        `monochrome` (bool | None):
             If True, apply a black-and-white filter to the images. Defaults to False if
             not specified.
 
@@ -547,12 +547,12 @@ class FramesRequest(BaseRequest):
         - `is_validated` -> `bool`: If the request has been validated.
     """
 
-    image_format: Optional[str] = None
-    capture_rate: Optional[int] = None
-    dimensions: Optional[tuple[int, int]] = None
-    resize: Optional[float] = None
-    rotate: Optional[int] = None
-    monochrome: Optional[bool] = None
+    image_format: str | None = None
+    capture_rate: int | None = None
+    dimensions: tuple[int, int] | None = None
+    resize: float | None = None
+    rotate: int | None = None
+    monochrome: bool | None = None
 
     def validate(self) -> "FramesRequest":
         """Validate fields if specified and return a validated `FramesRequest`."""
@@ -647,49 +647,49 @@ class GifRequest(BaseRequest):
 
     Fields
     -----
-        `start_time` (Optional[float | int | str]):
+        `start_time` (float | int | str | None):
             Specify the extraction's start time in seconds, or as a string in "HH:MM:SS"
             format. Defaults to 0 if not specified.
-        `stop_time` (Optional[float | int | str]):
+        `stop_time` (float | int | str | None):
             Specify the extraction's stop time in seconds, or as a string in "HH:MM:SS"
             format. Defaults to the video duration if not specified.
-        `destdir` (Optional[pathlib.Path]):
+        `destdir` (Path | None):
             Specify the directory you want to save output to. Defaults to the video's
             directory if not specified.
-        `filename` (Optional[str]):
+        `filename` (str | None):
             Specify the name of the extracted file(s). Defaults to the video filename
             if not specified.
-        `verbose` (Optional[bool]):
+        `verbose` (bool | None):
             If True, the prepared request and extraction results will be printed as JSON
             to console. Defaults to False if not specified.
-        `overwrite` (Optional[bool]):
+        `overwrite` (bool | None):
             If True, permits overwriting the destination path if the file or directory
             already exists. Defaults to False if not specified.
-        `fps` (Optional[float]):
+        `fps` (float | None):
             Override the frames per second (fps) value obtained from `cv2` when reading
             the video. This value is used to set the start and stop frames for the
             extraction range. This option should be used only in rare cases where `cv2`
             fails to accurately read the fps. If not specified, it defaults to the fps
             of the video as read by `cv2`.
-        `dimensions` (Optional[Tuple[int, int]]):
+        `dimensions` (tuple[int, int] | None):
             Specify the dimensions (frame width, frame height) of the gif. Defaults to
             the video dimensions if not specified.
-        `resize` (Optional[float]):
+        `resize` (float | None):
             Resize the dimensions of the gif by a factor of `n`. A value of 0.5
             will halve the dimensions. If you specify `dimensions`, `resize` will apply
             to the dimensions you specify. Defaults to 1.0 if not specified (no change).
-        `rotate` (Optional[int]):
+        `rotate` (int | None):
             Rotate the gif by `n` degrees. Allowed values: 0, 90, 180 or 270. Defaults
             to 0 if not specified (no change).
-        `speed` (Optional[float]):
+        `speed` (float | None):
             Set the speed of the extracted gif. A value of 0.5 will halve the playback
             speed of the gif. Defaults to 1.0 if not specified (no change).
-        `bounce` (Optional[bool]):
+        `bounce` (bool | None):
             If True, bounce the extracted gif bommerang-style. Defaults to False if
             not specified.
-        `reverse` (Optional[bool]):
+        `reverse` (bool | None):
             If True, reverse the extracted gif. Defaults to False if not specified.
-        `monochrome` (Optional[bool]):
+        `monochrome` (bool | None):
             If True, apply a black-and-white filter to the gif. Defaults to False if
             not specified.
 
@@ -706,13 +706,13 @@ class GifRequest(BaseRequest):
         - `is_validated` -> `bool`: If the request has been validated.
     """
 
-    dimensions: Optional[tuple[int, int]] = None
-    resize: Optional[float] = None
-    rotate: Optional[int] = None
-    speed: Optional[float] = None
-    bounce: Optional[bool] = None
-    reverse: Optional[bool] = None
-    monochrome: Optional[bool] = None
+    dimensions: tuple[int, int] | None = None
+    resize: float | None = None
+    rotate: int | None = None
+    speed: float | None = None
+    bounce: bool | None = None
+    reverse: bool | None = None
+    monochrome: bool | None = None
 
     def validate(self) -> "GifRequest":
         """Validate fields if specified and return a validated `GifRequest`."""
@@ -832,31 +832,31 @@ class PreparedBaseRequest(PreparedRequest):
     -----
         `video` (Video):
             The object containing video metadata used to prepare the request.
-        `start_time` (Optional[float | int | str]):
+        `start_time` (float | int | str | None):
             Specify the extraction's start time in seconds, or as a string in "HH:MM:SS"
             format. Defaults to 0 if not specified.
-        `stop_time` (Optional[float | int | str]):
+        `stop_time` (float | int | str | None):
             Specify the extraction's stop time in seconds, or as a string in "HH:MM:SS"
             format. Defaults to the video duration if not specified.
-        `destdir` (Optional[pathlib.Path]):
+        `destdir` (Path | None):
             Specify the directory you want to save output to. Defaults to the video's
             directory if not specified.
-        `filename` (Optional[str]):
+        `filename` (str | None):
             Specify the name of the extracted file(s). Defaults to the video filename
             if not specified.
-        `verbose` (Optional[bool]):
+        `verbose` (bool | None):
             If True, the prepared request and extraction results will be printed as JSON
             to console. Defaults to False if not specified.
-        `overwrite` (Optional[bool]):
+        `overwrite` (bool | None):
             If True, permits overwriting the destination path if the file or directory
             already exists. Defaults to False if not specified.
-        `fps` (Optional[float]):
+        `fps` (float | None):
             Override the frames per second (fps) value obtained from `cv2` when reading
             the video. This value is used to set the start and stop frames for the
             extraction range. This option should be used only in rare cases where `cv2`
             fails to accurately read the fps. If not specified, it defaults to the fps
             of the video as read by `cv2`.
-        `destpath` (pathlib.Path):
+        `destpath` (Path):
             The destination path of the extracted file or directory. Not initialized.
         `extraction_range` (dict):
             The range represented as seconds, as timestamps, and frame numbers.
@@ -878,15 +878,15 @@ class PreparedBaseRequest(PreparedRequest):
     """
 
     video: Video
-    start_time: Optional[float | int | str] = None
-    stop_time: Optional[float | int | str] = None
-    destdir: Optional[Path] = None
-    filename: Optional[str] = None
-    verbose: Optional[bool] = None
-    overwrite: Optional[bool] = None
-    fps: Optional[float] = None
+    start_time: float | int | str | None = None
+    stop_time: float | int | str | None = None
+    destdir: Path | None = None
+    filename: str | None = None
+    verbose: bool | None = None
+    overwrite: bool | None = None
+    fps: float | None = None
     destpath: Path = field(init=False)
-    extraction_range: dict = field(init=False, default_factory=dict)
+    extraction_range: dict[str, Any] = field(init=False, default_factory=dict)
     _is_prepared: bool = field(init=False)
 
     def prepare(self) -> "PreparedBaseRequest":
@@ -926,7 +926,7 @@ class PreparedBaseRequest(PreparedRequest):
         self.fps = P.prepare_fps(self.video.fps, self.fps)
         return self.fps
 
-    def _prepare_extraction_range(self) -> dict:
+    def _prepare_extraction_range(self) -> dict[str, Any]:
         """Prepare, set and return a dictionary representing the extraction range."""
         self.extraction_range = P.prepare_extraction_range(
             self.video.duration_seconds,
@@ -960,50 +960,50 @@ class PreparedAudioRequest(PreparedBaseRequest):
     -----
         `video` (Video):
             The object containing video metadata used to prepare the request.
-        `start_time` (Optional[float | int | str]):
+        `start_time` (float | int | str | None):
             Specify the extraction's start time in seconds, or as a string in "HH:MM:SS"
             format. Defaults to 0 if not specified.
-        `stop_time` (Optional[float | int | str]):
+        `stop_time` (float | int | str | None):
             Specify the extraction's stop time in seconds, or as a string in "HH:MM:SS"
             format. Defaults to the video duration if not specified.
-        `destdir` (Optional[pathlib.Path]):
+        `destdir` (Path | None):
             Specify the directory you want to save output to. Defaults to the video's
             directory if not specified.
-        `filename` (Optional[str]):
+        `filename` (str | None):
             Specify the name of the extracted file(s). Defaults to the video filename
             if not specified.
-        `verbose` (Optional[bool]):
+        `verbose` (bool | None):
             If True, the prepared request and extraction results will be printed as JSON
             to console. Defaults to False if not specified.
-        `overwrite` (Optional[bool]):
+        `overwrite` (bool | None):
             If True, permits overwriting the destination path if the file or directory
             already exists. Defaults to False if not specified.
-        `fps` (Optional[float]):
+        `fps` (float | None):
             Override the frames per second (fps) value obtained from `cv2` when reading
             the video. This value is used to set the start and stop frames for the
             extraction range. This option should be used only in rare cases where `cv2`
             fails to accurately read the fps. If not specified, it defaults to the fps
             of the video as read by `cv2`.
-        `destpath` (pathlib.Path):
+        `destpath` (Path):
             The destination path of the extracted file or directory. Not initialized.
         `extraction_range` (dict):
             The range represented as seconds, as timestamps, and frame numbers.
             Not initialized.
-        `audio_format` (Optional[str]):
+        `audio_format` (str | None):
             Set the extracted audio file format. Defaults to 'mp3' if not specified.
             See: `videoxt.constants.SUPPORTED_AUDIO_FORMATS`.
-        `speed` (Optional[float]):
+        `speed` (float | None):
             Set the speed of the extracted audio. A value of 0.5 will halve the speed of
             the extracted audio. Defaults to 1.0 if not specified (no change).
-        `bounce` (Optional[bool]):
+        `bounce` (bool | None):
             If True, bounce the extracted audio bommerang-style. Defaults to False if
             not specified.
-        `reverse` (Optional[bool]):
+        `reverse` (bool | None):
             If True, reverse the extracted audio. Defaults to False if not specified.
-        `volume` (Optional[float]):
+        `volume` (float | None):
             Set the volume of the extracted audio. A value of 0.5 will halve the volume
             of the extracted audio. Defaults to 1.0 if not specified (no change).
-        `normalize` (Optional[bool]):
+        `normalize` (bool | None):
             If True, normalize the audio. Normalization adjusts the gain of the audio to
             ensure consistent levels, preventing distortion and enhancing clarity in
             some cases. Defaults to False if not specified.
@@ -1024,12 +1024,12 @@ class PreparedAudioRequest(PreparedBaseRequest):
         - `is_verbose` -> `bool | None`: Return the state of the verbose field.
     """
 
-    audio_format: Optional[str] = None
-    speed: Optional[float] = None
-    bounce: Optional[bool] = None
-    reverse: Optional[bool] = None
-    volume: Optional[float] = None
-    normalize: Optional[bool] = None
+    audio_format: str | None = None
+    speed: float | None = None
+    bounce: bool | None = None
+    reverse: bool | None = None
+    volume: float | None = None
+    normalize: bool | None = None
 
     def prepare(self) -> "PreparedAudioRequest":
         """
@@ -1111,60 +1111,60 @@ class PreparedClipRequest(PreparedBaseRequest):
     -----
         `video` (Video):
             The object containing video metadata used to prepare the request.
-        `start_time` (Optional[float | int | str]):
+        `start_time` (float | int | str | None):
             Specify the extraction's start time in seconds, or as a string in "HH:MM:SS"
             format. Defaults to 0 if not specified.
-        `stop_time` (Optional[float | int | str]):
+        `stop_time` (float | int | str | None):
             Specify the extraction's stop time in seconds, or as a string in "HH:MM:SS"
             format. Defaults to the video duration if not specified.
-        `destdir` (Optional[pathlib.Path]):
+        `destdir` (Path | None):
             Specify the directory you want to save output to. Defaults to the video's
             directory if not specified.
-        `filename` (Optional[str]):
+        `filename` (str | None):
             Specify the name of the extracted file(s). Defaults to the video filename
             if not specified.
-        `verbose` (Optional[bool]):
+        `verbose` (bool | None):
             If True, the prepared request and extraction results will be printed as JSON
             to console. Defaults to False if not specified.
-        `overwrite` (Optional[bool]):
+        `overwrite` (bool | None):
             If True, permits overwriting the destination path if the file or directory
             already exists. Defaults to False if not specified.
-        `fps` (Optional[float]):
+        `fps` (float | None):
             Override the frames per second (fps) value obtained from `cv2` when reading
             the video. This value is used to set the start and stop frames for the
             extraction range. This option should be used only in rare cases where `cv2`
             fails to accurately read the fps. If not specified, it defaults to the fps
             of the video as read by `cv2`.
-        `destpath` (pathlib.Path):
+        `destpath` (Path):
             The destination path of the extracted file or directory. Not initialized.
         `extraction_range` (dict):
             The range represented as seconds, as timestamps, and frame numbers.
             Not initialized.
-        `dimensions` (Optional[Tuple[int, int]]):
+        `dimensions` (tuple[int, int] | None):
             Specify the dimensions (frame width, frame height) of the clip. Defaults to
             the video dimensions if not specified.
-        `resize` (Optional[float]):
+        `resize` (float | None):
             Resize the dimensions of the clip by a factor of `n`. A value of 0.5
             will halve the dimensions. If you specify `dimensions`, `resize` will apply
             to the dimensions you specify. Defaults to 1.0 if not specified (no change).
-        `rotate` (Optional[int]):
+        `rotate` (int | None):
             Rotate the clip by `n` degrees. Allowed values: 0, 90, 180 or 270. Defaults
             to 0 if not specified (no change).
-        `speed` (Optional[float]):
+        `speed` (float | None):
             Set the speed of the extracted clip. A value of 0.5 will halve the playback
             speed of the clip. Defaults to 1.0 if not specified (no change).
-        `bounce` (Optional[bool]):
+        `bounce` (bool | None):
             If True, bounce the extracted clip bommerang-style. Defaults to False if
             not specified.
-        `reverse` (Optional[bool]):
+        `reverse` (bool | None):
             If True, reverse the extracted clip. Defaults to False if not specified.
-        `monochrome` (Optional[bool]):
+        `monochrome` (bool | None):
             If True, apply a black-and-white filter to the clip. Defaults to False if
             not specified.
-        `volume` (Optional[float]):
+        `volume` (float | None):
             Set the volume of the extracted clip's audio. A value of 0.5 will halve the
             volume of the clip's audio. Defaults to 1.0 if not specified (no change).
-        `normalize` (Optional[bool]):
+        `normalize` (bool | None):
             If True, normalize the audio. Normalization adjusts the gain of the audio to
             ensure consistent levels, preventing distortion and enhancing clarity in
             some cases. Defaults to False if not specified.
@@ -1185,15 +1185,15 @@ class PreparedClipRequest(PreparedBaseRequest):
         - `is_verbose` -> `bool | None`: Return the state of the verbose field.
     """
 
-    dimensions: Optional[tuple[int, int]] = None
-    resize: Optional[float] = None
-    rotate: Optional[int] = None
-    speed: Optional[float] = None
-    bounce: Optional[bool] = None
-    reverse: Optional[bool] = None
-    monochrome: Optional[bool] = None
-    volume: Optional[float] = None
-    normalize: Optional[bool] = None
+    dimensions: tuple[int, int] | None = None
+    resize: float | None = None
+    rotate: int | None = None
+    speed: float | None = None
+    bounce: bool | None = None
+    reverse: bool | None = None
+    monochrome: bool | None = None
+    volume: float | None = None
+    normalize: bool | None = None
 
     def prepare(self) -> "PreparedClipRequest":
         """
@@ -1291,47 +1291,47 @@ class PreparedFramesRequest(PreparedBaseRequest):
     -----
         `video` (Video):
             The object containing video metadata used to prepare the request.
-        `start_time` (Optional[float | int | str]):
+        `start_time` (float | int | str | None):
             Specify the extraction's start time in seconds, or as a string in "HH:MM:SS"
             format. Defaults to 0 if not specified.
-        `stop_time` (Optional[float | int | str]):
+        `stop_time` (float | int | str | None):
             Specify the extraction's stop time in seconds, or as a string in "HH:MM:SS"
             format. Defaults to the video duration if not specified.
-        `destdir` (Optional[pathlib.Path]):
+        `destdir` (Path | None):
             Specify the directory you want to save output to. Defaults to the video's
             directory if not specified.
-        `filename` (Optional[str]):
+        `filename` (str | None):
             Specify the name of the extracted file(s). Defaults to the video filename
             if not specified.
-        `verbose` (Optional[bool]):
+        `verbose` (bool | None):
             If True, the prepared request and extraction results will be printed as JSON
             to console. Defaults to False if not specified.
-        `overwrite` (Optional[bool]):
+        `overwrite` (bool | None):
             If True, permits overwriting the destination path if the file or directory
             already exists. Defaults to False if not specified.
-        `fps` (Optional[float]):
+        `fps` (float | None):
             Override the frames per second (fps) value obtained from `cv2` when reading
             the video. This value is used to set the start and stop frames for the
             extraction range. This option should be used only in rare cases where `cv2`
             fails to accurately read the fps. If not specified, it defaults to the fps
             of the video as read by `cv2`.
-        `image_format` (Optional[str]):
+        `image_format` (str | None):
             Set the extracted image file format. Defaults to 'jpg' if not specified.
             See: `videoxt.constants.SUPPORTED_IMAGE_FORMATS`.
-        `capture_rate` (Optional[int]):
+        `capture_rate` (int | None):
             Capture every Nth video frame. Defaults to 1 if not specified, which
             extracts every frame within the extraction range.
-        `dimensions` (Optional[Tuple[int, int]]):
+        `dimensions` (tuple[int, int] | None):
             Specify the dimensions (frame width, frame height) of the images. Defaults
             to the video dimensions if not specified.
-        `resize` (Optional[float]):
+        `resize` (float | None):
             Resize the dimensions of the images by a factor of `n`. A value of 0.5
             will halve the dimensions. If you specify `dimensions`, `resize` will apply
             to the dimensions you specify. Defaults to 1.0 if not specified (no change).
-        `rotate` (Optional[int]):
+        `rotate` (int | None):
             Rotate the images by `n` degrees. Allowed values: 0, 90, 180 or 270.
             Defaults to 0 if not specified (no change).
-        `monochrome` (Optional[bool]):
+        `monochrome` (bool | None):
             If True, apply a black-and-white filter to the images. Defaults to False if
             not specified.
         `images_expected` (int):
@@ -1353,12 +1353,12 @@ class PreparedFramesRequest(PreparedBaseRequest):
         - `is_verbose` -> `bool | None`: Return the state of the verbose field.
     """
 
-    image_format: Optional[str] = None
-    capture_rate: Optional[int] = None
-    dimensions: Optional[tuple[int, int]] = None
-    resize: Optional[float] = None
-    rotate: Optional[int] = None
-    monochrome: Optional[bool] = None
+    image_format: str | None = None
+    capture_rate: int | None = None
+    dimensions: tuple[int, int] | None = None
+    resize: float | None = None
+    rotate: int | None = None
+    monochrome: bool | None = None
     images_expected: int = field(init=False)
 
     def prepare(self) -> "PreparedFramesRequest":
@@ -1449,49 +1449,49 @@ class PreparedGifRequest(PreparedBaseRequest):
     -----
         `video` (Video):
             The object containing video metadata used to prepare the request.
-        `start_time` (Optional[float | int | str]):
+        `start_time` (float | int | str | None):
             Specify the extraction's start time in seconds, or as a string in "HH:MM:SS"
             format. Defaults to 0 if not specified.
-        `stop_time` (Optional[float | int | str]):
+        `stop_time` (float | int | str | None):
             Specify the extraction's stop time in seconds, or as a string in "HH:MM:SS"
             format. Defaults to the video duration if not specified.
-        `destdir` (Optional[pathlib.Path]):
+        `destdir` (Path | None):
             Specify the directory you want to save output to. Defaults to the video's
             directory if not specified.
-        `filename` (Optional[str]):
+        `filename` (str | None):
             Specify the name of the extracted file(s). Defaults to the video filename
             if not specified.
-        `verbose` (Optional[bool]):
+        `verbose` (bool | None):
             If True, the prepared request and extraction results will be printed as JSON
             to console. Defaults to False if not specified.
-        `overwrite` (Optional[bool]):
+        `overwrite` (bool | None):
             If True, permits overwriting the destination path if the file or directory
             already exists. Defaults to False if not specified.
-        `fps` (Optional[float]):
+        `fps` (float | None):
             Override the frames per second (fps) value obtained from `cv2` when reading
             the video. This value is used to set the start and stop frames for the
             extraction range. This option should be used only in rare cases where `cv2`
             fails to accurately read the fps. If not specified, it defaults to the fps
             of the video as read by `cv2`.
-        `dimensions` (Optional[Tuple[int, int]]):
+        `dimensions` (tuple[int, int] | None):
             Specify the dimensions (frame width, frame height) of the gif. Defaults to
             the video dimensions if not specified.
-        `resize` (Optional[float]):
+        `resize` (float | None):
             Resize the dimensions of the gif by a factor of `n`. A value of 0.5
             will halve the dimensions. If you specify `dimensions`, `resize` will apply
             to the dimensions you specify. Defaults to 1.0 if not specified (no change).
-        `rotate` (Optional[int]):
+        `rotate` (int | None):
             Rotate the gif by `n` degrees. Allowed values: 0, 90, 180 or 270. Defaults
             to 0 if not specified (no change).
-        `speed` (Optional[float]):
+        `speed` (float | None):
             Set the speed of the extracted gif. A value of 0.5 will halve the playback
             speed of the gif. Defaults to 1.0 if not specified (no change).
-        `bounce` (Optional[bool]):
+        `bounce` (bool | None):
             If True, bounce the extracted gif bommerang-style. Defaults to False if
             not specified.
-        `reverse` (Optional[bool]):
+        `reverse` (bool | None):
             If True, reverse the extracted gif. Defaults to False if not specified.
-        `monochrome` (Optional[bool]):
+        `monochrome` (bool | None):
             If True, apply a black-and-white filter to the gif. Defaults to False if
             not specified.
 
@@ -1511,13 +1511,13 @@ class PreparedGifRequest(PreparedBaseRequest):
         - `is_verbose` -> `bool | None`: Return the state of the verbose field.
     """
 
-    dimensions: Optional[tuple[int, int]] = None
-    resize: Optional[float] = None
-    rotate: Optional[int] = None
-    speed: Optional[float] = None
-    bounce: Optional[bool] = None
-    reverse: Optional[bool] = None
-    monochrome: Optional[bool] = None
+    dimensions: tuple[int, int] | None = None
+    resize: float | None = None
+    rotate: int | None = None
+    speed: float | None = None
+    bounce: bool | None = None
+    reverse: bool | None = None
+    monochrome: bool | None = None
 
     def prepare(self) -> "PreparedGifRequest":
         """

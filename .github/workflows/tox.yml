@@ -1,4 +1,4 @@
-name: Test and run pre-commit with tox
+name: tests
 
 on:
     - push
@@ -21,5 +21,5 @@ jobs:
               run: |
                   python -m pip install --upgrade pip
                   pip install tox
-            - name: Test and run pre-commit with tox
+            - name: Run tests and pre-commit hooks with tox
               run: tox

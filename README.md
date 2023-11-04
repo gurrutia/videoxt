@@ -26,8 +26,7 @@
 
 From the command-line:
 ```sh
-# from the command-line
-# extract all audio from a video (default: 'mp3')
+# extract audio from a video file (default: 'mp3')
 $ videoxt audio MyVideo.mp4
 {"video": {"filepath": "C:/Users/gurrutia/MyVideo.mp4", ...}, "start_time": 0, ...}
 # Extracting audio...

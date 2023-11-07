@@ -21,15 +21,17 @@ def timestamp_to_seconds(timestamp: str) -> float:
 
     Usage:
     -----
-
-        >>> timestamp_to_seconds("1:01")
-        61.0
-        >>> timestamp_to_seconds("1:01.987654321")
-        61.0
-        >>> timestamp_to_seconds("10:00")
-        600.0
-        >>> timestamp_to_seconds("1:00:00")
-        3600.0
+    ```python
+    >>> from videoxt.utils import timestamp_to_seconds
+    >>> timestamp_to_seconds("1:01")
+    61.0
+    >>> timestamp_to_seconds("1:01.987654321")
+    61.0
+    >>> timestamp_to_seconds("10:00")
+    600.0
+    >>> timestamp_to_seconds("1:00:00")
+    3600.0
+    ```
 
     Args:
     -----
@@ -58,14 +60,17 @@ def seconds_to_timestamp(seconds: float) -> str:
 
     Usage:
     -----
-        >>> seconds_to_timestamp(60)
-        '0:01:00'
-        >>> seconds_to_timestamp(60.987654321)
-        '0:01:00'
-        >>> seconds_to_timestamp(600)
-        '0:10:00'
-        >>> seconds_to_timestamp(3600)
-        '1:00:00'
+    ```python
+    >>> from videoxt.utils import seconds_to_timestamp
+    >>> seconds_to_timestamp(60)
+    '0:01:00'
+    >>> seconds_to_timestamp(60.987654321)
+    '0:01:00'
+    >>> seconds_to_timestamp(600)
+    '0:10:00'
+    >>> seconds_to_timestamp(3600)
+    '1:00:00'
+    ```
 
     Args:
     -----
@@ -89,12 +94,15 @@ def timedelta_to_timestamp(duration: timedelta) -> str:
 
     Usage:
     -----
-        >>> timedelta_to_timestamp(timedelta(seconds=59))
-        '00:00:59'
-        >>> timedelta_to_timestamp(timedelta(seconds=61.987654321))
-        '00:01:01'
-        >>> timedelta_to_timestamp(timedelta(seconds=600))
-        '00:10:00'
+    ```python
+    >>> from videoxt.utils import timedelta_to_timestamp
+    >>> timedelta_to_timestamp(timedelta(seconds=59))
+    '00:00:59'
+    >>> timedelta_to_timestamp(timedelta(seconds=61.987654321))
+    '00:01:01'
+    >>> timedelta_to_timestamp(timedelta(seconds=600))
+    '00:10:00'
+    ```
 
     Args:
     -----
@@ -133,14 +141,17 @@ def append_enumeration(index: int, tag: str | None = None) -> str:
 
     Usage:
     -----
-        >>> append_enumeration(1)
-        ' (1)'
-        >>> append_enumeration(2)
-        ' (2)'
-        >>> append_enumeration(1, tag="_vxt")
-        '_vxt'
-        >>> append_enumeration(2, tag="_vxt")
-        '_vxt (2)'
+    ```python
+    >>> from videoxt.utils import append_enumeration
+    >>> append_enumeration(1)
+    ' (1)'
+    >>> append_enumeration(2)
+    ' (2)'
+    >>> append_enumeration(1, tag="_vxt")
+    '_vxt'
+    >>> append_enumeration(2, tag="_vxt")
+    '_vxt (2)'
+    ```
 
     Args:
     -----
@@ -173,14 +184,17 @@ def enumerate_dir(directory: Path, tag: str | None = None) -> Path:
 
     Usage:
     -----
-        >>> from pathlib import Path
-        >>> path = Path("test_dir")  # Assume 'test_dir' doesn't exist.
-        >>> enumerate_dir(path, tag="_frames")
-        Path('test_dir')
-        >>> enumerate_dir(path, tag="_frames")
-        Path('test_dir_frames')
-        >>> enumerate_dir(path, tag="_frames")
-        Path('test_dir_frames (2)')
+    ```python
+    >>> from videoxt.utils import
+    >>> from pathlib import Path
+    >>> path = Path("test_dir")  # Assume 'test_dir' doesn't exist.
+    >>> enumerate_dir(path, tag="_frames")
+    Path('test_dir')
+    >>> enumerate_dir(path, tag="_frames")
+    Path('test_dir_frames')
+    >>> enumerate_dir(path, tag="_frames")
+    Path('test_dir_frames (2)')
+    ```
 
     Args:
     -----
@@ -214,14 +228,17 @@ def enumerate_filepath(filepath: Path, tag: str | None = None) -> Path:
 
     Usage:
     -----
-        >>> from pathlib import Path
-        >>> filepath = Path('test.mp4')  # Assume 'test.mp4' doesn't exist.
-        >>> enumerate_filepath(filepath, tag="_vxt")
-        Path('test.mp4')
-        >>> enumerate_filepath(filepath, tag="_vxt")
-        Path('test_vxt.mp4')
-        >>> enumerate_filepath(filepath, tag="_vxt")
-        Path('test_vxt (2).mp4')
+    ```python
+    >>> from videoxt.utils import enumerate_filepath
+    >>> from pathlib import Path
+    >>> filepath = Path('test.mp4')  # Assume 'test.mp4' doesn't exist.
+    >>> enumerate_filepath(filepath, tag="_vxt")
+    Path('test.mp4')
+    >>> enumerate_filepath(filepath, tag="_vxt")
+    Path('test_vxt.mp4')
+    >>> enumerate_filepath(filepath, tag="_vxt")
+    Path('test_vxt (2).mp4')
+    ```
 
     Args:
     -----
@@ -282,18 +299,21 @@ def convert_bytes(n: int) -> str:
 
     Usage:
     -----
-        >>> convert_bytes(1)
-        '1.00 bytes'
-        >>> convert_bytes(1024)
-        '1.00 KB'
-        >>> convert_bytes(1024**2)
-        '1.00 MB'
-        >>> convert_bytes(1024**3)
-        '1.00 GB'
-        >>> convert_bytes(1024**4)
-        '1.00 TB'
-        >>> convert_bytes(1024**5)
-        '1.00 PB'
+    ```python
+    >>> from videoxt.utils import convert_bytes
+    >>> convert_bytes(1)
+    '1.00 bytes'
+    >>> convert_bytes(1024)
+    '1.00 KB'
+    >>> convert_bytes(1024**2)
+    '1.00 MB'
+    >>> convert_bytes(1024**3)
+    '1.00 GB'
+    >>> convert_bytes(1024**4)
+    '1.00 TB'
+    >>> convert_bytes(1024**5)
+    '1.00 PB'
+    ```
 
     Args:
     -----
@@ -388,13 +408,16 @@ def parse_kwargs(kwargs: dict[str, Any], obj: DataclassType) -> dict[str, Any]:
 
     Usage:
     -----
-        >>> from dataclasses import dataclass
-        >>> @dataclass
-        ... class Test:
-        ...     a: int
-        ...     b: int
-        >>> parse_kwargs({"a": 1, "b": 2, "c": 3}, Test)
-        {'a': 1, 'b': 2}
+    ```python
+    >>> from videoxt.utils import parse_kwargs
+    >>> from dataclasses import dataclass
+    >>> @dataclass
+    ... class Test:
+    ...     a: int
+    ...     b: int
+    >>> parse_kwargs({"a": 1, "b": 2, "c": 3}, Test)
+    {'a': 1, 'b': 2}
+    ```
 
     Args:
     -----

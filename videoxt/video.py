@@ -210,11 +210,13 @@ def open_video_capture(filepath: Path) -> Iterator[cv2.VideoCapture]:
 
     Usage:
     -----
-        >>> from videoxt.video import open_video_capture
-        >>> with open_video_capture('path/to/video.mp4') as opencap:
-        ...     # do something with 'opencap'
-        ...     type(opencap)
-        <class 'cv2.VideoCapture'>
+    ```python
+    >>> from videoxt.video import open_video_capture
+    >>> with open_video_capture('path/to/video.mp4') as opencap:
+    ...     # do something with 'opencap'
+    ...     type(opencap)
+    <class 'cv2.VideoCapture'>
+    ```
 
     Args:
     -----

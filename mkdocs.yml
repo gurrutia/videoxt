@@ -1,0 +1,101 @@
+site_name: VideoXT
+
+nav:
+  - Home: index.md
+  - Examples: examples.md
+  - CLI: cli.md
+  - Documentation:
+    - api: docs/api.md
+    - cli: docs/cli.md
+    - constants: docs/constants.md
+    - editors: docs/editors.md
+    - exceptions: docs/exceptions.md
+    - extractors: docs/extractors.md
+    - handlers: docs/handlers.md
+    - preppers: docs/preppers.md
+    - requestors: docs/requestors.md
+    - result: docs/result.md
+    - utils: docs/utils.md
+    - validators: docs/validators.md
+    - video: docs/video.md
+
+theme:
+  name: material
+  features:
+    - content.code.annotation
+    - content.code.copy
+    - content.code.select
+    - content.tabs.link
+    - navigation.footer
+    - navigation.path
+    - navigation.sections
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.top
+    - search.highlight
+    - search.suggest
+
+  language: en
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+watch:
+  - videoxt
+
+plugins:
+- search
+- mkdocstrings:
+    enabled: true
+    default_handler: python
+    handlers:
+      python:
+        paths: [.]
+        import:
+        - https://docs.python-requests.org/en/master/objects.inv
+        options:
+          docstring_options:
+            ignore_init_summary: true
+          docstring_style: sphinx
+          filters: ["!^_"]
+          members_order: source
+          merge_init_into_class: true
+          separate_signature: true
+          show_if_no_docstring: true
+
+repo_name: gurrutia/videoxt
+repo_url: https://github.com/gurrutia/videoxt
+
+extra:
+  social:
+    - icon: fontawesome/brands/github-alt
+      link: https://github.com/gurrutia
+    - icon: fontawesome/brands/linkedin
+      link: https://www.linkedin.com/in/gurrutia/
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - admonition
+  - pymdownx.arithmatex:
+      generic: true
+  - footnotes
+  - pymdownx.details
+  - pymdownx.mark
+  - attr_list
+
+copyright: |
+  &copy; 2023 <a href="https://github.com/gurrutia"  target="_blank" rel="noopener">Gerardo Urrutia</a>

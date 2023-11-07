@@ -1,0 +1,2 @@
+::: videoxt.api
+    :docstring:

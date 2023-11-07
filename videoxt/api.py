@@ -26,7 +26,7 @@ def extract(
 
     Args:
     -----
-        method (str):
+        `method` (str):
             The extraction method to use ("audio", "clip", "frames", "gif").
         `filepath` (Path | str):
             Path to the video file with extension.

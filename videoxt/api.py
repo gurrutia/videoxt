@@ -18,6 +18,7 @@ def extract(
     Extract audio, individual frames, short clips and GIFs from videos.
 
     See the documentation for list of options, or:
+
     - `extract_audio`: Extract audio from a video file.
     - `extract_clip`: Extract a short clip from a video file as `mp4`.
     - `extract_frames`: Extract individual frames from a video and save them as images.
@@ -25,7 +26,7 @@ def extract(
 
     Args:
     -----
-        `method` (str):
+        method (str):
             The extraction method to use ("audio", "clip", "frames", "gif").
         `filepath` (Path | str):
             Path to the video file with extension.

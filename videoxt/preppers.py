@@ -47,6 +47,7 @@ class ExtractionRange:
 
     Usage:
     -----
+    ```python
     >>> from videoxt.preppers import ExtractionRange
     >>> extraction_range = ExtractionRange(
     ...     duration_seconds=20,
@@ -67,6 +68,7 @@ class ExtractionRange:
     0
     >>> extraction_range.stop_frame
     300
+    ```
     """
 
     duration_seconds: float = field(repr=False)

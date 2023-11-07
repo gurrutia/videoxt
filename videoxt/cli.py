@@ -1,8 +1,9 @@
 """
-Command line interface for the videoxt library.
+Command line interface for the VideoXT library.
 
 Usage:
 -----
+```sh
 $ videoxt --help
 usage: videoxt [-h] [--version] {audio,clip,frames,gif} ...
 
@@ -18,6 +19,7 @@ positional arguments:
 options:
   -h, --help            show this help message and exit
   --version, -V         show program's version number and exit
+```
 """
 import argparse
 from collections.abc import Sequence

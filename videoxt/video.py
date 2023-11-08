@@ -80,10 +80,10 @@ class Video:
         self.filepath = V.valid_filepath(self.filepath, is_video=True)
         return self.filepath
 
-    def setattr_filesize(self) -> str:
-        """Set the filesize attribute to a human-readable format."""
-        self.filesize = U.convert_bytes(self.filesize_bytes)
-        return self.filesize
+    def validate_filesize_bytes(self) -> int:
+        """Validate the video file size in bytes is a positive integer."""
+        self.filesize_bytes = V.positive_int(self.filepath.stat().st_size)
+        return self.filesize_bytes
 
     def setattrs_from_opencap(self) -> tuple[tuple[int, int], float, int]:
         """Set the dimensions, fps and frame count read from an opened video capture."""
@@ -154,16 +154,10 @@ class Video:
         self.duration_timestamp = U.seconds_to_timestamp(self.duration_seconds)
         return self.duration, self.duration_seconds, self.duration_timestamp
 
-    def validate_filesize_bytes(self) -> int:
-        """Validate the video file size in bytes is a positive integer."""
-        try:
-            self.filesize_bytes = V.positive_int(self.filepath.stat().st_size)
-        except ValidationError as err:
-            raise VideoValidationError(
-                "The video file size could not be read. Please check the file."
-            ) from err
-
-        return self.filesize_bytes
+    def setattr_filesize(self) -> str:
+        """Set the filesize attribute to a human-readable format."""
+        self.filesize = U.convert_bytes(self.filesize_bytes)
+        return self.filesize
 
     def setattr_has_audio(self) -> bool:
         """Set the has_audio attribute with moviepy.editor import VideoFileClip.audio"""

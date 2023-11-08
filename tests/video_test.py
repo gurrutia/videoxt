@@ -1,7 +1,7 @@
 import cv2  # type: ignore
 import pytest
 
-from videoxt.exceptions import ClosedVideoCaptureError
+from videoxt.exceptions import ClosedVideoCaptureError, VideoValidationError
 from videoxt.video import Video, fetch_video_properties, open_video_capture
 
 
@@ -106,6 +106,60 @@ def test_video_object_with_invalid_filepath_raises_cv2_error(
 ):
     with pytest.raises(ClosedVideoCaptureError):
         Video(fixture_tmp_video_filepath_zero_seconds)
+
+
+def test_video_object_validate_dimensions_raises_video_validation_error_if_dimensions_are_none(
+    fixture_tmp_video_filepath,
+):
+    video = Video(fixture_tmp_video_filepath)
+    video.dimensions = None
+    with pytest.raises(VideoValidationError):
+        video.validate_dimensions()
+
+
+def test_video_object_validate_dimensions_raises_video_validation_error_if_dimensions_are_zero(
+    fixture_tmp_video_filepath,
+):
+    video = Video(fixture_tmp_video_filepath)
+    video.dimensions = (0, 0)
+    with pytest.raises(VideoValidationError):
+        video.validate_dimensions()
+
+
+def test_video_object_validate_fps_raises_video_validation_error_if_fps_is_none(
+    fixture_tmp_video_filepath,
+):
+    video = Video(fixture_tmp_video_filepath)
+    video.fps = None
+    with pytest.raises(VideoValidationError):
+        video.validate_fps()
+
+
+def test_video_object_validate_fps_raises_video_validation_error_if_fps_is_zero(
+    fixture_tmp_video_filepath,
+):
+    video = Video(fixture_tmp_video_filepath)
+    video.fps = 0
+    with pytest.raises(VideoValidationError):
+        video.validate_fps()
+
+
+def test_video_object_validate_frame_count_raises_video_validation_error_if_frame_count_is_none(
+    fixture_tmp_video_filepath,
+):
+    video = Video(fixture_tmp_video_filepath)
+    video.frame_count = None
+    with pytest.raises(VideoValidationError):
+        video.validate_frame_count()
+
+
+def test_video_object_validate_frame_count_raises_video_validation_error_if_frame_count_is_zero(
+    fixture_tmp_video_filepath,
+):
+    video = Video(fixture_tmp_video_filepath)
+    video.frame_count = 0
+    with pytest.raises(VideoValidationError):
+        video.validate_frame_count()
 
 
 def test_fetch_video_properties_with_invalid_filepath_raises_cv2_error(

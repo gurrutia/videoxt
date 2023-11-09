@@ -339,7 +339,7 @@ class CustomJSONEncoder(json.JSONEncoder):
         """Return a JSON serializable representation of the object."""
         if isinstance(obj, Path):
             return obj.resolve().as_posix()
-        if isinstance(obj, (Path, timedelta)):
+        if isinstance(obj, timedelta):
             return str(obj)
         if isinstance(obj, ExtractionMethod):
             return obj.value

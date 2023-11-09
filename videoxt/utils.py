@@ -277,20 +277,10 @@ def calculate_duration(frame_count: int, fps: float) -> timedelta:
     Returns:
     -----
         `datetime.timedelta`: The duration of the video.
-
-    Raises:
-    -----
-        `ZeroDivisionError`: If the fps is 0.
     """
     frame_count = positive_int(frame_count)
     fps = positive_float(fps)
-
-    try:
-        td = timedelta(seconds=frame_count / fps)
-    except ZeroDivisionError:
-        raise ZeroDivisionError("FPS cannot be 0.")
-    else:
-        return td
+    return timedelta(seconds=frame_count / fps)
 
 
 def convert_bytes(n: int) -> str:

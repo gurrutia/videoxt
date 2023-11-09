@@ -392,10 +392,23 @@ def test_custom_json_encoder_encode_timedelta():
     assert encoded_duration == '"1:11:00"'
 
 
-def test_custom_json_encoder_encode_custom_object():
-    custom_obj = ExtractionMethod.AUDIO
-    encoded_custom_obj = json.dumps(custom_obj, cls=CustomJSONEncoder)
-    assert encoded_custom_obj == '"audio"'
+def test_custom_json_encoder_encode_extraction_method_enum():
+    encoded_method = json.dumps(ExtractionMethod.AUDIO, cls=CustomJSONEncoder)
+    assert encoded_method == '"audio"'
+    encoded_method = json.dumps(ExtractionMethod.CLIP, cls=CustomJSONEncoder)
+    assert encoded_method == '"clip"'
+    encoded_method = json.dumps(ExtractionMethod.FRAMES, cls=CustomJSONEncoder)
+    assert encoded_method == '"frames"'
+    encoded_method = json.dumps(ExtractionMethod.GIF, cls=CustomJSONEncoder)
+    assert encoded_method == '"gif"'
+
+
+def test_custom_json_encoder_unhandled_custom_object_raises_type_error():
+    class UnhandledCustomObject:
+        pass
+
+    with pytest.raises(TypeError):
+        json.dumps(UnhandledCustomObject(), cls=CustomJSONEncoder)
 
 
 def test_to_json_mixin_to_json_skip_private_keys_is_false():

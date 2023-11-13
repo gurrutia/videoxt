@@ -1,4 +1,4 @@
-"""Contains constants used throughout the libary and version information."""
+"""Contains constants used throughout the library and version information."""
 import importlib.metadata
 from enum import Enum
 

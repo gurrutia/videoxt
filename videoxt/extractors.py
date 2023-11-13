@@ -9,7 +9,7 @@ import numpy as np
 from moviepy.editor import VideoFileClip  # type: ignore
 
 import videoxt.editors as E
-import videoxt.requestors as R
+import videoxt.requesters as R
 from videoxt.exceptions import (
     AudioWriteError,
     BuildImagePathError,

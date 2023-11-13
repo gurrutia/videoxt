@@ -17,7 +17,7 @@ from videoxt.extractors import (
     FramesExtractor,
     GifExtractor,
 )
-from videoxt.requestors import (
+from videoxt.requesters import (
     AudioRequest,
     ClipRequest,
     FramesRequest,

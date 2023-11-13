@@ -249,7 +249,7 @@ class Image:
     ],
 )
 def test_parse_kwargs(kwargs: dict, expected: dict):
-    """Test that the `parse_kwargs` function returns a dictonary containing only the
+    """Test that the `parse_kwargs` function returns a dictionary containing only the
     keyword arguments that match the fields in a given dataclass."""
     assert parse_kwargs(kwargs, Image) == expected
 

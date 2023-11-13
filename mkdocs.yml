@@ -13,7 +13,7 @@ nav:
     - extractors: docs/extractors.md
     - handlers: docs/handlers.md
     - preppers: docs/preppers.md
-    - requestors: docs/requestors.md
+    - requesters: docs/requestors.md
     - result: docs/result.md
     - utils: docs/utils.md
     - validators: docs/validators.md

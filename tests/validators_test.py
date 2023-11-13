@@ -737,13 +737,13 @@ def test_valid_video_filepath_with_supported_existing_filepath_lowercase_suffix(
     assert valid_filepath(path, is_video=True) == fixture_tmp_video_filepath
 
 
-def test_valid_video_filepath_with_supported_nonexistant_video_filepath(tmp_path: Path):
+def test_valid_video_filepath_with_supported_nonexistent_video_filepath(tmp_path: Path):
     path = tmp_path / "t.mp4"
     with pytest.raises(ValidationError):
         valid_filepath(path, is_video=True)
 
 
-def test_valid_video_filepath_with_supported_nonexistant_video_filepath_string():
+def test_valid_video_filepath_with_supported_nonexistent_video_filepath_string():
     with pytest.raises(ValidationError):
         valid_filepath("t.mp4", is_video=True)
 
@@ -755,7 +755,7 @@ def test_valid_video_filepath_with_unsupported_existing_file_suffix(
         valid_filepath(fixture_tmp_text_filepath, is_video=True)
 
 
-def test_valid_video_filepath_with_unsupported_nonexistant_file_suffix():
+def test_valid_video_filepath_with_unsupported_nonexistent_file_suffix():
     with pytest.raises(ValidationError):
         valid_filepath("t.txt", is_video=True)
 

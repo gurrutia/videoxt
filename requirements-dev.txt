@@ -1,2 +1,6 @@
 coverage
+mkdocs-material
+mkdocstrings-python
+pre-commit
 pytest
+tox

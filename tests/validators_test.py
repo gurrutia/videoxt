@@ -337,6 +337,20 @@ def test_valid_filepath_none():
         valid_filepath(None)
 
 
+def test_valid_filepath_empty_string_raises_validation_error():
+    with pytest.raises(ValidationError):
+        valid_filepath("")
+    with pytest.raises(ValidationError):
+        valid_filepath(" ")
+
+
+def test_valid_filepath_list_raises_validation_error():
+    with pytest.raises(ValidationError):
+        valid_filepath([])
+    with pytest.raises(ValidationError):
+        valid_filepath(["a", "b"])
+
+
 def test_valid_image_format_valid_image_formats():
     for image_format in C.SUPPORTED_IMAGE_FORMATS:
         assert valid_image_format(image_format) == image_format

@@ -703,6 +703,31 @@ def test_valid_start_time_with_valid_start_time_floats():
     assert valid_start_time(3600.9) == 3600.9
 
 
+def test_valid_start_time_raises_validation_error_with_negative_start_time():
+    with pytest.raises(ValidationError):
+        valid_start_time(-1)
+
+
+def test_valid_start_time_raises_validation_error_with_negative_start_time_string():
+    with pytest.raises(ValidationError):
+        valid_start_time("-1")
+
+
+def test_valid_start_time_raises_validation_error_with_text_as_start_time():
+    with pytest.raises(ValidationError):
+        valid_start_time("abc")
+
+
+def test_valid_start_time_raises_validation_error_with_empty_string():
+    with pytest.raises(ValidationError):
+        valid_start_time("")
+
+
+def test_valid_start_time_raises_validation_error_with_none():
+    with pytest.raises(ValidationError):
+        valid_start_time(None)
+
+
 def test_valid_stop_time_with_valid_stop_time_strings():
     assert valid_stop_time("1") == 1.0
     assert valid_stop_time("60") == 60.0
@@ -726,6 +751,36 @@ def test_valid_stop_time_with_valid_stop_time_floats():
     assert valid_stop_time(60.9) == 60.9
     assert valid_stop_time(3600.0) == 3600.0
     assert valid_stop_time(3600.9) == 3600.9
+
+
+def test_valid_stop_time_raises_validation_error_when_stop_time_is_zero():
+    with pytest.raises(ValidationError):
+        valid_stop_time(0)
+
+
+def test_valid_stop_time_raises_validation_error_with_negative_stop_time():
+    with pytest.raises(ValidationError):
+        valid_stop_time(-1)
+
+
+def test_valid_stop_time_raises_validation_error_with_negative_stop_time_string():
+    with pytest.raises(ValidationError):
+        valid_stop_time("-1")
+
+
+def test_valid_stop_time_raises_validation_error_with_text_as_stop_time():
+    with pytest.raises(ValidationError):
+        valid_stop_time("abc")
+
+
+def test_valid_stop_time_raises_validation_error_with_empty_string():
+    with pytest.raises(ValidationError):
+        valid_stop_time("")
+
+
+def test_valid_stop_time_raises_validation_error_with_none():
+    with pytest.raises(ValidationError):
+        valid_stop_time(None)
 
 
 def test_valid_video_filepath_with_supported_existing_filepath(

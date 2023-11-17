@@ -328,20 +328,24 @@ def valid_stop_timestamp(stop_timestamp: str) -> str:
 
 def valid_start_time(start_time: float | int | str) -> float | str:
     """
-    Validate any start time provided is in the correct format and not negative.
+    Validate the start time param is a not negative or a properly formatted timestamp.
+
+    If start_time is `str` it is expected to be a timestamp (ex: 'HH:MM:SS') and is
+    returned slightly modified if valid (microseconds are truncated, if any). Otherwise,
+    a number must be greater than or equal to 0 and is returned as a float if valid.
 
     Args:
     -----
-        `start_time` (float | int | str): The start time to validate.
+        `start_time` (float | int | str): The start time request parameter.
 
     Returns:
     -----
-        `float | str`: The start time as a float or string if valid.
+        `float | str`: The passed in, slightly modified start time if valid.
 
     Raises:
     -----
         `ValidationError`:
-            If start time is not a non-negative float or a properly formatted timestamp.
+            If start time an unaccepted timestamp string, not 0 or greater, or None.
     """
     if start_time is None:
         raise ValidationError("Start time cannot be None.")
@@ -370,20 +374,24 @@ def valid_start_time(start_time: float | int | str) -> float | str:
 
 def valid_stop_time(stop_time: float | int | str) -> float | str:
     """
-    Validate any stop time provided is in the correct format and not negative.
+    Validate the stop time param is a positive number or a properly formatted timestamp.
+
+    If stop_time is `str` it is expected to be a timestamp (ex: 'HH:MM:SS') and is
+    returned slightly modified if valid (microseconds are truncated, if any). Otherwise,
+    a number must be greater than 0 and is returned as a float if valid.
 
     Args:
     -----
-        `stop_time` (float | int | str): The stop time to validate.
+        `stop_time` (float | int | str): The stop time request parameter.
 
     Returns:
     -----
-        `float | str`: The stop time as a float or string if valid.
+        `float | str`: The passed in, slightly modified stop time if valid.
 
     Raises:
     -----
         `ValidationError`:
-            If stop time is not a positive float or a properly formatted timestamp.
+            If stop time an unaccepted timestamp string, not greater than 0, or None.
     """
     if stop_time is None:
         raise ValidationError("Stop time cannot be None.")

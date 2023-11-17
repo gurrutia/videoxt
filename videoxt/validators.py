@@ -422,7 +422,7 @@ def valid_extraction_range(
     start: float, stop: float, duration: float
 ) -> tuple[float, float, float]:
     """
-    Validate the extraction range is within bounds and return it.
+    Validate the extraction range against the video's duration and return it if valid.
 
     Args:
     -----
@@ -441,8 +441,8 @@ def valid_extraction_range(
     Raises:
     -----
         `ValidationError`:
-        - If the start second is greater than or equal to the duration.
-        - If the stop second is less than or equal to the start second.
+        - If the start time is greater than or equal to the video duration.
+        - If the stop time is less than or equal to the start time.
     """
     if stop > duration:
         stop = duration

@@ -59,6 +59,12 @@ pathlib.Path('C:/Users/gurrutia/MyVideo.mp4_frames')
 
 ---
 
+## Contributing
+
+For guidance on setting up a development environment and to make a contribution, see the [contributing guidelines](https://github.com/gurrutia/videoxt/blob/abdc3fe99a9244e668c270544bc83b44f7b828f3/CONTRIBUTING.md).
+
+---
+
 ## Used By
 
 - **Best Buy Teen Tech Center** at **Grand St. Settlement**, allowing filmmaking instructors to gather film stills that aid in constructing lesson plans for their youth workshops. [Download a workshop example here](https://github.com/gurrutia/videoxt/files/10887456/GSS_Filmmaking_Fall_2022_Transfiguration_Schools_W1.pdf).

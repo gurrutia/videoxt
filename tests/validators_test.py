@@ -438,7 +438,9 @@ def test_valid_dir_none():
     ("start", "stop", "duration", "expected"),
     [
         (0, 1, 2, (0, 1, 2)),  # start < stop < duration
-        (1, 3, 3, (1, 3, 3)),  # stop < stop, stop == duration
+        (1, 3, 3, (1, 3, 3)),  # stop == duration
+        (1, 3, 2, (1, 2, 2)),  # stop > duration
+        (-1, 1, 2, (0, 1, 2)),  # start < 0
     ],
 )
 def test_valid_extraction_range_valid_range(
@@ -450,9 +452,14 @@ def test_valid_extraction_range_valid_range(
 @pytest.mark.parametrize(
     ("start", "stop", "duration"),
     [
-        (1, 0, 0),  # start > duration
+        (2, 1, 2),  # start == duration
+        (3, 1, 2),  # start > duration
         (1, 1, 2),  # start == stop
         (1, 0, 2),  # start > stop
+        (1, 0, 2),  # stop == 0
+        (1, -1, 2),  # stop < 0
+        (1, 2, 0),  # duration == 0
+        (1, 2, -1),  # duration < 0
     ],
 )
 def test_valid_extraction_range_invalid_range(

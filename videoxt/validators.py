@@ -343,6 +343,9 @@ def valid_start_time(start_time: float | int | str) -> float | str:
         `ValidationError`:
             If start time is not a non-negative float or a properly formatted timestamp.
     """
+    if start_time is None:
+        raise ValidationError("Start time cannot be None.")
+
     try:
         start_time_float = float(start_time)
     except ValueError:
@@ -382,6 +385,9 @@ def valid_stop_time(stop_time: float | int | str) -> float | str:
         `ValidationError`:
             If stop time is not a positive float or a properly formatted timestamp.
     """
+    if stop_time is None:
+        raise ValidationError("Stop time cannot be None.")
+
     try:
         stop_time_float = float(stop_time)
     except ValueError:
